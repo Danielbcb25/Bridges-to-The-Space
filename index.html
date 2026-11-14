@@ -1,139 +1,147 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Pontes01 — Exploração Espacial</title>
-<meta name="description" content="Pontes01: jogo 2D em pixel art de gerenciamento de uma nave rumo ao planeta Pontes-01. Recursos, tripulação, desafios e ciência.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen&family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2305061a'/><rect x='4' y='2' width='8' height='6' fill='%23fff'/><rect x='5' y='3' width='6' height='4' fill='%234cfcff'/><rect x='4' y='8' width='8' height='6' fill='%230026ff'/></svg>">
+<meta content="Pontes01: jogo 2D em pixel art de gerenciamento de uma nave rumo ao planeta Pontes-01. Recursos, tripulação, desafios e ciência." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Silkscreen&amp;family=VT323&amp;display=swap" rel="stylesheet"/>
+<link href="css/style.css" rel="stylesheet"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'&gt;&lt;rect width='16' height='16' fill='%2305061a'/&gt;&lt;rect x='4' y='2' width='8' height='6' fill='%23fff'/&gt;&lt;rect x='5' y='3' width='6' height='4' fill='%234cfcff'/&gt;&lt;rect x='4' y='8' width='8' height='6' fill='%230026ff'/&gt;&lt;/svg&gt;" rel="icon"/>
 </head>
 <body>
 <header class="nav">
-  <a class="brand" href="#jogar">PONTES<span>01</span></a>
-  <nav>
-    <a href="#jogar">Jogar</a><a href="#missao">A Missão</a><a href="#sistemas">Sistemas</a><a href="#tripulacao">Tripulação</a><a href="#como-jogar">Como jogar</a><a href="#multiplayer">Multiplayer</a>
-  </nav>
+<a class="brand" href="#jogar">PONTES<span>01</span></a>
+<nav>
+<a data-i18n="nav.play" href="#jogar">Jogar</a><a data-i18n="nav.mission" href="#missao">A Missão</a><a data-i18n="nav.systems" href="#sistemas">Sistemas</a><a data-i18n="nav.crew" href="#tripulacao">Tripulação</a><a data-i18n="nav.how" href="#como-jogar">Como jogar</a><a data-i18n="nav.multi" href="#multiplayer">Multiplayer</a>
+</nav>
+<label class="langbox" title="Idioma · Language · Idioma"><span aria-hidden="true">🌐</span><select aria-label="Idioma / Language" id="lang"><option value="pt">🇧🇷 Português</option><option value="en">🇺🇸 English</option><option value="es">🇪🇸 Español</option></select></label>
 </header>
-
 <main>
-  <section id="jogar" class="play">
-    <div id="game" class="game">
-      <canvas id="cv" width="480" height="270"></canvas>
-      <div id="ui-layer">
-        <div id="hud"></div>
-        <div id="side"></div>
-        <div id="scr"></div>
-        <div id="modal"></div>
-        <div id="toast"></div>
-      </div>
-      <div id="touch">
-        <button data-key="ArrowLeft">◀</button><button data-key="ArrowRight">▶</button>
-        <button data-key="ArrowUp">▲</button><button data-key="ArrowDown">▼</button><button data-key="KeyE" class="e">E</button>
-      </div>
-      <button id="start" class="start"><span class="logo-s">PONTES<b>01</b></span><span class="blink">▶ CLIQUE PARA INICIAR</span><small>som ligado · use fones para a narração</small></button>
-    </div>
-    <div class="under">
-      <span>⌨ ←→/A D andar · ↑↓/W S escadas · E interagir · R relatório · T tripulação · F fundo · Esc menu · clique para andar</span>
-      <button id="fs" class="btn small">⛶ Tela cheia</button>
-    </div>
-  </section>
-
-  <section id="missao" class="sec">
-    <div class="wrap two">
-      <div>
-        <h2>A Missão</h2>
-        <p>Em razão do iminente colapso terrestre, as lideranças do planeta se uniram pela sobrevivência humana. Observatórios do mundo todo localizaram o planeta habitável mais próximo: <b class="cyan">Pontes-01</b>, a única esperança da Terra.</p>
-        <p>Você gerencia uma das centenas de naves lançadas ao espaço: seus <b>recursos</b>, sua <b>tripulação</b> e a <b>rota</b>. No caminho: chuvas de meteoros, radiação, microgravidade, escassez e o psicológico de todos a bordo.</p>
-        <p class="warnline">⚠ O jogo possui apenas um final. Se ele não for alcançado, a missão falha.</p>
-      </div>
-      <ol class="stages">
-        <li><b>Preparação</b> — 45 pontos de verba, 5 slots de módulo. Cada escolha é um sacrifício.</li>
-        <li><b>Partida e viagem</b> — controle a nave e enfrente os primeiros problemas espaciais.</li>
-        <li><b>Exploração científica</b> — compare dados reais de exoplanetas da NASA.</li>
-        <li><b>O novo mundo</b> — investigue Pontes-01 e enfrente a adaptação.</li>
-        <li><b>Migração</b> — decida onde a humanidade vai recomeçar.</li>
-      </ol>
-    </div>
-  </section>
-
-  <section id="sistemas" class="sec alt">
-    <div class="wrap">
-      <h2>Sistemas da nave</h2>
-      <p class="muted">Antes de cada desafio aparece um aviso com o tipo de problema, as partes envolvidas e o seu nível de dano. Os números do suporte à vida usam referências públicas da NASA (ISS): 0,84 kg de O₂ por pessoa/dia, reciclagem de água de até 98% e eletrólise de oxigênio.</p>
-      <div class="sysgrid">
-        <div><b>Casco e Blindagem</b><span>Proteção contra impactos e radiação cósmica</span><em class="dmg Baixo">Dano Baixo</em></div>
-        <div><b>Escudo Térmico</b><span>Suporta as temperaturas externas</span><em class="dmg Médio">Dano Médio</em></div>
-        <div><b>Sistema de Propulsão</b><span>Motores e propulsores, manobras e órbitas</span><em class="dmg Alto">Dano Alto</em></div>
-        <div><b>Tanques de Combustível e Oxidante</b><span>Propelentes líquidos e gasosos</span><em class="dmg Alto">Dano Alto</em></div>
-        <div><b>Aviônica</b><span>Computadores, sensores, radares e navegação</span><em class="dmg Médio">Dano Médio</em></div>
-        <div><b>Suporte à Vida</b><span>Pressão, temperatura, ar, água e dejetos</span><em class="dmg Alto">Dano Alto</em></div>
-        <div><b>Sistema de Comunicação</b><span>Antenas e rádio com o Controle da Missão</span><em class="dmg Médio">Dano Médio</em></div>
-        <div><b>Módulos de Acoplamento</b><span>Eclusa, portas e trajes</span><em class="dmg Médio">Dano Médio</em></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="tripulacao" class="sec">
-    <div class="wrap">
-      <h2>Tripulação</h2>
-      <p class="muted">Seis tripulantes fixos + o Comandante (você). Tripulantes podem morrer: cada morte tira uma função e derruba a moral. Se o Comandante morrer, a missão falha.</p>
-      <div class="crewgrid">
-        <div><img data-crew-sprite="0" alt=""><b>Paramédico</b><span>Trata feridos e doentes, monitora o estresse.</span></div>
-        <div><img data-crew-sprite="1" alt=""><b>Navegador</b><span>Rotação da nave e recálculo de rota.</span></div>
-        <div><img data-crew-sprite="2" alt=""><b>Agricultor / Eng. Genético</b><span>Cuida da horta e da comida.</span></div>
-        <div><img data-crew-sprite="3" alt=""><b>Engenheiro 1</b><span>Reparos, radiadores e persianas.</span></div>
-        <div><img data-crew-sprite="4" alt=""><b>Engenheiro 2</b><span>Suporte à vida e atividades externas.</span></div>
-        <div><img data-crew-sprite="5" alt=""><b>Pesquisador Chefe</b><span>Equipamentos científicos e dados.</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="como-jogar" class="sec alt">
-    <div class="wrap two">
-      <div>
-        <h2>Como jogar</h2>
-        <ul>
-          <li><b>Ande pela nave</b> em corte lateral 2D e use as estações (E): ponte, motores, rádio, laboratório, enfermaria, aviônica, painel térmico, tanques, suporte à vida, estufa, cozinha, eclusa e dormitórios.</li>
-          <li><b>Busca rápida</b> nas barras do topo; <b>busca aprofundada</b> no Relatório (R), com entradas e saídas de cada recurso.</li>
-          <li><b>Desafios</b> aleatórios: regulação térmica, chuva de meteoros, falta e vazamento de combustível, falha de oxigênio, painel enlouquecido, lixo, rádio com interferência, água contaminada, vazamento de traje, doenças e tempestade solar.</li>
-          <li>Os sorteios ocultos usam <b>d20</b> e <b>d10</b>. Você recebe pistas (fala confiante, luz amarela, luz vermelha), não números.</li>
-          <li><b>Alimentação</b>: horta 4×3, cozinha com receitas, cardápio, mesa, racionamento e desperdício.</li>
-          <li><b>Pontos</b> de cada fase compram itens de lazer (moral) e produtividade (eficiência) na Loja.</li>
-        </ul>
-      </div>
-      <div class="sprites-show">
-        <img data-sprite="civil" alt="Astronauta sem traje"><img data-sprite="suit" alt="Astronauta com traje"><img data-sprite="helmet" alt="Astronauta com capacete"><img data-sprite="broken" alt="Traje com tanque quebrado">
-        <p class="muted small">Sprites baseados em AstronautaComCapacete.png e variantes — personalize no Criador de Avatar.</p>
-      </div>
-    </div>
-  </section>
-
-  <section id="multiplayer" class="sec">
-    <div class="wrap">
-      <h2>Multiplayer (até 6 jogadores + Comandante)</h2>
-      <p>O jogo funciona sozinho no navegador (modo solo, com bots). Para jogar em grupo, rode o servidor incluído — sem dependências — e abra o jogo pelo endereço dele:</p>
-      <pre><code>node server/server.js
+<section class="play" id="jogar">
+<div class="game" id="game">
+<canvas height="270" id="cv" width="480"></canvas>
+<div id="ui-layer">
+<div id="hud"></div>
+<div id="side"></div>
+<div id="scr"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+</div>
+<div class="chat" id="chat"></div>
+<div id="touch">
+<button data-key="ArrowLeft">◀</button><button data-key="ArrowRight">▶</button>
+<button data-key="ArrowUp">▲</button><button data-key="ArrowDown">▼</button><button class="e" data-key="KeyE">E</button>
+</div>
+<button class="start" id="start"><span class="logo-s">PONTES<b>01</b></span><span class="blink" data-i18n="start.click">▶ CLIQUE PARA INICIAR</span><small data-i18n="start.sound">som ligado · use fones para a narração</small></button>
+</div>
+<div class="under">
+<span data-i18n="under.keys">⌨ ←→/A D andar · ↑↓/W S escadas · E interagir · R relatório · T tripulação · F fundo · J diário · Enter chat · Esc menu · clique para andar</span>
+<button class="btn small" data-i18n="under.fs" id="fs">⛶ Tela cheia</button>
+</div>
+</section>
+<section class="sec" id="missao">
+<div class="wrap two">
+<div>
+<h2 data-i18n="s9">A Missão</h2>
+<p data-i18n="s10">Em razão do iminente colapso terrestre, as lideranças do planeta se uniram pela sobrevivência humana. Observatórios do mundo todo localizaram o planeta habitável mais próximo: <b class="cyan">Pontes-01</b>, a única esperança da Terra.</p>
+<p data-i18n="s11">Você gerencia uma das centenas de naves lançadas ao espaço: seus <b>recursos</b>, sua <b>tripulação</b> e a <b>rota</b>. No caminho: chuvas de meteoros, radiação, microgravidade, escassez e o psicológico de todos a bordo.</p>
+<p class="warnline" data-i18n="s12">⚠ O jogo possui apenas um final. Se ele não for alcançado, a missão falha.</p>
+</div>
+<ol class="stages">
+<li data-i18n="s13"><b>Preparação</b> — 45 pontos de verba, 5 slots de módulo. Cada escolha é um sacrifício.</li>
+<li data-i18n="s14"><b>Partida e viagem</b> — controle a nave e enfrente os primeiros problemas espaciais.</li>
+<li data-i18n="s15"><b>Exploração científica</b> — compare dados reais de exoplanetas da NASA.</li>
+<li data-i18n="s16"><b>O novo mundo</b> — investigue Pontes-01 e enfrente a adaptação.</li>
+<li data-i18n="s17"><b>Migração</b> — decida onde a humanidade vai recomeçar.</li>
+        <li data-i18n="n1"><b>Colônia em Pontes-01</b> — o jogo continua: construa a base, transmita dados à Terra e receba as naves de tripulação.</li>
+</ol>
+</div>
+</section>
+<section class="sec alt" id="sistemas">
+<div class="wrap">
+<h2 data-i18n="s18">Sistemas da nave</h2>
+<p class="muted" data-i18n="s19">Antes de cada desafio aparece um aviso com o tipo de problema, as partes envolvidas e o seu nível de dano. Os números do suporte à vida usam referências públicas da NASA (ISS): 0,84 kg de O₂ por pessoa/dia, reciclagem de água de até 98% e eletrólise de oxigênio.</p>
+<div class="sysgrid">
+<div><b data-i18n="s20">Casco e Blindagem</b><span data-i18n="s21">Proteção contra impactos e radiação cósmica</span><em class="dmg Baixo" data-i18n="s22">Dano Baixo</em></div>
+<div><b data-i18n="s23">Escudo Térmico</b><span data-i18n="s24">Suporta as temperaturas externas</span><em class="dmg Médio" data-i18n="s25">Dano Médio</em></div>
+<div><b data-i18n="s26">Sistema de Propulsão</b><span data-i18n="s27">Motores e propulsores, manobras e órbitas</span><em class="dmg Alto" data-i18n="s28">Dano Alto</em></div>
+<div><b data-i18n="s29">Tanques de Combustível e Oxidante</b><span data-i18n="s30">Propelentes líquidos e gasosos</span><em class="dmg Alto" data-i18n="s31">Dano Alto</em></div>
+<div><b data-i18n="s32">Aviônica</b><span data-i18n="s33">Computadores, sensores, radares e navegação</span><em class="dmg Médio" data-i18n="s34">Dano Médio</em></div>
+<div><b data-i18n="s35">Suporte à Vida</b><span data-i18n="s36">Pressão, temperatura, ar, água e dejetos</span><em class="dmg Alto" data-i18n="s37">Dano Alto</em></div>
+<div><b data-i18n="s38">Sistema de Comunicação</b><span data-i18n="s39">Antenas e rádio com o Controle da Missão</span><em class="dmg Médio" data-i18n="s40">Dano Médio</em></div>
+<div><b data-i18n="s41">Módulos de Acoplamento</b><span data-i18n="s42">Eclusa, portas e trajes</span><em class="dmg Médio" data-i18n="s43">Dano Médio</em></div>
+</div>
+</div>
+</section>
+<section class="sec" id="tripulacao">
+<div class="wrap">
+<h2 data-i18n="s44">Tripulação</h2>
+<p class="muted" data-i18n="s45">Seis tripulantes fixos + o Comandante (você). Tripulantes podem morrer: cada morte tira uma função e derruba a moral. Se o Comandante morrer, a missão falha.</p>
+<div class="crewgrid">
+<div><img alt="" data-crew-sprite="0"/><b data-i18n="s46">Paramédico</b><span data-i18n="s47">Trata feridos e doentes, monitora o estresse.</span></div>
+<div><img alt="" data-crew-sprite="1"/><b data-i18n="s48">Navegador</b><span data-i18n="s49">Rotação da nave e recálculo de rota.</span></div>
+<div><img alt="" data-crew-sprite="2"/><b data-i18n="s50">Agricultor / Eng. Genético</b><span data-i18n="s51">Cuida da horta e da comida.</span></div>
+<div><img alt="" data-crew-sprite="3"/><b data-i18n="s52">Engenheiro 1</b><span data-i18n="s53">Reparos, radiadores e persianas.</span></div>
+<div><img alt="" data-crew-sprite="4"/><b data-i18n="s54">Engenheiro 2</b><span data-i18n="s55">Suporte à vida e atividades externas.</span></div>
+<div><img alt="" data-crew-sprite="5"/><b data-i18n="s56">Pesquisador Chefe</b><span data-i18n="s57">Equipamentos científicos e dados.</span></div>
+</div>
+</div>
+</section>
+<section class="sec alt" id="como-jogar">
+<div class="wrap two">
+<div>
+<h2 data-i18n="s58">Como jogar</h2>
+<ul>
+<li data-i18n="s59"><b>Ande pela nave</b> em corte lateral 2D e use as estações (E): ponte, motores, rádio, laboratório, enfermaria, aviônica, painel térmico, tanques, suporte à vida, estufa, cozinha, eclusa e dormitórios.</li>
+<li data-i18n="s60"><b>Busca rápida</b> nas barras do topo; <b>busca aprofundada</b> no Relatório (R), com entradas e saídas de cada recurso.</li>
+<li data-i18n="s61"><b>Desafios</b> aleatórios: regulação térmica, chuva de meteoros, falta e vazamento de combustível, falha de oxigênio, painel enlouquecido, lixo, rádio com interferência, água contaminada, vazamento de traje, doenças e tempestade solar.</li>
+<li data-i18n="s62">Os sorteios ocultos usam <b>d20</b> e <b>d10</b>. Você recebe pistas (fala confiante, luz amarela, luz vermelha), não números.</li>
+<li data-i18n="s63"><b>Alimentação</b>: horta 4×3, cozinha com receitas, cardápio, mesa, racionamento e desperdício.</li>
+<li data-i18n="s64"><b>Pontos</b> de cada fase compram itens de lazer (moral) e produtividade (eficiência) na Loja.</li>
+          <li data-i18n="n2"><b>Explore a Terra</b>: entre nos 8 edifícios da cidade, leia os painéis com dados da NASA e converse com os moradores. O Diário do Explorador (J) rende verba extra para montar a nave.</li>
+          <li data-i18n="n3"><b>Escolha qualquer planeta</b> na Estação Ponte-Alfa — até os errados. Cada viagem gasta combustível, oxigênio, comida e dias, e ensina por que Pontes-01 é a melhor aposta.</li>
+          <li data-i18n="n4"><b>Depois do pouso o jogo continua</b>: instale painéis solares, água e estufa, erga a torre, transmita dados à Terra e acenda o farol para as naves de tripulação pousarem.</li>
+          <li data-i18n="n5"><b>Chat</b> (Enter): no multiplayer, converse com os outros jogadores; no solo, fale com a tripulação e com o Controle da Missão (curiosidades da NASA).</li>
+</ul>
+</div>
+<div class="sprites-show">
+<img alt="Astronauta sem traje" data-sprite="civil"/><img alt="Astronauta com traje" data-sprite="suit"/><img alt="Astronauta com capacete" data-sprite="helmet"/><img alt="Traje com tanque quebrado" data-sprite="broken"/>
+<p class="muted small" data-i18n="s65">Sprites baseados em AstronautaComCapacete.png e variantes — personalize no Criador de Avatar.</p>
+</div>
+</div>
+</section>
+<section class="sec" id="multiplayer">
+<div class="wrap">
+<h2 data-i18n="s66">Multiplayer (até 6 jogadores + Comandante)</h2>
+<p data-i18n="s67">O jogo funciona sozinho no navegador (modo solo, com bots). Para jogar em grupo, rode o servidor incluído — sem dependências — e abra o jogo pelo endereço dele:</p>
+<pre><code>node server/server.js
 # abra http://localhost:8080 (ou o IP da máquina na rede local)</code></pre>
-      <p>Quem cria a sala é o Comandante; os outros entram com o código e assumem um tripulante. Lugares vazios ficam com bots.</p>
-    </div>
-  </section>
+<p data-i18n="s68">Quem cria a sala é o Comandante; os outros entram com o código e assumem um tripulante. Lugares vazios ficam com bots.</p>
+      <p data-i18n="n6">Todos conversam pelo <b>chat da sala</b> e trabalham juntos na colônia: cada jogador anda pela superfície, constrói e acende o farol enquanto as naves descem.</p>
+</div>
+</section>
 </main>
 <footer class="foot">
-  <p>“É mais fácil manter a Terra habitável do que habitar outro planeta.”</p>
-  <p class="muted small">Bridges to the Space · Pontes01 · Trilha sonora e sprites do projeto.</p>
+<p data-i18n="s69">“É mais fácil manter a Terra habitável do que habitar outro planeta.”</p>
+<p class="muted small" data-i18n="s70">Bridges to the Space · Pontes01 · Trilha sonora e sprites do projeto.</p>
 </footer>
-
+<script src="js/i18n.js"></script>
+<script src="js/lang-en.js"></script>
+<script src="js/lang-es.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/data.js"></script>
 <script src="js/engine.js"></script>
 <script src="js/events.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/scenes.js"></script>
+<script src="js/colony.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/city.js"></script>
+<script src="js/chat.js"></script>
 <script src="js/net.js"></script>
 <script src="js/main.js"></script>
 </body>

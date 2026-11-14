@@ -79,15 +79,16 @@ const Narrator = {
   pickVoice() {
     if (!('speechSynthesis' in window)) return null;
     const vs = speechSynthesis.getVoices();
-    this.voice = vs.find(v => /pt[-_]BR/i.test(v.lang)) || vs.find(v => /^pt/i.test(v.lang)) || null;
+    const lg = I18n.speech(), base = lg.slice(0, 2);
+    this.voice = vs.find(v => v.lang.replace('_', '-').toLowerCase() === lg.toLowerCase()) || vs.find(v => v.lang.toLowerCase().startsWith(base)) || null;
     return this.voice;
   },
   say(text) {
     if (!Save.data.settings.narration || !('speechSynthesis' in window)) return;
     try {
       speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'pt-BR'; u.rate = 1.02; u.pitch = 0.95;
+      const u = new SpeechSynthesisUtterance(L(text));
+      u.lang = I18n.speech(); u.rate = 1.02; u.pitch = 0.95;
       if (!this.voice) this.pickVoice();
       if (this.voice) u.voice = this.voice;
       u.onstart = () => { this.speaking = true; Music.refreshVolume(); };

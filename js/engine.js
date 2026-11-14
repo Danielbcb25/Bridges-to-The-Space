@@ -91,7 +91,7 @@ function setupCost(st) {
   return c;
 }
 function setupSlots(st) { return st.modules.reduce((s, id) => s + (MODULES.find(m => m.id === id).slots), 0); }
-function setupBudget() { return BUDGET + (Save.owns('verba') ? 3 : 0); }
+function setupBudget() { return BUDGET + (Save.owns('verba') ? 3 : 0) + (S && S.earthBonus ? S.earthBonus : 0); }
 
 function has(id) {
   if (!S) return false;
@@ -247,8 +247,9 @@ function moral(v, who) {
 }
 
 // ---------- Mensagens ----------
+const ptOf = t => (t && typeof t === 'object') ? t.pt : t;
 function logMsg(text, kind = 'info') {
-  S.log.push({ t: Date.now(), day: S.day, text, kind });
+  S.log.push({ t: Date.now(), day: S.day, text: ptOf(text), kind });
   if (S.log.length > 60) S.log.shift();
   S.v++;
 }
@@ -259,8 +260,8 @@ function say(id, text, dur = 5) {
   logMsg(`${c.roleName} ${c.name}: “${text}”`, 'say');
 }
 function sayRole(role, text, dur) { const c = byRole(role).find(x => x.alive); if (c) say(c, text, dur); else logMsg(text, 'say'); }
-function toast(text, kind = 'info') { S.toast = { text, kind, t: 4, id: Math.random() }; logMsg(text, kind); }
-function narrate(text) { S.narration = { text, id: Math.random() }; logMsg('Narração: ' + text, 'narr'); }
+function toast(text, kind = 'info') { S.toast = { text, kind, t: 4, id: Math.random() }; logMsg(ptOf(text), kind); }
+function narrate(text) { S.narration = { text, id: Math.random() }; logMsg('Narração: ' + ptOf(text), 'narr'); }
 
 // ---------- Movimento ----------
 function nearestLadder(x) { return LADDERS.reduce((b, l) => Math.abs(l - x) < Math.abs(b - x) ? l : b, LADDERS[0]); }

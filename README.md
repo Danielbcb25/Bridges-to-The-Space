@@ -14,6 +14,14 @@ node server/server.js
 
 Abra `http://localhost:8080` (ou o IP da máquina na rede). O Comandante cria a sala em *Multiplayer*; os outros entram com o código.
 
+## Novidades
+
+- **Tradutor no topo do site**: Português · English · Español (interface, textos do site, narração por voz e conteúdo novo; o idioma fica salvo no navegador).
+- **Terra explorável**: cidade com 8 edifícios educativos (dados da NASA) e 8 moradores com diálogos; o **Diário do Explorador** (J) dá até +3 pontos de verba.
+- **Qualquer destino na Estação Ponte-Alfa**: escolha até os exoplanetas errados — a viagem custa combustível, oxigênio, comida e dias, e mostra por que o planeta não serve (mais dados do NASA Exoplanet Archive).
+- **O jogo continua em Pontes-01**: construa campo solar, água, estufa, torre e pista; transmita dados à Terra; acenda o farol e receba 3 naves de tripulação (colonos) para fechar o final.
+- **Chat**: no multiplayer, conversa em tempo real entre os jogadores (Enter); no solo, converse com a tripulação e com o Controle da Missão (curiosidades da NASA).
+
 ## O que tem
 
 - Narração da introdução, caminhada pela Terra poluída e comunicados.

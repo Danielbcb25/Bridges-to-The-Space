@@ -44,30 +44,34 @@ const Net = {
         this.players[m.pid] = { name: String(m.name || 'Tripulante').slice(0, 14), role: free.id, avatar: m.avatar };
         this.send({ t: 'to', pid: m.pid, msg: { t: 'welcome', crew: free.id, roleName: free.name, code: this.room } });
         if (S) this.assignSeats();
-        if (S) toast(`${this.players[m.pid].name} entrou como ${free.name}.`);
+        const nm = this.players[m.pid].name;
+        Chat.sysAll(K(`${nm} entrou como ${free.name}.`, `${nm} joined as ${free.name}.`, `${nm} entró como ${free.name}.`), 'join');
+        if (S) toast(`${nm} entrou como ${free.name}.`);
         break;
       }
       case 'leave': {
         const p = this.players[m.pid]; if (!p) return;
         delete this.players[m.pid];
+        Chat.sysAll(K(`${p.name} saiu da sala.`, `${p.name} left the room.`, `${p.name} salió de la sala.`), 'join');
         if (S) { const c = crewById(p.role); if (c) { c.owner = null; c.task = null; } toast(`${p.name} saiu. Um bot assumiu.`); }
         break;
       }
       case 'pos': {
         const p = this.players[m.pid]; if (!p || !S) return;
         const c = crewById(p.role); if (!c || !c.alive) return;
-        Object.assign(c, { x: clamp(+m.x || 0, 40, WORLD_W - 40), deck: m.deck === 'L' ? 'L' : 'U', face: m.face > 0 ? 1 : -1, moving: !!m.moving, walkT: +m.walkT || 0, climb: +m.climb || 0, climbTo: m.climbTo === 'L' ? 'L' : 'U' });
+        Object.assign(c, { x: clamp(+m.x || 0, 20, (S.scene === 'colony' ? COLONY_W : WORLD_W) - 20), deck: m.deck === 'L' ? 'L' : 'U', face: m.face > 0 ? 1 : -1, moving: !!m.moving, walkT: +m.walkT || 0, climb: +m.climb || 0, climbTo: m.climbTo === 'L' ? 'L' : 'U' });
         c.tx = c.x; c.tdeck = c.deck;
         break;
       }
       case 'act': {
         const p = this.players[m.pid]; if (!p || !S) return;
         if (typeof m.type !== 'string' || !ACTIONS[m.type]) return;
-        const blocked = ['cruise', 'fund', 'leaveStation', 'land', 'chooseSite', 'toMigration', 'chooseExo', 'trade', 'ration', 'hibernate'];
+        const blocked = ['cruise', 'fund', 'leaveStation', 'land', 'chooseSite', 'toMigration', 'chooseExo', 'setDest', 'detourReturn', 'trade', 'ration', 'hibernate'];
         if (blocked.includes(m.type)) return; // decisões do Comandante
         applyAction(m.type, m.p, p.role);
         break;
       }
+      case 'chat': if (this.role === 'host') Chat.fromPlayer(m.pid, m.text); else if (this.role === 'client') Chat.fromNet(m.m); break;
       // ---- cliente ----
       case 'welcome': this.role = 'client'; this.room = m.code; U.me = m.crew; this.myRoleName = m.roleName; U.screen = 'lobby'; break;
       case 'state': {
@@ -97,7 +101,7 @@ const Net = {
       this.sendT -= dt;
       if (this.sendT <= 0) { this.sendT = 0.2; this.send({ t: 'bcast', msg: { t: 'state', S } }); }
     }
-    if (this.role === 'client' && S && S.scene === 'ship') {
+    if (this.role === 'client' && S && (S.scene === 'ship' || S.scene === 'colony')) {
       this.posT -= dt;
       const c = crewById(U.me);
       if (this.posT <= 0 && c) { this.posT = 0.1; this.send({ t: 'pos', x: c.x, deck: c.deck, face: c.face, moving: c.moving, walkT: c.walkT, climb: c.climb, climbTo: c.climbTo }); }

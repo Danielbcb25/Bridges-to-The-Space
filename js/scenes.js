@@ -42,6 +42,9 @@ function planetCanvas(type, d, rot) {
     let n = fbm(nx + 10, ny + 10, 3), cl = fbm(nx * 1.7 + 50, ny * 2.5, 9);
     let col;
     if (type === 'mars') { col = n > 0.55 ? [196, 98, 52] : n > 0.42 ? [170, 76, 40] : [130, 58, 36]; if (Math.abs(dy) > 0.85) col = [230, 220, 210]; }
+    else if (type === 'rock') { col = n > 0.55 ? [150, 140, 128] : n > 0.42 ? [118, 108, 100] : [88, 80, 78]; if (cl > 0.7) col = [170, 160, 150]; }
+    else if (type === 'ocean') { col = n > 0.6 ? [200, 220, 235] : n > 0.4 ? [40, 96, 170] : [28, 66, 140]; if (cl > 0.62) col = [225, 235, 245]; }
+    else if (type === 'lava') { col = n > 0.5 ? [255, 150, 40] : n > 0.4 ? [200, 70, 24] : [70, 24, 20]; }
     else if (type === 'gas') { const b = Math.sin(dy * 14 + fbm(nx, ny * 6, 2) * 3); col = b > 0.3 ? [214, 180, 140] : b > -0.3 ? [186, 140, 100] : [150, 104, 78]; }
     else if (type === 'pontes') {
       col = n > 0.56 ? (n > 0.66 ? [96, 150, 84] : [62, 132, 92]) : n > 0.52 ? [210, 200, 140] : [36, 92, 170];
@@ -59,7 +62,7 @@ function planetCanvas(type, d, rot) {
     const i = (y * d + x) * 4;
     img.data[i] = q(col[0]); img.data[i + 1] = q(col[1]); img.data[i + 2] = q(col[2]); img.data[i + 3] = 255;
     if (dd > 0.9) { // atmosfera
-      const atm = type === 'mars' ? [255, 160, 110] : type === 'earthPoll' ? [200, 150, 90] : [120, 190, 255];
+      const atm = type === 'mars' ? [255, 160, 110] : type === 'earthPoll' ? [200, 150, 90] : type === 'lava' ? [255, 120, 40] : type === 'rock' ? [150, 140, 130] : [120, 190, 255];
       img.data[i] = (img.data[i] + atm[0]) >> 1; img.data[i + 1] = (img.data[i + 1] + atm[1]) >> 1; img.data[i + 2] = (img.data[i + 2] + atm[2]) >> 1;
     }
   }
@@ -89,6 +92,7 @@ function spaceBg() {
 }
 
 function text(t, x, y, col = '#fff', size = 8, align = 'left', font = 'Silkscreen') {
+  t = T(t);
   cx.font = `${size}px "${font}", monospace`; cx.textAlign = align; cx.textBaseline = 'top';
   cx.fillStyle = '#000'; cx.fillText(t, x + 1, y + 1);
   cx.fillStyle = col; cx.fillText(t, x, y);
@@ -111,18 +115,18 @@ function drawShipExterior(x, y, s = 1, flame = true) {
 }
 
 // ---------- TERRA POLUÍDA ----------
-const EARTH_W = 1600, GROUND = 222;
+const EARTH_W = 3400, GROUND = 222;
 let earthLayout = null;
 function buildEarth() {
   let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
   const far = [], near = [], props = [], npcs = [];
   for (let x = 0; x < EARTH_W + 200; x += 18 + rnd() * 20) far.push({ x, w: 16 + rnd() * 26, h: 40 + rnd() * 70 });
   for (let x = 40; x < EARTH_W; x += 70 + rnd() * 60) near.push({ x, w: 40 + rnd() * 40, h: 70 + rnd() * 70, chim: rnd() < 0.4, col: pick(['#3b3328', '#2f2a24', '#46392a', '#353038']) });
-  const signs = ['AR PÉSSIMO • IQA 312', 'ÁGUA: RACIONAMENTO NÍVEL 4', 'TEMPERATURA: 46 °C', 'USE MÁSCARA', 'COLÔNIA EM MARTE: VAGAS ESGOTADAS', 'PROJETO PONTES-01: ALISTAMENTO'];
-  signs.forEach((t, i) => props.push({ type: 'sign', x: 150 + i * 230, t }));
-  for (let i = 0; i < 9; i++) props.push({ type: 'trash', x: 80 + rnd() * (EARTH_W - 160) });
-  for (let i = 0; i < 6; i++) props.push({ type: 'tree', x: 120 + rnd() * (EARTH_W - 240) });
-  for (let i = 0; i < 6; i++) npcs.push({ x: 100 + rnd() * (EARTH_W - 200), dir: rnd() < 0.5 ? -1 : 1, av: randomAvatar(rnd), t: rnd() * 5 });
+  const signs = ['AR PÉSSIMO • IQA 312', 'ÁGUA: RACIONAMENTO NÍVEL 4', 'TEMPERATURA: 46 °C', 'USE MÁSCARA', 'CO₂: 420+ ppm (NASA)', 'MAR: +10 cm DESDE 1993', 'COLÔNIA EM MARTE: VAGAS ESGOTADAS', '6.000+ EXOPLANETAS CONFIRMADOS', 'PROJETO PONTES-01: ALISTAMENTO'];
+  signs.forEach((t, i) => props.push({ type: 'sign', x: 120 + i * 372, t }));
+  for (let i = 0; i < 18; i++) props.push({ type: 'trash', x: 80 + rnd() * (EARTH_W - 160) });
+  for (let i = 0; i < 10; i++) props.push({ type: 'tree', x: 120 + rnd() * (EARTH_W - 240) });
+  for (let i = 0; i < 10; i++) npcs.push({ x: 100 + rnd() * (EARTH_W - 200), dir: rnd() < 0.5 ? -1 : 1, av: randomAvatar(rnd), t: rnd() * 5 });
   earthLayout = { far, near, props, npcs, smoke: [] };
 }
 function drawEarth(dt, player) {
@@ -157,7 +161,7 @@ function drawEarth(dt, player) {
   cx.fillStyle = '#4a3f33'; for (let x = -(cam % 24); x < VW; x += 24) cx.fillRect(x, GROUND, 12, 2);
   cx.fillStyle = '#2a231c'; cx.fillRect(0, GROUND + 18, VW, 2);
   // plataforma de lançamento ao fundo
-  const px = EARTH_W - 120 - cam;
+  const px = EARTH_W - 80 - cam;
   if (px < VW + 40) {
     cx.fillStyle = '#555'; cx.fillRect(px - 20, GROUND - 6, 60, 6); cx.fillStyle = '#777'; cx.fillRect(px + 30, GROUND - 90, 4, 84);
     cx.fillStyle = '#ddd'; cx.fillRect(px, GROUND - 80, 14, 74); cx.fillStyle = '#c33'; cx.fillRect(px, GROUND - 86, 14, 6); cx.fillRect(px + 3, GROUND - 92, 8, 6);
@@ -175,6 +179,7 @@ function drawEarth(dt, player) {
     if (p.type === 'trash') { cx.drawImage(getItemSprite('lata'), x, GROUND - 6); cx.drawImage(getItemSprite('garrafa'), x + 8, GROUND - 8); cx.drawImage(getItemSprite('papel'), x + 16, GROUND - 5); }
     if (p.type === 'tree') { cx.fillStyle = '#2a1e14'; cx.fillRect(x, GROUND - 30, 3, 30); cx.fillRect(x - 6, GROUND - 26, 6, 2); cx.fillRect(x + 3, GROUND - 22, 7, 2); cx.fillRect(x - 3, GROUND - 32, 2, 4); }
   }
+  drawCity(dt, cam);
   // NPCs com máscara
   for (const n of L.npcs) {
     n.t += dt; n.x += n.dir * 14 * dt; if (n.x < 40 || n.x > EARTH_W - 60) n.dir *= -1;
@@ -194,6 +199,7 @@ function drawChar(av, outfit, x, floorY, face, walkFrame, mood, mask) {
   if (mask && outfit === 'civil') { cx.fillStyle = '#e8e8e8'; cx.fillRect(X + 6, Y + 11, 8, 3); cx.fillStyle = '#9a9a9a'; cx.fillRect(X + 5, Y + 11, 1, 1); cx.fillRect(X + 14, Y + 11, 1, 1); }
 }
 function bubble(str, x, y) {
+  str = T(str);
   cx.font = '8px "Silkscreen", monospace';
   const words = str.split(' '); const lines = []; let cur = '';
   for (const w of words) { const t = cur ? cur + ' ' + w : w; if (cx.measureText(t).width > 120) { lines.push(cur); cur = w; } else cur = t; }

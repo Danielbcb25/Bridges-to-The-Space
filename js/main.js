@@ -13,6 +13,7 @@ function musicFor() {
   if (S.scene === 'end') return S.ending && S.ending.ok ? 'heroic' : 'fase';
   if (S.event && S.event.phase !== 'result') return 'heroic';
   if (S.scene === 'migration') return 'heroic';
+  if (S.scene === 'colony') return S.colony && S.colony.ships.some(s => s.state === 'inbound') ? 'heroic' : 'fase';
   return 'fase';
 }
 
@@ -41,6 +42,7 @@ function moveHuman(c, dt) {
 }
 
 function interact() {
+  if (S && S.scene === 'colony' && !U.panel) return colonyInteract();
   if (!S || S.scene !== 'ship' || U.panel) return;
   const c = me(); if (!c || !c.alive) return;
   const ev = S.event;
@@ -62,14 +64,10 @@ function update(dt) {
   if (!S || U.screen !== 'game') return;
   const host = Net.role !== 'client';
   if (S.scene === 'intro') U.introT += dt;
-  if (S.scene === 'earth' && host) {
-    const E = U.earth;
-    if (!U.comms) {
-      E.t += dt;
-      const p = E.p; const dx = ((keys.ArrowRight || keys.KeyD) ? 1 : 0) - ((keys.ArrowLeft || keys.KeyA) ? 1 : 0);
-      if (dx) { p.x = clamp(p.x + dx * 60 * dt, 20, EARTH_W - 20); p.face = dx; p.moving = true; p.walkT += dt; } else p.moving = false;
-      if (E.t >= E.limit) { U.comms = 1; Sfx.alarm(); Narrator.say('Você foi selecionado para uma missão espacial para salvar o futuro da humanidade.'); }
-    }
+  if (S.scene === 'earth' && host) tickCity(dt);
+  if (S.scene === 'colony') {
+    const c = me(); if (c) moveColonyHuman(c, dt);
+    if (host && !(U.panel === 'menu' && !Net.role)) tickColony(dt); // no solo, o menu pausa a colônia
   }
   if (S.scene === 'launch' && host) {
     U.launchT += dt;
@@ -84,8 +82,9 @@ function update(dt) {
     if (host && !(Net.role !== 'host' && U.panel === 'menu')) tickGame(dt);
     // som de alerta em novos eventos
     if (S.event && S.event.id !== lastEventId) { lastEventId = S.event.id; Sfx.alarm(); }
-  } else if (host && ['station', 'planet', 'migration'].includes(S.scene)) {
+  } else if (host && ['station', 'detour', 'planet', 'migration'].includes(S.scene)) {
     tickCrew(dt);
+    if (S.toast) { S.toast.t -= dt; if (S.toast.t <= 0) S.toast = null; }
   }
   if (S.scene === 'ship' && S.event && S.event.puzzle && S.event.puzzle.kind === 'pilot') {
     const up = keys.ArrowUp || keys.KeyW, down = keys.ArrowDown || keys.KeyS;
@@ -105,7 +104,7 @@ function draw(dt) {
       drawEarth(dt, p);
       drawChar(Object.assign({}, crewById('cmd').avatar), 'civil', p.x - R.earthCam, GROUND, p.face, p.moving ? Math.floor(p.walkT * 8) : 0, 'happy');
       // placa próxima
-      const sign = earthLayout.props.find(s => s.type === 'sign' && Math.abs(s.x + 25 - p.x) < 40);
+      const sign = !cityBusy() && earthLayout.props.find(s => s.type === 'sign' && Math.abs(s.x + 20 - p.x) < 46);
       if (sign) bubble(sign.t, p.x - R.earthCam, GROUND - 34);
       break;
     }
@@ -119,6 +118,8 @@ function draw(dt) {
       break;
     }
     case 'station': drawStationBg(dt); break;
+    case 'detour': drawDetourBg(dt); break;
+    case 'colony': drawColony(dt); break;
     case 'planet': drawPlanetBg(dt); break;
     case 'migration': drawSurface(dt, false); break;
     case 'end': if (S.ending && S.ending.ok) drawSurface(dt, true); else { spaceBg(); drawStars(1, dt); drawShipExterior(220 + Math.sin(R.t * 0.2) * 20, 140, 1.2, false); } break;
@@ -141,6 +142,19 @@ window.addEventListener('keydown', e => {
   const inGame = S && U.screen === 'game';
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && inGame) e.preventDefault();
   if (!inGame) return;
+  if (e.code === 'Enter' && S.scene !== 'intro' && !U.comms) { e.preventDefault(); Chat.focus(); return; }
+  if (S.scene === 'earth') {
+    if (e.code === 'Escape') cityEsc();
+    if (e.code === 'KeyE' || e.code === 'Space') cityInteract();
+    if (e.code === 'KeyJ' && !U.comms) UIH.cityDiary();
+    return;
+  }
+  if (S.scene === 'colony') {
+    if (e.code === 'Escape') { if (U.panel) UIH.closePanel(); else UIH.panel('menu'); }
+    if (e.code === 'KeyE' || e.code === 'Space') { if (U.panel && U.panel.startsWith('c:')) UIH.closePanel(); else interact(); }
+    if (e.code === 'KeyT') { U.panel === 'crew' ? UIH.closePanel() : UIH.panel('crew'); }
+    return;
+  }
   if (e.code === 'Escape') { if (U.panel) UIH.closePanel(); else if (S.scene === 'ship') UIH.panel('menu'); }
   if (S.scene !== 'ship') {
     if (S.scene === 'intro' && (e.code === 'Enter' || e.code === 'Space')) UIH.introNext();
@@ -157,6 +171,11 @@ window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; }
 function bindCanvas() {
   cv.addEventListener('pointerdown', e => {
     Music.unlock(); Sfx.ensure();
+    if (S && S.scene === 'colony' && !U.panel && S.colony && S.colony.tut) {
+      const r0 = cv.getBoundingClientRect();
+      U.clickTarget = { x: clamp((e.clientX - r0.left) / r0.width * VW + R.colCam, 24, COLONY_W - 24) };
+      return;
+    }
     if (!S || S.scene !== 'ship' || U.panel) return;
     const r = cv.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width * VW + R.camX, y = (e.clientY - r.top) / r.height * VH;
@@ -175,6 +194,10 @@ function bindCanvas() {
 }
 
 function boot() {
+  I18n.init();
+  const sel = document.getElementById('lang');
+  if (sel) { sel.innerHTML = LANGS.map(l => `<option value="${l.id}">${l.flag} ${l.label}</option>`).join(''); sel.value = I18n.lang; sel.addEventListener('change', () => I18n.set(sel.value)); }
+  Chat.init();
   initCanvas();
   bindUI();
   bindCanvas();

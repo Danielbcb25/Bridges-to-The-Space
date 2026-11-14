@@ -820,19 +820,59 @@ ACTIONS.analyzeExo = p => {
   if (S.res.dados < cost) return toast('Dados insuficientes para a análise.', 'warn');
   addRes('dados', -cost, 'Análise de exoplaneta'); S.explore.analyzed.push(p.id);
 };
-ACTIONS.chooseExo = p => {
-  if (S.explore.chosen === 'pontes') return;
-  if (p.id === 'pontes') {
-    S.explore.chosen = 'pontes'; addPoints(60, 'Análise científica correta');
-    narrate('Controle da Missão: análise confirmada. Pontes-01 tem raio parecido com o da Terra, temperatura de equilíbrio amena, estrela calma e está na nossa rota.');
-  } else {
-    const exo = EXOPLANETS.find(e => e.id === p.id);
-    moral(-4); addRes('combustivel', -20, 'Desvio de cálculo');
-    S.explore.wrong = (S.explore.wrong || 0) + 1;
-    toast(`Controle da Missão: ${exo.name} não serve. ${exo.issues}`, 'warn');
+// Destino livre: o jogador pode escolher qualquer exoplaneta, até os errados (e aprender com as consequências).
+ACTIONS.setDest = p => { if (EXOPLANETS.some(e => e.id === p.id)) S.explore.dest = p.id; };
+ACTIONS.chooseExo = ACTIONS.setDest;
+function tripCost(exo, back) {
+  const t = exo.trip; const k = back ? 0.9 : 1;
+  return { fuel: Math.round(t.fuel * k), o2: Math.round(t.o2 * k), food: Math.round(t.food * k), days: t.days };
+}
+function applyTripCost(c) {
+  addRes('combustivel', -c.fuel, 'Desvio de rota'); addRes('oxigenio', -c.o2, 'Desvio de rota');
+  addRes('comida', -c.food, 'Desvio de rota'); addRes('agua', -c.days * 4, 'Desvio de rota');
+  S.day += c.days; S.v++;
+}
+ACTIONS.leaveStation = () => {
+  const id = S.explore.dest;
+  if (!id) return toast('Escolha primeiro o planeta de destino.', 'warn');
+  if (id === 'pontes') {
+    if (S.explore.analyzed.includes('pontes') && !S.explore.bonusPaid) { S.explore.bonusPaid = true; addPoints(60, 'Análise científica correta'); }
+    narrate('Controle da Missão: rota confirmada para Pontes-01. Raio parecido com o da Terra, temperatura amena e estrela calma.');
+    S.explore.chosen = 'pontes';
+    return leaveStation();
   }
+  const exo = EXOPLANETS.find(e => e.id === id); if (!exo || !exo.trip) return;
+  const c = tripCost(exo);
+  if (S.res.combustivel < c.fuel) {
+    applyTripCost({ fuel: S.res.combustivel, o2: Math.min(S.res.oxigenio, c.o2), food: Math.min(S.res.comida, c.food), days: c.days });
+    return fail(`Você partiu para ${exo.name} sem combustível suficiente (${c.fuel} kg). A nave ficou à deriva. ${L(exo.trip.outcome)}`);
+  }
+  applyTripCost(c);
+  S.explore.wrong = (S.explore.wrong || 0) + 1;
+  const gain = addRes('dados', exo.trip.dados, 'Dados de exoplaneta') || 0;
+  if (S.res.oxigenio <= 0) return fail(`O oxigênio acabou durante a viagem até ${exo.name}.`);
+  if (S.res.comida <= 0) moral(-15);
+  moral(exo.trip.moral);
+  S.detour = { id, arrivedDay: S.day, dados: Math.round(gain) };
+  S.scene = 'detour'; S.stage = 2;
+  narrate(`Chegamos a ${exo.name}. Atenção: este não é o destino planejado.`);
 };
-ACTIONS.leaveStation = () => { if (S.explore.chosen !== 'pontes') return toast('Confirme primeiro o planeta candidato.', 'warn'); leaveStation(); };
+ACTIONS.detourReturn = () => {
+  if (S.scene !== 'detour' || !S.detour) return;
+  const exo = EXOPLANETS.find(e => e.id === S.detour.id); const c = tripCost(exo, true);
+  if (S.res.combustivel < c.fuel) {
+    applyTripCost({ fuel: S.res.combustivel, o2: Math.min(S.res.oxigenio, c.o2), food: Math.min(S.res.comida, c.food), days: c.days });
+    return fail(`Sem combustível para voltar de ${exo.name} (precisava de ${c.fuel} kg). A nave ficou presa lá, longe de Pontes-01.`);
+  }
+  applyTripCost(c);
+  if (S.res.oxigenio <= 0) return fail('O oxigênio acabou durante a volta à Estação Ponte-Alfa.');
+  if (S.res.comida <= 0) moral(-15);
+  S.explore.visited = S.explore.visited || {}; S.explore.visited[exo.id] = true;
+  S.explore.dest = null; S.detour = null; S.scene = 'station'; S.stage = 2;
+  moral(-3);
+  addPoints(10, 'Lição aprendida: dados de um exoplaneta real');
+  narrate('De volta à Estação Ponte-Alfa. Escolha o próximo destino com mais cuidado, Comandante.');
+};
 
 ACTIONS.planetAnalyze = p => {
   if (S.planet.analyzed.includes(p.id)) return;
@@ -901,7 +941,5 @@ ACTIONS.land = () => {
   if (alive().length < 3) reasons.push('Restaram menos de 3 tripulantes.');
   if (reasons.length) { fail(reasons.join(' ')); return; }
   addPoints(200, 'Chegada a Pontes-01');
-  S.scene = 'end'; S.stage = 5;
-  S.ending = { ok: true, site: site.name, score };
-  Save.data.runs++; if (!Save.data.best || S.points > Save.data.best) Save.data.best = S.points; Save.write();
+  startColony(site, score); // o jogo continua na superfície de Pontes-01
 };
