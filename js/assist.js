@@ -58,26 +58,14 @@ function assistSteps() {
     }
     case 'setup': {
       const st = S.setup;
-      add(KS('Escolha a origem do Comandante.', 'Choose the Commander\'s origin.', 'Elija el origen del Comandante.'), true, null, '🧑‍🚀');
-      add(KS('Escolha módulos de sobrevivência (estufa, reciclador…).', 'Pick survival modules (greenhouse, recycler…).', 'Elija módulos de supervivencia (invernadero, reciclador…).'), ['estufa', 'reciclaAgua', 'biorreator', 'reciclaLixo', 'hibernacao'].some(m => st.modules.includes(m)), { setup: 3 }, '🧩');
-      add(KS('Confira o Relatório de prontidão.', 'Check the Readiness report.', 'Revise el Informe de preparación.'), U.setupStep >= SETUP_STEPS.length - 1, { setup: SETUP_STEPS.length - 1 }, '📋');
-      add(KS('Decole!', 'Launch!', '¡Despegue!'), false, { setup: SETUP_STEPS.length - 1 }, '🚀');
+      add(KS('Missão: escolha a origem do Comandante e a rota.', 'Mission: choose the Commander\'s origin and the route.', 'Misión: elija el origen del Comandante y la ruta.'), U.setupStep > 0, { setup: 0 }, '🧭');
+      add(KS('Módulos: escolha até 5 slots (estufa, reciclador…).', 'Modules: pick up to 5 slots (greenhouse, recycler…).', 'Módulos: elija hasta 5 ranuras (invernadero, reciclador…).'), U.setupStep > 1 && st.modules.length > 0, { setup: 1 }, '🧩');
+      add(KS('Suprimentos: combustível, água, oxigênio, comida e peças.', 'Supplies: fuel, water, oxygen, food and parts.', 'Suministros: combustible, agua, oxígeno, comida y piezas.'), U.setupStep > 2, { setup: 2 }, '📦');
+      add(KS('Decole!', 'Launch!', '¡Despegue!'), false, { setup: 3 }, '🚀');
       break;
     }
     case 'ship': {
-      const ev = S.event;
-      if (ev && ev.phase === 'warn') add(K('Desafio: ', 'Challenge: ', 'Desafío: ') && KS('Enfrente o desafio: ' + EVENT_INFO[ev.type].title, 'Face the challenge: ' + T(EVENT_INFO[ev.type].title), 'Enfrente el desafío: ' + T(EVENT_INFO[ev.type].title)), false, null, EVENT_INFO[ev.type].icon, 'eventGo');
-      if (ev && ev.phase === 'run' && ev.type !== 'termico') ev.steps.forEach(s => add(s.label, s.done, s.station ? { st: s.station } : null, s.done ? '✔' : '⚠'));
-      if (ev && ev.phase === 'run' && ev.type === 'termico') add(KS('Mantenha a temperatura entre 18 °C e 26 °C no painel térmico.', 'Keep the temperature between 18 °C and 26 °C on the thermal panel.', 'Mantenga la temperatura entre 18 °C y 26 °C en el panel térmico.'), false, null, '🌡');
-      if (ev && ev.phase === 'result') add(KS('Veja o resultado e continue.', 'See the result and continue.', 'Vea el resultado y continúe.'), false, null, '✔', 'eventClose');
-      const pct = k => S.cap[k] ? S.res[k] / S.cap[k] : 1;
-      if (pct('oxigenio') < 0.25) add(KS('Oxigênio baixo: cuide do Suporte à Vida.', 'Low oxygen: check Life Support.', 'Oxígeno bajo: revise el Soporte Vital.'), false, { st: 'suporte' }, '🫁');
-      if (pct('comida') < 0.15) add(KS('Pouca comida: plante na estufa e ajuste o racionamento.', 'Low food: plant in the greenhouse and adjust rationing.', 'Poca comida: plante en el invernadero y ajuste el racionamiento.'), false, { st: S.trays.length ? 'estufa' : 'cozinha' }, '🍱');
-      if (S.res.lixo > 15) add(KS('Lixo acumulado: escolha o destino no Compactador.', 'Trash piling up: choose its destination at the Compactor.', 'Basura acumulada: elija su destino en el Compactador.'), false, { st: 'lixo' }, '🗑');
-      const broken = Object.keys(SYSTEMS).find(k => sysHp(k) < 50);
-      if (broken) add(KS('Reparar: ' + SYSTEMS[broken].name, 'Repair: ' + T(SYSTEMS[broken].name), 'Reparar: ' + T(SYSTEMS[broken].name)), false, { st: SYSTEMS[broken].station && STATIONS[SYSTEMS[broken].station] ? SYSTEMS[broken].station : 'avionica' }, '🔧');
-      if (S.crew.some(c => c.alive && (c.sickness || (c.status !== 'ok' && c.statusT > 0)))) add(KS('Há tripulante ferido ou doente: vá à Enfermaria.', 'A crew member is hurt or sick: go to the Infirmary.', 'Hay un tripulante herido o enfermo: vaya a la Enfermería.'), false, { st: 'enfermaria' }, '✚');
-      if (S.day > S.meds.validUntil) add(KS('Remédios vencidos: troque o lote na Enfermaria.', 'Medicines expired: swap the batch at the Infirmary.', 'Medicinas vencidas: cambie el lote en la Enfermería.'), false, { st: 'enfermaria' }, '💊');
+      // só a progressão principal: desafios aleatórios têm o próprio painel
       const tut = [
         [KS('Vá à Ponte de comando (andar de cima, à direita).', 'Go to the Command bridge (upper deck, right).', 'Vaya al Puente de mando (cubierta superior, derecha).'), 'ponte', '🧭'],
         [KS('Escolha o modo de cruzeiro no painel de pilotagem.', 'Choose the cruise mode at the piloting panel.', 'Elija el modo de crucero en el panel de pilotaje.'), 'ponte', '🚀'],
@@ -123,11 +111,12 @@ UIH.help = () => { U.help = !U.help; Sfx.click(); };
 UIH.helpGo = () => { const n = assistNext(); U.help = false; if (n && n.act) { if (n.act === 'report') UIH.panel('report'); else act(n.act); } else goStep(n); };
 
 function assistMini() {
-  const n = assistNext(); if (!n) return '';
+  const all = assistSteps(); const n = all.find(x => !x.done); if (!n) return '';
+  const done = all.filter(x => x.done).length;
   const key = JSON.stringify(n.t);
   if (U.lastAssist !== key) { U.lastAssist = key; U.assistFlash = R.t + 2.5; if (S.scene !== 'intro') Sfx.tone(1180, 0.06, 'sine', 0.04); }
   const flash = R.t < (U.assistFlash || 0) ? 'flash' : '';
-  return `<div class="assist-mini ${flash}" data-ui="help" title="${esc(L(K('Computador de bordo (H)', 'Onboard computer (H)', 'Computadora de a bordo (H)')))}"><span class="pc">💻</span><span class="ic">${n.icon}</span><span class="tx">${esc(L(n.t))}</span><kbd>H</kbd></div>`;
+  return `<div class="assist-mini ${flash}" data-ui="help" title="${esc(L(K('Computador de bordo (H)', 'Onboard computer (H)', 'Computadora de a bordo (H)')))}"><span class="pc">💻</span><span class="ic">${n.icon}</span><span class="tx">${esc(L(n.t))}</span><span class="cnt">${done}/${all.length}</span>${n.go || n.act ? `<button class="btn tiny primary" data-ui="helpGo">▶ ${esc(L(K('Ir', 'Go', 'Ir')))}</button>` : ''}<kbd>H</kbd></div>`;
 }
 function helpPanel() {
   const all = assistSteps(); const n = all.find(s => !s.done);
@@ -137,7 +126,7 @@ function helpPanel() {
     ${n ? `<div class="nextcard"><div class="big-ic">${n.icon}</div><div><small>${esc(L(K('PRÓXIMO PASSO', 'NEXT STEP', 'PRÓXIMO PASO')))}</small><p>${esc(L(n.t))}</p>${n.go || n.act ? `<button class="btn primary" data-ui="helpGo">${n.act ? '▶ ' + esc(L(K('Fazer agora', 'Do it now', 'Hacerlo ahora'))) : '📍 ' + esc(L(K('Ir até lá', 'Go there', 'Ir allí')))}</button>` : ''}</div></div>` : `<p class="green">✔ ${esc(L(K('Tudo em dia!', 'All caught up!', '¡Todo al día!')))}</p>`}
     <h4>${esc(L(K('Lista de tarefas', 'To-do list', 'Lista de tareas')))}</h4>
     <ul class="todo">${all.map(s => `<li class="${s.done ? 'done' : s === n ? 'cur' : ''}"><span>${s.done ? '☑' : s === n ? '▶' : '☐'}</span> ${s.icon} ${esc(L(s.t))}</li>`).join('')}</ul>
-    <h4>${esc(L(K('Controles', 'Controls', 'Controles')))}</h4><div class="keys">${keysHelp.map(([k, d]) => `<span><kbd>${esc(L(K(k, k === 'Espaço' ? 'Space' : k, k === 'Espaço' ? 'Espacio' : k)))}</kbd> ${esc(L(d))}</span>`).join('')}</div></div></div>`;
+</div></div>`;
 }
 
 // ---------- página do site: modo jogo ----------

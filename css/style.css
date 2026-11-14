@@ -435,3 +435,19 @@ img.mini { image-rendering: pixelated; height: 1.4em; vertical-align: middle; ma
 .rb.big .nm { font-size: 0.68em; }
 .rb.big .bar { width: 3.4em; }
 .hud-top.slim .bars:has(.hudfull) { flex-wrap: wrap; }
+
+/* ---------- partida: só a tela do jogo, em tela cheia ---------- */
+body.playing { background: #000; overflow: hidden; }
+body.playing > header.nav, body.playing main > section:not(#jogar), body.playing .foot, body.playing .under, body.playing #crew-live { display: none !important; }
+body.playing .play { padding: 0; background: #000; }
+body.playing .game { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(100vw, calc(100vh * 16 / 9)); height: auto; aspect-ratio: 16 / 9; border: 0; border-radius: 0; box-shadow: none; z-index: 100; }
+
+/* ---------- interface pixelada dentro do jogo ---------- */
+img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rendering: crisp-edges; vertical-align: -0.18em; display: inline-block; }
+#game *, #game *::before, #game *::after { border-radius: 0 !important; }
+#game .panel, #game .evp, #game .tbox, #game .assist-mini, #game .toast, #game .callbar { box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); }
+#game .btn, #game .mbtn, #game .chip, #game .opt, #game .card { box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6); }
+#game .bar, #game .bar i { image-rendering: pixelated; }
+.assist-mini .cnt { color: var(--muted); font-size: 0.85em; }
+.mbtn { justify-content: flex-start; gap: 0.5em; } .mbtn small { margin-left: auto; }
+.game[data-scene=setup] .assist-mini { top: auto !important; bottom: 0.45em !important; left: 50% !important; max-width: 36%; }

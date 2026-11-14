@@ -61,7 +61,7 @@ const NASA = {
 };
 
 // ---------------- Montagem da expedição ----------------
-const BUDGET = 45, SLOTS = 5;
+const BUDGET = 30, SLOTS = 5; // menos itens à venda: a verba continua sendo um dilema
 
 const ORIGINS = [
   { id: 'astronauta', name: 'Ex-astronauta', bonus: '+1 em rotação e manobras' },
@@ -159,19 +159,15 @@ const PANTRY = [
   { id: 'favorito', name: 'Prato favorito de cada tripulante', pts: 1, desc: 'Humor extra ao servir favoritos' },
 ];
 
+// Montagem enxuta: dinheiro só para módulos e suprimentos essenciais (4 abas)
 const SETUP_STEPS = [
-  { id: 'origin', title: 'Origem do Comandante' },
-  { id: 'skills', title: 'Habilidades de liderança' },
-  { id: 'route', title: 'Rota' },
+  { id: 'mission', title: 'Missão' },
   { id: 'modules', title: 'Módulos' },
-  { id: 'upgrades', title: 'Melhorias dos 8 sistemas' },
-  { id: 'reserves', title: 'Reservas de recursos' },
-  { id: 'training', title: 'Treinamento da tripulação' },
-  { id: 'gadgets', title: 'Gadgets' },
-  { id: 'pantry', title: 'Despensa' },
-  { id: 'fund', title: 'Fundo de contingência' },
-  { id: 'report', title: 'Relatório de prontidão' },
+  { id: 'supplies', title: 'Suprimentos' },
+  { id: 'report', title: 'Decolar' },
 ];
+// itens essenciais vendidos na aba Suprimentos (além das reservas)
+const ESSENTIALS = [['pantry', 'racaoExtra'], ['upgrades', 'filtroReserva'], ['upgrades', 'casco1'], ['pantry', 'geladeira']];
 
 // ---------------- Horta e cozinha ----------------
 // days = dias de jogo; water = L totais; yield = kg

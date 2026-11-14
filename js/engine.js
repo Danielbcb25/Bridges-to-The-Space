@@ -162,6 +162,8 @@ function applySetup() {
   for (const k of Object.keys(SYSTEMS)) S.systems[k] = { hp: 100 };
   if (Save.owns('cascoExtra')) S.systems.casco.hp = 100;
   S.fund = setupBudget() - setupCost(st);
+  // a nave já sai com cozinha equipada (não entra mais na compra)
+  if (!st.pantry.includes('cozinha')) st.pantry.push('cozinha');
   if (has('livro')) S.food.recipes = ['salada', 'ensopado', 'tortilha'];
   // horta
   const nTrays = has('estufa') ? 12 : (has('ervas') ? 2 : 0);

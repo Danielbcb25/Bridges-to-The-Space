@@ -115,7 +115,7 @@ function drawShipExterior(x, y, s = 1, flame = true) {
 }
 
 // ---------- TERRA POLUÍDA ----------
-const EARTH_W = 3400, GROUND = 222;
+const EARTH_W = 2150, GROUND = 222; // cidade compacta
 let earthLayout = null;
 function buildEarth() {
   let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -124,16 +124,16 @@ function buildEarth() {
   for (let x = 40; x < EARTH_W; x += 70 + rnd() * 60) near.push({ x, w: 40 + rnd() * 40, h: 70 + rnd() * 70, chim: rnd() < 0.4, col: pick(['#3b3328', '#2f2a24', '#46392a', '#353038']) });
   const signs = ['AR PÉSSIMO • IQA 312', 'ÁGUA: RACIONAMENTO NÍVEL 4', 'TEMPERATURA: 46 °C', 'USE MÁSCARA', 'CO₂: 420+ ppm (NASA)', 'MAR: +10 cm DESDE 1993', 'COLÔNIA EM MARTE: VAGAS ESGOTADAS', '6.000+ EXOPLANETAS CONFIRMADOS', 'PROJETO PONTES-01b: ALISTAMENTO'];
   // placas nos vãos entre os prédios da cidade (longe das portas e das pessoas)
-  const signX = [110, 440, 870, 1170, 1720, 2010, 2400, 2790, 2980];
+  const signX = [40, 255, 525, 820, 1070, 1265, 1515, 1765, 1885];
   signs.forEach((t, i) => props.push({ type: 'sign', x: signX[i] != null ? signX[i] : 120 + i * 372, t }));
-  for (let i = 0; i < 60; i++) props.push({ type: 'trash', x: 40 + rnd() * (EARTH_W - 80) });
+  for (let i = 0; i < 38; i++) props.push({ type: 'trash', x: 40 + rnd() * (EARTH_W - 80) });
   // cidade mais impactante: montes de lixo, sacos, tambores pegando fogo e carros abandonados
-  for (let i = 0; i < 22; i++) props.push({ type: 'pile', x: 60 + rnd() * (EARTH_W - 120), w: 22 + rnd() * 30, h: 8 + rnd() * 12, s: rnd() });
-  for (let i = 0; i < 40; i++) props.push({ type: 'bag', x: 30 + rnd() * (EARTH_W - 60), c: pick(['#1c1c1c', '#2a3a2a', '#3a3a46', '#4a3a1c']) });
+  for (let i = 0; i < 14; i++) props.push({ type: 'pile', x: 60 + rnd() * (EARTH_W - 120), w: 22 + rnd() * 30, h: 8 + rnd() * 12, s: rnd() });
+  for (let i = 0; i < 25; i++) props.push({ type: 'bag', x: 30 + rnd() * (EARTH_W - 60), c: pick(['#1c1c1c', '#2a3a2a', '#3a3a46', '#4a3a1c']) });
   for (let i = 0; i < 9; i++) props.push({ type: 'barrel', x: 150 + rnd() * (EARTH_W - 300) });
-  for (let i = 0; i < 7; i++) props.push({ type: 'car', x: 120 + rnd() * (EARTH_W - 240), c: pick(['#6a3a2a', '#3a4a5a', '#5a5a3a', '#4a2a3a']) });
+  for (let i = 0; i < 4; i++) props.push({ type: 'car', x: 120 + rnd() * (EARTH_W - 240), c: pick(['#6a3a2a', '#3a4a5a', '#5a5a3a', '#4a2a3a']) });
   for (let i = 0; i < 10; i++) props.push({ type: 'tree', x: 120 + rnd() * (EARTH_W - 240) });
-  for (let i = 0; i < 10; i++) npcs.push({ x: 100 + rnd() * (EARTH_W - 200), dir: rnd() < 0.5 ? -1 : 1, av: randomAvatar(rnd), t: rnd() * 5 });
+  for (let i = 0; i < 6; i++) npcs.push({ x: 100 + rnd() * (EARTH_W - 200), dir: rnd() < 0.5 ? -1 : 1, av: randomAvatar(rnd), t: rnd() * 5 });
   props.sort((a, b) => ['car', 'pile', 'barrel', 'tree', 'bag', 'trash', 'sign'].indexOf(a.type) - ['car', 'pile', 'barrel', 'tree', 'bag', 'trash', 'sign'].indexOf(b.type));
   const dust = []; for (let i = 0; i < 60; i++) dust.push({ x: rnd() * VW, y: rnd() * VH, v: 6 + rnd() * 18 });
   earthLayout = { far, near, props, npcs, smoke: [], dust };
@@ -313,7 +313,7 @@ function drawShipInterior(dt, me) {
     cx.globalAlpha = 1;
     if (c.status !== 'ok') { cx.fillStyle = c.status === 'ferido' ? '#ff8a3a' : '#ff3a3a'; cx.fillRect(Math.round(c.x) - 2, floor - 36, 5, 2); cx.fillRect(Math.round(c.x), floor - 38, 1, 6); }
     if (c.task) { const p = clamp(c.task.t / c.task.dur, 0, 1); cx.fillStyle = '#000'; cx.fillRect(Math.round(c.x) - 11, floor - 40, 22, 4); cx.fillStyle = '#38e07b'; cx.fillRect(Math.round(c.x) - 10, floor - 39, Math.round(20 * p), 2); }
-    const near = Math.abs(c.x - me.x) < 60 && Math.abs(c.x - me.x) > 14 && c.deck === me.deck;
+    const near = Math.abs(c.x - me.x) < 60 && Math.abs(c.x - me.x) > 26 && c.deck === me.deck;
     if (c === me || near) text(c === me ? 'VOCÊ' : c.name.toUpperCase(), Math.round(c.x), floor - 46 - (c.task ? 4 : 0), c === me ? '#ffd34c' : (c.owner && c.owner !== 'bot' ? '#7fffd0' : '#bcd3ff'), 8, 'center');
   }
   for (const c of S.crew) if (c.alive && c.bubble) { const floor = DECKS[c.deck].floor; bubble(c.bubble.text, c.x, floor - 48); }
@@ -434,7 +434,6 @@ function drawSetupBg(dt) {
   cx.fillStyle = '#0a1a3a'; cx.fillRect(0, 0, VW, VH);
   cx.fillStyle = '#123064'; for (let x = 0; x < VW; x += 12) cx.fillRect(x, 0, 1, VH); for (let y = 0; y < VH; y += 12) cx.fillRect(0, y, VW, 1);
   cx.save(); cx.globalAlpha = 0.9; drawShipExterior(150, 130, 3, false); cx.restore();
-  text('PROJETO DA NAVE — CORTE LATERAL', 12, 10, '#9fd0ff', 8);
 }
 function drawLaunch(dt, t) {
   const g = cx.createLinearGradient(0, 0, 0, VH); const k = clamp(t / 6, 0, 1);

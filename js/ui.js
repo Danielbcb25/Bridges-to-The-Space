@@ -38,7 +38,47 @@ function setHTML(id, html) {
   if (U.cache[id] === html) return;
   U.cache[id] = html;
   const el = document.getElementById(id);
-  if (el) el.innerHTML = I18n.dom(html);
+  if (el) el.innerHTML = pixelEmoji(I18n.dom(html));
+}
+
+// ---------- ícones pixelados: cada emoji vira uma imagem 12×12 ampliada sem suavização ----------
+const EMOJI_RE = /(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}\uFE0F)(?:\u200D(?:\p{Emoji_Presentation}|\p{Extended_Pictographic}\uFE0F?))*\uFE0F?/gu;
+const _pxEmoji = new Map();
+function pxEmojiURL(e) {
+  if (_pxEmoji.has(e)) return _pxEmoji.get(e);
+  const N = 12, c = document.createElement('canvas'); c.width = c.height = N;
+  const g = c.getContext('2d');
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = `${N - 1}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  g.fillText(e, N / 2, N / 2 + 1);
+  const img = g.getImageData(0, 0, N, N), d = img.data;
+  for (let i = 0; i < d.length; i += 4) { // sem meio-tons: alfa binário e cores reduzidas
+    if (d[i + 3] < 110) { d[i + 3] = 0; continue; }
+    const a = d[i + 3] / 255; d[i + 3] = 255;
+    for (let k = 0; k < 3; k++) d[i + k] = Math.min(255, Math.round((d[i + k] / a) / 40) * 40);
+  }
+  g.putImageData(img, 0, 0);
+  const url = c.toDataURL();
+  _pxEmoji.set(e, url); return url;
+}
+function pixelEmoji(html) {
+  if (!html || !EMOJI_RE.test(html)) return html;
+  EMOJI_RE.lastIndex = 0;
+  const tpl = document.createElement('template'); tpl.innerHTML = html;
+  const walk = n => {
+    if (n.nodeType === 3) {
+      const v = n.nodeValue; EMOJI_RE.lastIndex = 0; if (!EMOJI_RE.test(v)) return; EMOJI_RE.lastIndex = 0;
+      const frag = document.createDocumentFragment(); let last = 0, m;
+      while ((m = EMOJI_RE.exec(v))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(v.slice(last, m.index)));
+        const im = document.createElement('img'); im.className = 'pxe'; im.alt = m[0]; im.src = pxEmojiURL(m[0]); frag.appendChild(im);
+        last = m.index + m[0].length;
+      }
+      if (last < v.length) frag.appendChild(document.createTextNode(v.slice(last)));
+      n.replaceWith(frag);
+    } else if (n.nodeType === 1 && n.tagName !== 'SELECT' && n.tagName !== 'OPTION') [...n.childNodes].forEach(walk);
+  };
+  [...tpl.content.childNodes].forEach(walk);
+  return tpl.innerHTML;
 }
 
 // =============== TELAS SEM PARTIDA ===============
@@ -222,21 +262,11 @@ function setupScreen() {
   };
   let body = '';
   switch (step.id) {
-    case 'origin': body = `<p class="muted">Escolha uma origem gratuita para o Comandante.</p><div class="opts">${ORIGINS.map(o => `<button class="opt ${st.origin === o.id ? 'on' : ''}" data-ui="setOrigin" data-arg="${o.id}"><b>${o.name}</b><span>${o.bonus}</span><em>grátis</em></button>`).join('')}</div>`; break;
-    case 'skills': body = `<p class="muted">Sem teto: você pode gastar todos os pontos só no líder — mas ficará com uma nave básica.</p><div class="opts">${SKILLS.map(s => item(s, 'skills')).join('')}</div>`; break;
-    case 'route': body = `<div class="opts">${ROUTES.map(r => `<button class="opt ${st.route === r.id ? 'on' : ''}" data-ui="setRoute" data-arg="${r.id}"><b>${r.name}</b><span>${r.desc}</span><em>${r.cost} · sem custo</em></button>`).join('')}</div>`; break;
-    case 'modules': {
-      const cats = [...new Set(MODULES.map(m => m.cat))];
-      body = `<p class="muted">5 slots no total; o reator de fusão ocupa 2. Sinergias: Estufa+Reciclador de água · Reciclador de lixo+Oficina 3D · Laboratório+Sonda · Radar+Copiloto IA · Enfermaria+Hibernação.</p>` + cats.map(c => `<h4>${c}</h4><div class="opts">${MODULES.filter(m => m.cat === c).map(m => item(m, 'modules')).join('')}</div>`).join('');
-      break;
-    }
-    case 'upgrades': body = `<div class="opts">${UPGRADES.map(u => item(u, 'upgrades', ' · ' + SYSTEMS[u.sys].name)).join('')}</div>`; break;
-    case 'reserves': body = `<div class="opts">${RESERVES.map(r => item(r, 'reserves')).join('')}</div>`; break;
-    case 'training': body = `<div class="opts">${TRAINING.map(r => item(r, 'training')).join('')}</div>`; break;
-    case 'gadgets': body = `<div class="opts">${GADGETS.map(r => item(r, 'gadgets')).join('')}</div>`; break;
-    case 'pantry': body = `<p class="muted">A nave já sai com 60 kg de ração liofilizada (≈ 14 dias para 7 pessoas a 0,6 kg/dia).</p><div class="opts">${PANTRY.map(r => item(r, 'pantry')).join('')}</div>`; break;
-    case 'fund': body = `<div class="fund"><div class="bignum">${left}</div><p>${L(K('pontos sobrando viram <b>fundo de contingência</b> para emergências na viagem: peça de reposição (2), tratamento médico urgente (3), baterias de emergência (2) ou oxigênio (2).', 'leftover points become a <b>contingency fund</b> for emergencies on the trip: spare part (2), urgent medical treatment (3), emergency batteries (2) or oxygen (2).', 'los puntos sobrantes se convierten en un <b>fondo de contingencia</b> para emergencias en el viaje: pieza de repuesto (2), tratamiento médico urgente (3), baterías de emergencia (2) u oxígeno (2).'))}</p><p class="muted">${L(K('O dilema: gastar tudo para sair forte ou guardar pontos para se adaptar.', 'The dilemma: spend everything to start strong or save points to adapt.', 'El dilema: gastar todo para salir fuerte o guardar puntos para adaptarse.'))}</p></div>`; break;
-    case 'report': body = `<div class="report-list">${readinessAlerts().map(a => `<div class="alert ${a[0]}">${esc(a[1])}</div>`).join('')}</div><div class="row"><button class="btn primary big" data-ui="launch">🚀 DECOLAR</button></div>`; break;
+    case 'mission': body = `<h4>${esc(T('Origem do Comandante'))}</h4><div class="opts">${ORIGINS.map(o => `<button class="opt ${st.origin === o.id ? 'on' : ''}" data-ui="setOrigin" data-arg="${o.id}"><b>${o.name}</b><span>${o.bonus}</span></button>`).join('')}</div>
+      <h4>${esc(T('Rota'))}</h4><div class="opts">${ROUTES.map(r => `<button class="opt ${st.route === r.id ? 'on' : ''}" data-ui="setRoute" data-arg="${r.id}"><b>${r.name}</b><span>${r.desc}</span></button>`).join('')}</div>`; break;
+    case 'modules': body = `<p class="muted small">${esc(L(K('5 slots · o reator de fusão ocupa 2', '5 slots · the fusion reactor takes 2', '5 ranuras · el reactor de fusión ocupa 2')))}</p><div class="opts">${MODULES.map(m => item(m, 'modules')).join('')}</div>`; break;
+    case 'supplies': body = `<div class="opts">${RESERVES.map(r => item(r, 'reserves')).join('')}${ESSENTIALS.map(([list, id]) => { const cat = list === 'pantry' ? PANTRY : UPGRADES; const it = cat.find(x => x.id === id); return it ? item(it, list) : ''; }).join('')}</div>`; break;
+    case 'report': body = `<div class="fund"><div class="bignum">${left}</div><p class="small">${L(K('pontos sobrando viram <b>fundo de contingência</b> para emergências na viagem.', 'leftover points become a <b>contingency fund</b> for emergencies on the trip.', 'los puntos sobrantes se convierten en un <b>fondo de contingencia</b> para emergencias en el viaje.'))}</p></div><div class="report-list">${readinessAlerts().map(a => `<div class="alert ${a[0]}">${esc(a[1])}</div>`).join('')}</div><div class="row"><button class="btn primary big" data-ui="launch">🚀 DECOLAR</button></div>`; break;
   }
   return `<div class="setup">
     <div class="setup-side">
@@ -595,8 +625,10 @@ function fundPanel() {
 }
 function menuPanel() {
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel center" data-stop="1"><h2>PAUSA</h2>
-    <div class="menu"><button class="mbtn" data-ui="closePanel">▶ Continuar</button><button class="mbtn" data-ui="panel" data-arg="settings">⚙ Configurações</button>
+    <div class="menu"><button class="mbtn" data-ui="closePanel">▶ Continuar</button><button class="mbtn" data-ui="panel" data-arg="settings">⚙ Configurações</button><button class="mbtn" data-ui="fullscreen">⛶ ${esc(L(K('Tela cheia', 'Fullscreen', 'Pantalla completa')))}</button>
     ${U.confirmQuit ? '<button class="mbtn red" data-ui="quit">Confirmar: sair para o título</button>' : '<button class="mbtn" data-ui="quitAsk">⏏ Sair para o título</button>'}</div>
+    <div class="row" style="justify-content:center">${LANGS.map(l => `<button class="chip ${I18n.lang === l.id ? 'on' : ''}" data-ui="setLang" data-arg="${l.id}">${l.label}</button>`).join('')}</div>
+    <p class="small muted keyshelp">${esc(L(K('← → andar · ↑ ↓ escadas · Shift correr · E / Espaço interagir · H computador de bordo · R relatório · T tripulação · Esc menu', '← → walk · ↑ ↓ ladders · Shift run · E / Space interact · H onboard computer · R report · T crew · Esc menu', '← → caminar · ↑ ↓ escaleras · Shift correr · E / Espacio interactuar · H computadora de a bordo · R informe · T tripulación · Esc menú')))}</p>
     <p class="small muted">Pontos desta jornada: ${S.points} · Créditos: ${Save.data.credits}</p></div></div>`;
 }
 
@@ -751,7 +783,15 @@ UIH.avRandom = () => { const n = U.avatarDraft.name; U.avatarDraft = Object.assi
 UIH.paintColor = c => { U.paintColor = c; U.avatarDirty = true; };
 UIH.paintClear = () => { U.avatarDraft.paint = {}; };
 UIH.avSave = () => { if (U.avatarDraft) { delete U.avatarDraft.paint; U.avatarDraft.visor = DEFAULT_AVATAR.visor; } const n = $('#av-name'); if (n) U.avatarDraft.name = n.value.trim() || 'Comandante'; Save.data.avatar = U.avatarDraft; Save.write(); Sfx.ok(); UIH.title(); };
+function enterGameFullscreen() {
+  const el = document.documentElement;
+  try { if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch (e) { /* sem permissão: o CSS já ocupa a janela */ }
+}
+function exitGameFullscreen() { try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) { /* */ } }
+UIH.setLang = l => { I18n.set(l); };
+UIH.fullscreen = () => { if (document.fullscreenElement) exitGameFullscreen(); else enterGameFullscreen(); };
 UIH.startGame = journey => {
+  enterGameFullscreen();
   const mode = Net.role === 'host' ? 'host' : 'solo';
   newGame(journey, mode);
   if (Net.role === 'host') Net.assignSeats();
@@ -803,9 +843,9 @@ UIH.cookClear = () => { U.cook = []; };
 UIH.cook = () => { act('cook', { ing: U.cook.slice() }); U.cook = []; };
 UIH.pilot = d => act('puzzle', { op: 'move', d: +d * 0.08 });
 UIH.quitAsk = () => { U.confirmQuit = true; };
-UIH.quit = () => { Narrator.stop(); if (Net.role) Net.leave(); S = null; U.screen = 'title'; U.panel = null; Music.play('intro'); };
+UIH.quit = () => { exitGameFullscreen(); Narrator.stop(); if (Net.role) Net.leave(); S = null; U.screen = 'title'; U.panel = null; Music.play('intro'); };
 UIH.netHost = () => { const el = $('#net-url'); const url = el ? el.value.trim() : ''; U.lobby = { url }; Net.host(url); };
-UIH.netJoin = () => { const el = $('#net-url'); const url = el ? el.value.trim() : ''; const code = $('#net-code').value.trim().toUpperCase(); U.lobby = { url, code }; Net.join(url, code); };
+UIH.netJoin = () => { enterGameFullscreen(); const el = $('#net-url'); const url = el ? el.value.trim() : ''; const code = $('#net-code').value.trim().toUpperCase(); U.lobby = { url, code }; Net.join(url, code); };
 UIH.netLeave = () => { Net.leave(); U.screen = 'lobby'; };
 ACTIONS.tut = p => { if (S.tutorial < p.n) S.tutorial = p.n; };
 
