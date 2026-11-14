@@ -1,5 +1,5 @@
 // ============================================================
-//  COLÔNIA EM PONTES-01 — o jogo continua depois do pouso
+//  COLÔNIA EM PONTES-01b — o jogo continua depois do pouso
 //  Construir a base, transmitir dados para a Terra e receber
 //  as naves de tripulação (colonos). Textos novos em PT/EN/ES.
 // ============================================================
@@ -77,9 +77,9 @@ function startColony(site, score) {
     tut: 0, done: false, finishT: 0, feed: [], storm: 0, factN: 0, nextFact: 70, built: 0,
   };
   S.crew.forEach((c, i) => { c.x = 110 + i * 22; c.deck = 'L'; c.tx = c.x; c.tdeck = 'L'; c.moving = false; c.ctask = null; c.task = null; c.climb = 0; c.eva = false; c.hibernating = false; c.bubble = null; });
-  narrate(K('Pouso realizado em ' + site.name + '. Bem-vindos a Pontes-01! A viagem acabou, mas a missão está só começando: construam a base, falem com a Terra e recebam as naves de tripulação.',
-    'Landing complete at ' + site.name + '. Welcome to Pontes-01! The trip is over, but the mission is just beginning: build the base, talk to Earth and receive the crew ships.',
-    'Aterrizaje completado en ' + site.name + '. ¡Bienvenidos a Pontes-01! El viaje terminó, pero la misión recién empieza: construyan la base, hablen con la Tierra y reciban las naves de tripulación.'));
+  narrate(K('Pouso realizado em ' + site.name + '. Bem-vindos a Pontes-01b! A viagem acabou, mas a missão está só começando: construam a base, falem com a Terra e recebam as naves de tripulação.',
+    'Landing complete at ' + site.name + '. Welcome to Pontes-01b! The trip is over, but the mission is just beginning: build the base, talk to Earth and receive the crew ships.',
+    'Aterrizaje completado en ' + site.name + '. ¡Bienvenidos a Pontes-01b! El viaje terminó, pero la misión recién empieza: construyan la base, hablen con la Tierra y reciban las naves de tripulación.'));
 }
 const colonyPop = () => alive().length + (S.colony ? S.colony.colonists : 0);
 const colonyBeds = () => S.colony.b.habitat * 20;
@@ -183,7 +183,7 @@ const CTASK_DONE = {
     if (id === 'solar') { S.cap.energia += 40; }
     if (id === 'agua') { S.cap.agua += 150; }
     if (id === 'estufa') { S.cap.comida += 40; }
-    addPoints(20, 'Construção em Pontes-01');
+    addPoints(20, 'Construção em Pontes-01b');
     colonyMsg(K(c.name + ' concluiu: ' + L(CBUILD[id].name) + ' (nível ' + C.b[id] + ').', c.name + ' finished: ' + L(CBUILD[id].name) + ' (level ' + C.b[id] + ').', c.name + ' terminó: ' + L(CBUILD[id].name) + ' (nivel ' + C.b[id] + ').'), 'good');
     Sfx.ok();
   },
@@ -202,7 +202,7 @@ const CTASK_DONE = {
     C.tx[pk.id] = true; C.txCount++; C.txFx = 4; S.v++;
     addPoints(25, 'Dados enviados à Terra');
     const delay = 8 + Math.floor(Math.random() * 12);
-    C.pendingAck = (C.pendingAck || []).concat([{ t: 6, k: K('Terra → Pontes-01: pacote “' + L(pk.name) + '” recebido e validado pelos cientistas. O sinal viaja à velocidade da luz (atraso de ~' + delay + ' min, como Marte em média). Obrigado, Pontes-01!', 'Earth → Pontes-01: package “' + L(pk.name) + '” received and validated by scientists. The signal travels at the speed of light (~' + delay + ' min delay, like Mars on average). Thank you, Pontes-01!', 'Tierra → Pontes-01: paquete “' + L(pk.name) + '” recibido y validado por los científicos. La señal viaja a la velocidad de la luz (retraso de ~' + delay + ' min, como Marte en promedio). ¡Gracias, Pontes-01!') }]);
+    C.pendingAck = (C.pendingAck || []).concat([{ t: 6, k: K('Terra → Pontes-01b: pacote “' + L(pk.name) + '” recebido e validado pelos cientistas. O sinal viaja à velocidade da luz (atraso de ~' + delay + ' min, como Marte em média). Obrigado, Pontes-01b!', 'Earth → Pontes-01b: package “' + L(pk.name) + '” received and validated by scientists. The signal travels at the speed of light (~' + delay + ' min delay, like Mars on average). Thank you, Pontes-01b!', 'Tierra → Pontes-01b: paquete “' + L(pk.name) + '” recibido y validado por los científicos. La señal viaja a la velocidad de la luz (retraso de ~' + delay + ' min, como Marte en promedio). ¡Gracias, Pontes-01b!') }]);
     colonyMsg(K('Transmitindo “' + L(pk.name) + '” para a Terra pela antena de alto ganho… sinal enviado!', 'Transmitting “' + L(pk.name) + '” to Earth through the high-gain antenna… signal sent!', 'Transmitiendo “' + L(pk.name) + '” a la Tierra por la antena de alta ganancia… ¡señal enviada!'), 'good');
   },
   beacon(c) {
@@ -237,7 +237,7 @@ function landShip(sh) {
   sh.state = 'landed'; C.shipsLanded++; C.colonists += sh.size;
   addRes('energia', def.sup.kwh, 'Suprimentos da nave'); addRes('agua', def.sup.agua, 'Suprimentos da nave'); addRes('comida', def.sup.comida, 'Suprimentos da nave');
   moral(6); addPoints(60, 'Nave de tripulação recebida');
-  colonyMsg(K(sh.name + ' pousou! +' + sh.size + ' colonos chegaram a Pontes-01 trazendo suprimentos. População: ' + colonyPop() + '.', sh.name + ' landed! +' + sh.size + ' colonists arrived on Pontes-01 with supplies. Population: ' + colonyPop() + '.', sh.name + ' aterrizó! +' + sh.size + ' colonos llegaron a Pontes-01 con suministros. Población: ' + colonyPop() + '.'), 'good');
+  colonyMsg(K(sh.name + ' pousou! +' + sh.size + ' colonos chegaram a Pontes-01b trazendo suprimentos. População: ' + colonyPop() + '.', sh.name + ' landed! +' + sh.size + ' colonists arrived on Pontes-01b with supplies. Population: ' + colonyPop() + '.', sh.name + ' aterrizó! +' + sh.size + ' colonos llegaron a Pontes-01b con suministros. Población: ' + colonyPop() + '.'), 'good');
   Sfx.ok();
 }
 
@@ -315,7 +315,7 @@ function tickColony(dt) {
 }
 function finishColony() {
   const C = S.colony;
-  addPoints(200, 'Colônia estabelecida em Pontes-01');
+  addPoints(200, 'Colônia estabelecida em Pontes-01b');
   S.scene = 'end'; S.stage = 6;
   S.ending = { ok: true, site: C.site, score: C.score, colony: true };
   Save.data.runs++; if (!Save.data.best || S.points > Save.data.best) Save.data.best = S.points; Save.write();
@@ -493,7 +493,7 @@ function colonyHud() {
   if (m && m.ctask) prompt = `⏳ ${esc(L(m.ctask.label))} — ${Math.abs(m.x - CBUILD[m.ctask.bid].x) < 70 ? esc(L(K('fique aqui', 'stay here', 'quédese aquí'))) : esc(L(K('volte ao local!', 'go back to the site!', '¡vuelva al lugar!')))}`;
   else if (nb) prompt = `<b>E</b> — ${esc(L(CSHORT[nb]))}`;
   return `<div class="hud-top"><div class="bars">${items.join('')}</div><div class="clock"><b>${esc(L(K('COLÔNIA · DIA', 'COLONY · DAY', 'COLONIA · DÍA')))} ${C.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}<br><small>${esc(C.site)}${C.storm > 0 ? ' · 🌪' : ''}</small></div></div>
-    <div class="objbox"><b>${esc(L(K('MISSÃO PONTES-01', 'PONTES-01 MISSION', 'MISIÓN PONTES-01')))} ${doneN}/${obj.length}</b>${obj.map(o => `<div class="${o.done ? 'done' : ''}">${o.done ? '✔' : '▫'} ${esc(L(o.t))}</div>`).join('')}</div>
+    <div class="objbox"><b>${esc(L(K('MISSÃO PONTES-01b', 'PONTES-01b MISSION', 'MISIÓN PONTES-01b')))} ${doneN}/${obj.length}</b>${obj.map(o => `<div class="${o.done ? 'done' : ''}">${o.done ? '✔' : '▫'} ${esc(L(o.t))}</div>`).join('')}</div>
     <div class="hud-bottom"><div class="prompt">${prompt}</div>
     <div class="btns"><button class="btn small" data-ui="panel" data-arg="c:nave">${esc(L(K('Controle', 'Control', 'Control')))}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div></div>`;
 }
@@ -557,7 +557,7 @@ function colonyPanel(id) {
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>${B.icon} ${esc(L(B.name))}</h2>${body}<p class="quote small">🛰 ${esc(L(B.fact))}</p></div></div>`;
 }
 function colonyIntro() {
-  return `<div class="modal-bg"><div class="panel center wide scroll" data-stop="1"><div class="blink cyan">● ${esc(L(K('PONTES-01 · SUPERFÍCIE', 'PONTES-01 · SURFACE', 'PONTES-01 · SUPERFICIE')))}</div><h2>${esc(L(K('A MISSÃO CONTINUA', 'THE MISSION CONTINUES', 'LA MISIÓN CONTINÚA')))}</h2>
+  return `<div class="modal-bg"><div class="panel center wide scroll" data-stop="1"><div class="blink cyan">● ${esc(L(K('PONTES-01b · SUPERFÍCIE', 'PONTES-01b · SURFACE', 'PONTES-01b · SUPERFICIE')))}</div><h2>${esc(L(K('A MISSÃO CONTINUA', 'THE MISSION CONTINUES', 'LA MISIÓN CONTINÚA')))}</h2>
     <p class="big">${esc(L(K('Pousamos em ' + S.colony.site + '! Mas uma colônia não se faz sozinha.', 'We landed at ' + T(S.colony.site) + '! But a colony does not build itself.', '¡Aterrizamos en ' + T(S.colony.site) + '! Pero una colonia no se construye sola.')))}</p>
     ${colonyObjectives().map(o => `<div class="alert info">▫ ${esc(L(o.t))}</div>`).join('')}
     <p class="small">${esc(L(K('Ande com ← → (A/D) e use E nas construções. Você pode trabalhar sozinho ou chamar a equipe (bots/jogadores). Fique perto do local enquanto trabalha. Nenhuma construção funciona sem energia: comece pelo campo solar. Se faltar comida ou água por 3 dias, a colônia falha.', 'Walk with ← → (A/D) and press E at buildings. You can work yourself or call the crew (bots/players). Stay near the site while you work. Nothing runs without power: start with the solar field. If food or water runs out for 3 days, the colony fails.', 'Camine con ← → (A/D) y pulse E en los edificios. Puede trabajar usted mismo o llamar al equipo (bots/jugadores). Quédese cerca del lugar mientras trabaja. Nada funciona sin energía: empiece por el campo solar. Si falta comida o agua por 3 días, la colonia fracasa.')))}</p>

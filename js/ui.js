@@ -76,7 +76,7 @@ function historyScreen() {
     <h2>HISTÓRIA</h2>
     ${NARRATION_INTRO.map(t => `<p>${esc(t)}</p>`).join('')}
     <h3>As 5 etapas</h3>
-    <ol><li><b>Preparação:</b> montar a expedição com verba limitada.</li><li><b>Partida e viagem:</b> controlar a nave e enfrentar os problemas espaciais.</li><li><b>Exploração científica:</b> analisar dados reais de exoplanetas.</li><li><b>O novo mundo:</b> investigar Pontes-01 e se adaptar.</li><li><b>Migração:</b> escolher onde a humanidade vai recomeçar.</li></ol>
+    <ol><li><b>Preparação:</b> montar a expedição com verba limitada.</li><li><b>Partida e viagem:</b> controlar a nave e enfrentar os problemas espaciais.</li><li><b>Exploração científica:</b> analisar dados reais de exoplanetas.</li><li><b>O novo mundo:</b> investigar Pontes-01b e se adaptar.</li><li><b>Migração:</b> escolher onde a humanidade vai recomeçar.</li></ol>
     <p class="quote">“Na Terra, a atmosfera regula a temperatura de graça. Numa nave, tudo isso tem custo. Por isso é mais fácil manter a Terra habitável do que habitar outro planeta.”</p>
     <div class="row"><button class="btn" data-ui="title">◀ Voltar</button></div>
   </div>`;
@@ -283,7 +283,7 @@ function readinessAlerts() {
   if (h('lab') && h('sonda')) a.push(['good', 'Sinergia: Laboratório + Sonda dobram os dados.']);
   if (h('radar') && h('ia')) a.push(['good', 'Sinergia: Radar + Copiloto de IA — pistas ainda mais claras.']);
   if (h('enfermaria') && h('hibernacao')) a.push(['good', 'Sinergia: feridos se recuperam bem mais rápido.']);
-  if (!h('sonda') && !h('pouso')) a.push(['warn', 'Sem sonda nem nave de pouso: investigar Pontes-01 vai arriscar a nave principal.']);
+  if (!h('sonda') && !h('pouso')) a.push(['warn', 'Sem sonda nem nave de pouso: investigar Pontes-01b vai arriscar a nave principal.']);
   const left = setupBudget() - setupCost(st);
   if (left < 0) a.push(['bad', 'Verba estourada! Remova itens para decolar.']);
   else a.push(['info', `Fundo de contingência: ${left} ponto(s).`]);
@@ -316,7 +316,7 @@ function hudBottom() {
   if (m && m.task) prompt = `⏳ ${esc(m.task.label)} — fique na estação`;
   const p = S.progress;
   return `<div class="hud-bottom">
-    <div class="track"><span class="lbl">TERRA</span><div class="line"><i style="width:${p * 100}%"></i><em class="mk st" style="left:50%">◆</em><em class="ship" style="left:${p * 100}%">▶</em></div><span class="lbl cyan">PONTES-01</span></div>
+    <div class="track"><span class="lbl">TERRA</span><div class="line"><i style="width:${p * 100}%"></i><em class="mk st" style="left:50%">◆</em><em class="ship" style="left:${p * 100}%">▶</em></div><span class="lbl cyan">PONTES-01b</span></div>
     <div class="prompt">${prompt}</div>
     <div class="btns"><button class="btn small" data-ui="panel" data-arg="report">[R] Relatório</button><button class="btn small" data-ui="panel" data-arg="crew">[T] Tripulação</button><button class="btn small" data-ui="panel" data-arg="fund">[F] Fundo ${S.fund}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div>
   </div>`;
@@ -338,7 +338,7 @@ function eventPanel() {
   const info = EVENT_INFO[ev.type];
   if (ev.phase === 'warn') {
     return `<div class="evp warn"><div class="blink red">⚠ ALERTA DE DESAFIO</div><h2>${info.icon} ${info.title}</h2><p>${info.desc}</p>
-      <h4>Partes da nave envolvidas</h4>${info.systems.map(s => `<div class="sysline"><span>${SYSTEMS[s].name}</span><em class="dmg ${SYSTEMS[s].dmg}">Dano ${SYSTEMS[s].dmg}</em>${bar(sysHp(s), 100)}<b>${fmt(sysHp(s), 0)}%</b></div>`).join('')}
+      <h4>Partes da nave envolvidas</h4>${info.systems.map(s => `<div class="sysline"><span>${SYSTEMS[s].name}</span><em class="dmg ${SYSTEMS[s].dmg}">Dano ${SYSTEMS[s].dmg} (−${DMG_PCT[SYSTEMS[s].dmg]}%)</em>${bar(sysHp(s), 100)}<b>${fmt(sysHp(s), 0)}%</b></div>`).join('')}
       ${info.energy ? `<div class="sysline"><span>Energia</span><em class="dmg Médio">reserva</em>${bar(S.res.energia, S.cap.energia)}<b>${fmt(S.res.energia, 0)} kWh</b></div>` : ''}
       ${has('radar') ? '<p class="cyan small">📡 Radar de longo alcance: aviso antecipado recebido.</p>' : ''}
       <div class="row"><button class="btn primary" data-act="eventGo">Enfrentar agora (${Math.ceil(ev.warnT)} s)</button></div></div>`;
@@ -460,7 +460,7 @@ function thermalPanel() {
 // ---------- painéis das estações ----------
 function repairRow(sys) {
   const hp = sysHp(sys);
-  return `<div class="sysline"><span>${SYSTEMS[sys].name}</span><em class="dmg ${SYSTEMS[sys].dmg}">Dano ${SYSTEMS[sys].dmg}</em>${bar(hp, 100)}<b>${fmt(hp, 0)}%</b>
+  return `<div class="sysline"><span>${SYSTEMS[sys].name}</span><em class="dmg ${SYSTEMS[sys].dmg}">Dano ${SYSTEMS[sys].dmg} (−${DMG_PCT[SYSTEMS[sys].dmg]}%)</em>${bar(hp, 100)}<b>${fmt(hp, 0)}%</b>
     ${hp < 100 ? `<button class="btn tiny" data-act="repair" data-p='${J({ sys })}'>Reparar</button><button class="btn tiny" data-act="repair" data-p='${J({ sys, call: true })}'>Chamar eng.</button>` : ''}</div>`;
 }
 function stationPanel(id) {
@@ -494,7 +494,16 @@ function stationPanel(id) {
         <span>CO₂ produzido</span><b>${fmt(NASA.co2PorPessoaDia * n, 1)} kg/dia</b></div>` + peç;
       break;
     }
-    case 'lixo': body = `<div class="kv"><span>Lixo a bordo</span><b>${fmt(S.res.lixo, 1)} kg</b><span>Reciclador</span><b>${has('reciclaLixo') ? 'instalado' : 'não'}</b><span>Adubo</span><b>${fmt(S.adubo, 1)} kg</b><span>Peças</span><b>${S.peças}</b></div><p class="small">O lixo é o espelho da poluição que expulsou a humanidade da Terra. Acima de 15 kg ele tira humor da tripulação. Ejete pela Eclusa ou recicle.</p>`; break;
+    case 'lixo': {
+      const tm = trashMode(), rec = has('reciclaLixo'), imp = has('impressora');
+      const opts = [['reciclar', 'Reciclar', rec ? '1,4 kg/dia → adubo' + (imp ? ' e peças (6 kg = 1 peça)' : '') + ' · gasta energia' : 'precisa do Reciclador de lixo', !rec], ['compostar', 'Compostar', '0,7 kg/dia → metade vira adubo', false], ['ejetar', 'Ejetar', 'joga fora pela Eclusa acima de 8 kg · nada é reaproveitado', false]];
+      body = `<div class="kv"><span>Lixo a bordo</span><b>${fmt(S.res.lixo, 1)} kg</b><span>Reciclador</span><b>${rec ? 'instalado' : 'não'}</b><span>Oficina 3D</span><b>${imp ? 'instalada' : 'não'}</b><span>Adubo</span><b>${fmt(S.adubo, 1)} kg</b><span>Peças</span><b>${S.peças}</b></div>
+      <h4>Destino do lixo</h4><div class="opts">${opts.map(([k, n, d, off]) => `<button class="opt ${tm === k ? 'on' : ''} ${off ? 'cant' : ''}" ${off ? '' : `data-act="trashMode" data-p='${J({ mode: k })}'`}><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div class="row"><button class="btn small" data-act="processTrash">Processar agora (3 kg · 2 kWh)</button></div>
+      <h4>Como o lixo é reaproveitado</h4><p class="small">Lixo → <b>adubo</b> (use na Estufa: nutrientes a 100% e mais colheita) ${rec && imp ? '→ <b>peças de reparo</b> (Oficina 3D)' : ''}. Restos de comida, cascas e plantas estragadas também viram lixo. Sem reaproveitar, o lixo vira peso e tira humor da tripulação.</p>
+      <p class="small">O lixo é o espelho da poluição que expulsou a humanidade da Terra. Acima de 15 kg ele tira humor da tripulação.</p>`;
+      break;
+    }
     case 'eclusa': body = repairRow('acoplamento') + `<div class="row"><button class="btn small" data-act="ejectTrash">Ejetar lixo (${fmt(S.res.lixo, 1)} kg)</button></div>`; break;
     case 'dormitorio': body = `<p>Descansar recupera humor. ${shopBonus().moral ? 'Itens de lazer da loja dão bônus.' : ''}</p><div class="row"><button class="btn small" data-act="rest">Descansar (eu)</button></div>
       <h4>Mandar descansar</h4>${S.crew.filter(c => c.alive && c.id !== 'cmd').map(c => `<div class="sysline"><span>${esc(c.name)}</span>${bar(c.humor, 100)}<b>${fmt(c.humor, 0)}</b><button class="btn tiny" data-act="rest" data-p='${J({ id: c.id })}'>Descansar</button>${has('hibernacao') ? `<button class="btn tiny" data-act="hibernate" data-p='${J({ id: c.id })}'>${c.hibernating ? 'Acordar' : 'Hibernar'}</button>` : ''}</div>`).join('')}
@@ -563,7 +572,7 @@ function reportPanel() {
       return `<tr><td><details><summary>${m.icon} ${m.name}</summary><div class="reasons">${reasons || '<i>sem movimento</i>'}</div></details></td><td>${fmt(S.res[m.id], 1)} ${m.unit}</td><td>${cap ? fmt(S.res[m.id] / cap * 100, 0) + '%' : '—'}</td><td class="green">+${fmt(inD, 1)}</td><td class="red">${fmt(outD, 1)}</td><td>${tot >= 0 ? '+' : ''}${fmt(tot, 1)}</td></tr>`;
     }).join('')}</table><p class="small muted">Clique no nome de um recurso para ver as entradas e saídas por origem.</p>`;
   }
-  if (tab === 'sistemas') body = Object.keys(SYSTEMS).map(k => `<div class="sysline"><span title="${esc(SYSTEMS[k].desc)}">${SYSTEMS[k].name}</span><em class="dmg ${SYSTEMS[k].dmg}">Dano ${SYSTEMS[k].dmg}</em>${bar(sysHp(k), 100)}<b>${fmt(sysHp(k), 0)}%</b></div><p class="small muted">${esc(SYSTEMS[k].desc)}</p>`).join('');
+  if (tab === 'sistemas') body = Object.keys(SYSTEMS).map(k => `<div class="sysline"><span title="${esc(SYSTEMS[k].desc)}">${SYSTEMS[k].name}</span><em class="dmg ${SYSTEMS[k].dmg}">Dano ${SYSTEMS[k].dmg} (−${DMG_PCT[SYSTEMS[k].dmg]}%)</em>${bar(sysHp(k), 100)}<b>${fmt(sysHp(k), 0)}%</b></div><p class="small muted">${esc(SYSTEMS[k].desc)}</p>`).join('');
   if (tab === 'tripulacao') body = crewList();
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Relatório da nave</h2>${tabs}${body}</div></div>`;
 }
@@ -602,7 +611,7 @@ function stationScreen() {
     const c = tripCost(dexo);
     const short = S.res.combustivel < c.fuel;
     foot = `<div class="alert ${short ? 'bad' : 'warn'}">${esc(L(K('Destino', 'Destination', 'Destino')))}: <b>${dexo.name}</b> — ⛽ ${c.fuel} kg · O₂ ${c.o2} kg · 🍱 ${c.food} kg · ${c.days} ${esc(L(K('dias', 'days', 'días')))}${short ? ' — ' + esc(L(K('COMBUSTÍVEL INSUFICIENTE: a nave ficará à deriva!', 'NOT ENOUGH FUEL: the ship will drift!', '¡COMBUSTIBLE INSUFICIENTE: la nave quedará a la deriva!'))) : ' — ' + esc(L(K('este não é o planeta planejado. Tem certeza?', 'this is not the planned planet. Are you sure?', 'este no es el planeta planificado. ¿Está seguro?')))}</div>`;
-  } else if (dexo) foot = `<div class="alert good">${esc(L(K('Destino', 'Destination', 'Destino')))}: <b>Pontes-01</b> — ${esc(L(K('na rota, sem custo extra', 'on route, no extra cost', 'en la ruta, sin costo extra')))}</div>`;
+  } else if (dexo) foot = `<div class="alert good">${esc(L(K('Destino', 'Destination', 'Destino')))}: <b>Pontes-01b</b> — ${esc(L(K('na rota, sem custo extra', 'on route, no extra cost', 'en la ruta, sin costo extra')))}</div>`;
   else foot = `<div class="alert info">${esc(L(K('Escolha um planeta de destino para partir.', 'Pick a destination planet to depart.', 'Elija un planeta de destino para partir.')))}</div>`;
   return `<div class="stage-panel"><h2>ESTAÇÃO PONTE-ALFA</h2>${miniRes()}${tabs}<div class="scroll">${body}</div>${foot}
     <div class="row"><button class="btn primary" data-act="leaveStation" ${dest ? '' : 'disabled'}>${esc(L(K('Partir ▶', 'Depart ▶', 'Partir ▶')))}</button></div></div>`;
@@ -612,7 +621,7 @@ function detourScreen() {
   const short = S.res.combustivel < c.fuel;
   const kv = (a, b) => `<span>${esc(L(a))}</span><b>${b}</b>`;
   return `<div class="stage-panel"><h2>${esc(L(K('DESVIO DE ROTA: ', 'ROUTE DETOUR: ', 'DESVÍO DE RUTA: ')))}${exo.name}</h2>${miniRes()}<div class="scroll">
-    <div class="alert bad">⚠ ${esc(L(K('Este não é Pontes-01. A viagem custou combustível, oxigênio, comida e dias — e a moral caiu.', 'This is not Pontes-01. The trip cost fuel, oxygen, food and days — and morale fell.', 'Este no es Pontes-01. El viaje costó combustible, oxígeno, comida y días, y la moral cayó.')))}</div>
+    <div class="alert bad">⚠ ${esc(L(K('Este não é Pontes-01b. A viagem custou combustível, oxigênio, comida e dias — e a moral caiu.', 'This is not Pontes-01b. The trip cost fuel, oxygen, food and days — and morale fell.', 'Este no es Pontes-01b. El viaje costó combustible, oxígeno, comida y días, y la moral cayó.')))}</div>
     <h4>${esc(L(K('O que a tripulação encontrou', 'What the crew found', 'Lo que encontró la tripulación')))}</h4><p>${esc(L(exo.trip.outcome))}</p>
     <h4>${esc(L(K('Dados (NASA Exoplanet Archive, aproximados)', 'Data (NASA Exoplanet Archive, approximate)', 'Datos (NASA Exoplanet Archive, aproximados)')))}</h4>
     <div class="kv small">${kv(K('Distância', 'Distance', 'Distancia'), typeof exo.dist === 'number' ? fmt(exo.dist, 1) + ' ' + L(K('anos-luz', 'light-years', 'años luz')) : '—')}${kv(K('Raio/massa', 'Radius/mass', 'Radio/masa'), exo.radius)}${kv(K('Temp. de equilíbrio', 'Equilibrium temp.', 'Temp. de equilibrio'), exo.teq + ' K')}${kv(K('Ano', 'Year', 'Año'), exo.period + ' ' + L(K('dias', 'days', 'días')))}${kv(K('Estrela', 'Star', 'Estrella'), esc(T(exo.star)))}${kv(K('Descoberta', 'Discovered', 'Descubrimiento'), esc(T(exo.disc)))}${kv('ESI', exo.esi)}</div>
@@ -622,7 +631,7 @@ function detourScreen() {
 }
 function miniRes() { return `<div class="minires">${['energia', 'combustivel', 'agua', 'oxigenio', 'comida', 'dados'].map(k => { const m = RES_META.find(x => x.id === k); return `<span>${m.icon} ${fmt(S.res[k], 0)} ${m.unit}</span>`; }).join('')}<span>✚ ${fmt(S.res.medicos, 0)}</span><span>⚙ ${S.peças} peças</span></div>`; }
 function planetScreen() {
-  return `<div class="stage-panel"><h2>O NOVO MUNDO: PONTES-01</h2>${miniRes()}<div class="scroll">
+  return `<div class="stage-panel"><h2>O NOVO MUNDO: PONTES-01b</h2>${miniRes()}<div class="scroll">
     <h4>Análises ${has('sonda') ? '(sonda de reconhecimento)' : has('pouso') ? '(nave auxiliar de pouso)' : '(sem sonda: a nave desce — arriscado)'}</h4>
     <div class="opts">${PLANET_ANALYSES.map(a => { const d = S.planet.analyzed.includes(a.id); return `<div class="opt ${d ? 'on' : ''}"><b>${a.name}</b><span>${d ? esc(a.result) : 'custo: ' + a.cost + ' GB e 4 kWh'}</span>${d ? '' : `<button class="btn tiny" data-act="planetAnalyze" data-p='${J({ id: a.id })}'>Analisar</button>`}</div>`; }).join('')}</div>
     <h4>Desafios de adaptação e sobrevivência</h4>
@@ -642,7 +651,7 @@ function endScreen() {
   const fd = S.food;
   const humorAvg = alive().length ? alive().reduce((s, c) => s + c.humor, 0) / alive().length : 0;
   return `<div class="panel center wide scroll end ${e.ok ? 'ok' : 'bad'}">
-    <h1>${e.ok ? (e.colony ? esc(L(K('PONTES-01: A COLÔNIA ESTÁ DE PÉ', 'PONTES-01: THE COLONY STANDS', 'PONTES-01: LA COLONIA ESTÁ EN PIE'))) : 'CHEGAMOS A PONTES-01') : 'MISSÃO FRACASSADA'}</h1>
+    <h1>${e.ok ? (e.colony ? esc(L(K('PONTES-01b: A COLÔNIA ESTÁ DE PÉ', 'PONTES-01b: THE COLONY STANDS', 'PONTES-01b: LA COLONIA ESTÁ EN PIE'))) : 'CHEGAMOS A PONTES-01b') : 'MISSÃO FRACASSADA'}</h1>
     <p class="big">${e.ok ? (e.colony ? esc(L(K('Em ' + e.site + ', a base cresceu, a Terra recebeu os dados e três naves trouxeram os primeiros colonos. A humanidade tem um novo começo — que custou caro.', 'At ' + e.site + ' the base grew, Earth received the data and three ships brought the first colonists. Humanity has a new beginning — and it came at a high cost.', 'En ' + e.site + ' la base creció, la Tierra recibió los datos y tres naves trajeron a los primeros colonos. La humanidad tiene un nuevo comienzo, que costó caro.'))) : `A expedição pousou no ${esc(e.site)}. A humanidade tem um novo começo — que custou caro.`) : esc(e.reason)}</p>
     ${e.ok && e.colony && S.colony ? `<div class="kv"><span>${esc(L(K('População final', 'Final population', 'Población final')))}</span><b>${colonyPop()}</b><span>${esc(L(K('Dias na colônia', 'Days on the colony', 'Días en la colonia')))}</span><b>${S.colony.day}</b><span>${esc(L(K('Construções', 'Buildings', 'Construcciones')))}</span><b>${S.colony.built}</b><span>${esc(L(K('Pacotes de dados enviados à Terra', 'Data packages sent to Earth', 'Paquetes de datos enviados a la Tierra')))}</span><b>${S.colony.txCount}</b><span>${esc(L(K('Exoplanetas visitados por engano', 'Exoplanets visited by mistake', 'Exoplanetas visitados por error')))}</span><b>${(S.explore && S.explore.wrong) || 0}</b></div>` : ''}
     <div class="kv"><span>Dias de viagem</span><b>${S.day}</b><span>Tripulantes vivos</span><b>${alive().length} de 7</b><span>Pontos</span><b>${S.points}</b><span>Energia gasta</span><b>${fmt(spent('energia'), 0)} kWh</b><span>Combustível gasto</span><b>${fmt(spent('combustivel'), 0)} kg</b><span>Água consumida</span><b>${fmt(spent('agua'), 0)} L</b><span>Oxigênio respirado</span><b>${fmt(spent('oxigenio'), 0)} kg</b>

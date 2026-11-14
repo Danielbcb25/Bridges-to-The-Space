@@ -106,7 +106,7 @@ function newGame(journey, mode) {
   const crew = [{
     id: 'cmd', role: 'comandante', roleName: 'Comandante', name: cmdAvatar.name || 'Comandante', avatar: cmdAvatar,
   }];
-  ROLES.forEach((r, i) => crew.push({ id: r.id, role: r.id, roleName: r.name, name: names[i], avatar: Object.assign(randomAvatar(Math.random, FEM_NAMES.includes(names[i])), { name: names[i] }) }));
+  ROLES.forEach((r, i) => crew.push({ id: r.id, role: r.id, roleName: roleForName(r.name, names[i]), name: names[i], avatar: Object.assign(randomAvatar(Math.random, FEM_NAMES.includes(names[i])), { name: names[i] }) }));
   crew.forEach((c, i) => Object.assign(c, {
     alive: true, status: 'ok', statusT: 0, humor: 85 + Math.floor(Math.random() * 10), saciedade: 90, nutricao: 80, nut: [80, 80, 80],
     x: 0, deck: 'U', tx: 0, tdeck: 'U', climb: 0, face: 1, walkT: 0, moving: false, task: null, idleT: Math.random() * 4,
@@ -238,7 +238,8 @@ function effIndex() {
   return clamp(e, 5, 100);
 }
 function sysHp(k) { return S.systems[k] ? S.systems[k].hp : 100; }
-function damageSys(k, v) { if (S.systems[k]) S.systems[k].hp = clamp(S.systems[k].hp - v, 0, 100); }
+// v = gravidade base (1 = ocorrência média); o nível do sistema define a % descontada (Baixo 10 · Médio 20 · Alto 30)
+function damageSys(k, v) { if (S.systems[k]) S.systems[k].hp = clamp(S.systems[k].hp - v * DMG_PCT[SYSTEMS[k].dmg] / 20, 0, 100); }
 
 // moral: altera humor de todos (ou de um tripulante)
 function moral(v, who) {
@@ -415,11 +416,18 @@ function simulate(dt) {
   }
   // Lixo
   addRes('lixo', NASA.lixoPorPessoaDia * n * f, 'Lixo gerado');
-  if (has('reciclaLixo') && S.res.lixo > 0.5) {
+  const tm = trashMode();
+  if (tm === 'reciclar' && S.res.lixo > 0.5) {
     const conv = Math.min(S.res.lixo, 1.4 * f);
-    addRes('lixo', -conv, 'Reciclador de lixo');
+    addRes('lixo', -conv, 'Reciclador de lixo'); addRes('energia', -0.4 * conv, 'Reciclador de lixo');
     S.adubo += conv; S.recycled = (S.recycled || 0) + conv;
     if (has('impressora') && S.recycled >= 6) { S.recycled -= 6; S.peças += 1; toast('Oficina 3D: lixo reciclado virou 1 peça de reparo.'); }
+  } else if (tm === 'compostar' && S.res.lixo > 0.5) {
+    const conv = Math.min(S.res.lixo, 0.7 * f);
+    addRes('lixo', -conv, 'Compostagem'); S.adubo += conv * 0.5;
+  } else if (tm === 'ejetar' && S.res.lixo > 8) {
+    const kg = S.res.lixo - 2; addRes('lixo', -kg, 'Ejetado pela eclusa'); S.food.wasted += kg * 0.3;
+    if (!S.oneShot.ejectInfo) { S.oneShot.ejectInfo = true; toast('Descarte automático: lixo ejetado pela eclusa (nada é reaproveitado).'); }
   }
   // Humor diário
   for (const c of people) {
@@ -676,12 +684,12 @@ function enterStation() {
 }
 function leaveStation() {
   S.stage = 1; S.scene = 'ship';
-  narrate('Partindo da Estação Ponte-Alfa. Próximo destino: Pontes-01.');
+  narrate('Partindo da Estação Ponte-Alfa. Próximo destino: Pontes-01b.');
 }
 function enterPlanet() {
   S.stage = 3; S.scene = 'planet';
-  addPoints(80, 'Chegada a Pontes-01');
-  narrate('O novo mundo. A nave entrou em órbita de Pontes-01. Investigue o planeta, faça análises e enfrente os desafios de adaptação.');
+  addPoints(80, 'Chegada a Pontes-01b');
+  narrate('O novo mundo. A nave entrou em órbita de Pontes-01b. Investigue o planeta, faça análises e enfrente os desafios de adaptação.');
 }
 
 function addPoints(v, reason) {
@@ -700,6 +708,17 @@ function applyAction(type, p, actorId) {
   S.v++;
 }
 
+function trashMode() { const m = S.trashMode || 'compostar'; return m === 'reciclar' && !has('reciclaLixo') ? 'compostar' : m; }
+ACTIONS.trashMode = p => { if (['reciclar', 'compostar', 'ejetar'].includes(p.mode)) { S.trashMode = p.mode; logMsg('Destino do lixo: ' + p.mode); } };
+ACTIONS.processTrash = () => {
+  if (S.res.lixo < 0.5) return toast('Não há lixo para processar.', 'warn');
+  if (S.res.energia < 2) return toast('Energia insuficiente (2 kWh).', 'warn');
+  const kg = Math.min(S.res.lixo, 3); addRes('energia', -2, 'Processar lixo'); addRes('lixo', -kg, 'Processado manualmente');
+  const rec = has('reciclaLixo');
+  S.adubo += kg * (rec ? 1 : 0.5);
+  if (rec && has('impressora')) { S.recycled = (S.recycled || 0) + kg; if (S.recycled >= 6) { S.recycled -= 6; S.peças += 1; toast('Oficina 3D: lixo reciclado virou 1 peça de reparo.', 'good'); } }
+  toast(`${fmt(kg)} kg de lixo viraram ${fmt(kg * (rec ? 1 : 0.5))} kg de adubo para a horta.`, 'good');
+};
 ACTIONS.cruise = p => { S.cruise = p.mode; logMsg('Modo de cruzeiro: ' + p.mode); if (S.tutorial === 1) S.tutorial = 2; };
 ACTIONS.repair = (p, actor) => {
   const sys = p.sys; if (!S.systems[sys] || S.systems[sys].hp >= 100) return;

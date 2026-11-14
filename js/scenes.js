@@ -122,7 +122,7 @@ function buildEarth() {
   const far = [], near = [], props = [], npcs = [];
   for (let x = 0; x < EARTH_W + 200; x += 18 + rnd() * 20) far.push({ x, w: 16 + rnd() * 26, h: 40 + rnd() * 70 });
   for (let x = 40; x < EARTH_W; x += 70 + rnd() * 60) near.push({ x, w: 40 + rnd() * 40, h: 70 + rnd() * 70, chim: rnd() < 0.4, col: pick(['#3b3328', '#2f2a24', '#46392a', '#353038']) });
-  const signs = ['AR PÉSSIMO • IQA 312', 'ÁGUA: RACIONAMENTO NÍVEL 4', 'TEMPERATURA: 46 °C', 'USE MÁSCARA', 'CO₂: 420+ ppm (NASA)', 'MAR: +10 cm DESDE 1993', 'COLÔNIA EM MARTE: VAGAS ESGOTADAS', '6.000+ EXOPLANETAS CONFIRMADOS', 'PROJETO PONTES-01: ALISTAMENTO'];
+  const signs = ['AR PÉSSIMO • IQA 312', 'ÁGUA: RACIONAMENTO NÍVEL 4', 'TEMPERATURA: 46 °C', 'USE MÁSCARA', 'CO₂: 420+ ppm (NASA)', 'MAR: +10 cm DESDE 1993', 'COLÔNIA EM MARTE: VAGAS ESGOTADAS', '6.000+ EXOPLANETAS CONFIRMADOS', 'PROJETO PONTES-01b: ALISTAMENTO'];
   // placas nos vãos entre os prédios da cidade (longe das portas e das pessoas)
   const signX = [110, 440, 870, 1170, 1720, 2010, 2400, 2790, 2980];
   signs.forEach((t, i) => props.push({ type: 'sign', x: signX[i] != null ? signX[i] : 120 + i * 372, t }));
@@ -168,7 +168,7 @@ function drawEarth(dt, player) {
     cx.fillStyle = '#555'; cx.fillRect(px - 20, GROUND - 6, 60, 6); cx.fillStyle = '#777'; cx.fillRect(px + 30, GROUND - 90, 4, 84);
     cx.fillStyle = '#ddd'; cx.fillRect(px, GROUND - 80, 14, 74); cx.fillStyle = '#c33'; cx.fillRect(px, GROUND - 86, 14, 6); cx.fillRect(px + 3, GROUND - 92, 8, 6);
     cx.fillStyle = '#1f5bff'; cx.fillRect(px + 2, GROUND - 50, 10, 3);
-    text('PONTES-01', px - 10, GROUND - 104, '#ffd34c');
+    text('PONTES-01b', px - 10, GROUND - 104, '#ffd34c');
   }
   // props
   for (const p of L.props) {
@@ -442,7 +442,7 @@ function drawPlanetBg(dt) {
   drawPlanet('pontes', 180, 150, 220, R.t * 0.5);
   const a = R.t * 0.4; const ox = 180 + Math.cos(a) * 140, oy = 150 + Math.sin(a) * 40;
   if (Math.sin(a) < 0 || true) drawShipExterior(ox, oy, 0.7, false);
-  text('ÓRBITA DE PONTES-01', 12, 10, '#9fd0ff', 8);
+  text('ÓRBITA DE PONTES-01b', 12, 10, '#9fd0ff', 8);
 }
 function drawSurface(dt, colony) {
   const g = cx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, '#3a6ab0'); g.addColorStop(0.6, '#9cc6e8'); g.addColorStop(1, '#f2d9a8');

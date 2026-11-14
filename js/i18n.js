@@ -73,7 +73,7 @@ const I18n = {
       if (!done) {
         let m;
         // fala de tripulante: "Engenheiro 1 João: “...”", "Navegador Ana ★"
-        if ((m = /^(Paramédico|Navegador|Agricultor \/ Eng\. Genético|Engenheiro \d|Pesquisador Chefe|Comandante)( .*)$/.exec(k))) {
+        if ((m = /^(Paramédic[oa]|Navegador[a]?|Agricultor[a]? \/ Eng\. Gen[ée]tic[oa]|Engenheir[oa] \d|Pesquisador[a]? Chefe|Comandante)( .*)$/.exec(k))) {
           const rest = m[2]; const sp = /^ (.+?): “(.+)”$/.exec(rest);
           out = s.replace(k, this.t(m[1]) + (sp ? ' ' + sp[1] + ': “' + this.t(sp[2]) + '”' : rest.replace(/^ Comandante$/, ' ' + this.t('Comandante'))));
         }

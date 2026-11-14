@@ -12,8 +12,8 @@ const ASSETS = {
 const NARRATION_INTRO = [
   'Em razão do iminente colapso terrestre, há tempos, as principais lideranças do planeta se reuniam em prol da sobrevivência humana.',
   'Em meio ao caos, observatórios do mundo todo se uniram com o objetivo de localizar o planeta habitável mais próximo da Terra. E assim o fizeram.',
-  'Nomeado de “Pontes-01”, este passou a ser a única esperança de sobrevivência da Terra.',
-  'Você passará a gerenciar uma das centenas de estações e naves espaciais lançadas ao espaço: seus recursos, sua tripulação e a rota para Pontes-01.',
+  'Nomeado de “Pontes-01b”, este passou a ser a única esperança de sobrevivência da Terra.',
+  'Você passará a gerenciar uma das centenas de estações e naves espaciais lançadas ao espaço: seus recursos, sua tripulação e a rota para Pontes-01b.',
   'Durante a expedição, você enfrentará chuvas de asteroides, radiação, microgravidade, a escassez de recursos e o psicológico de todos a bordo.',
   'Atenção! O jogo possui apenas um final. Caso este não seja alcançado, o jogador falha.',
 ];
@@ -28,11 +28,15 @@ const ROLES = [
   { id: 'pesquisador', name: 'Pesquisador Chefe', short: 'Pesquisador', home: 'lab', likes: ['diferente'], avoid: [], allergy: [] },
 ];
 const FEM_NAMES = ['Ana', 'Carla', 'Elisa', 'Gabi', 'Iara', 'Luana', 'Nina', 'Paula', 'Sofia', 'Yara'];
+// concordância de gênero: cargos no feminino para nomes femininos
+const FEM_ROLE = { 'Paramédico': 'Paramédica', 'Navegador': 'Navegadora', 'Agricultor / Eng. Genético': 'Agricultora / Eng. Genética', 'Engenheiro 1': 'Engenheira 1', 'Engenheiro 2': 'Engenheira 2', 'Pesquisador Chefe': 'Pesquisadora Chefe' };
+const roleForName = (role, name) => (FEM_NAMES.includes(name) && FEM_ROLE[role]) || role;
 const CREW_NAMES = ['Ana', 'Bruno', 'Carla', 'Davi', 'Elisa', 'Felipe', 'Gabi', 'Heitor', 'Iara', 'João', 'Kaique', 'Luana', 'Marcos', 'Nina', 'Otávio', 'Paula', 'Rafa', 'Sofia', 'Tiago', 'Yara'];
 const FOOD_TAGS = ['sopa', 'apimentado', 'salada', 'carne', 'batata', 'pao', 'doce', 'diferente', 'algas', 'soja'];
 
 // ---------------- Sistemas da nave (8) ----------------
 // Dados internos inspirados em números públicos da NASA (ISS / ECLSS)
+const DMG_PCT = { Baixo: 10, Médio: 20, Alto: 30 }; // % de integridade descontada a cada ocorrência de dano
 const SYSTEMS = {
   casco: { name: 'Casco e Blindagem', dmg: 'Baixo', station: 'aviônica', desc: 'Estrutura externa de proteção contra impactos e radiação cósmica.' },
   termico: { name: 'Escudo Térmico', dmg: 'Médio', station: 'termico', desc: 'Projetado para suportar as temperaturas externas (MLI: cobertor multicamadas, como na ISS).' },
@@ -225,7 +229,7 @@ const EXOPLANETS = [
     trip: { days: 120, fuel: 12000, o2: 520, food: 380, moral: -45, dados: 0, type: 'rock', outcome: { pt: 'O “primo da Terra” orbita uma estrela parecida com o Sol, em um ano de 385 dias. Mas fica a 1.400 anos-luz: nenhuma tecnologia atual alcança isso.', en: 'Earth\'s “cousin” orbits a Sun-like star with a 385-day year. But it is 1,400 light-years away: no current technology can get there.', es: 'El “primo de la Tierra” orbita una estrella parecida al Sol, con un año de 385 días. Pero está a 1.400 años luz: ninguna tecnología actual llega allí.' } } },
   { id: 'cnc55e', name: '55 Cancri e', dist: 41, radius: '1,88 R⊕ (8 M⊕)', teq: 2000, period: 0.74, star: 'Estrela tipo Sol (G8)', esi: 0.11, disc: '2004 · velocidade radial', sma: 0.015, issues: '“Mundo de lava”: temperatura de ~2.000 K no lado diurno.',
     trip: { days: 8, fuel: 190, o2: 22, food: 12, moral: -12, dados: 60, type: 'lava', outcome: { pt: 'Um “mundo de lava”: orbita tão perto da estrela que seu ano dura menos de 18 horas e o lado diurno passa dos 2.000 K. Rocha derretida, nenhuma chance de pouso.', en: 'A “lava world”: it orbits so close to its star that its year lasts under 18 hours and the dayside tops 2,000 K. Molten rock — no chance to land.', es: 'Un “mundo de lava”: orbita tan cerca de su estrella que su año dura menos de 18 horas y el lado diurno supera los 2.000 K. Roca fundida: imposible aterrizar.' } } },
-  { id: 'pontes', name: 'Pontes-01', dist: 'na rota', radius: '1,04 R⊕', teq: 268, period: 291, star: 'Anã amarela-laranja G9, calma', esi: 0.96, disc: 'Projeto Pontes (ficção)', sma: 0.82, issues: 'Medições da expedição: água líquida provável e campo magnético detectado.', fiction: true },
+  { id: 'pontes', name: 'Pontes-01b', dist: 'na rota', radius: '1,04 R⊕', teq: 268, period: 291, star: 'Anã amarela-laranja G9, calma', esi: 0.96, disc: 'Projeto Pontes (ficção)', sma: 0.82, issues: 'Medições da expedição: água líquida provável e campo magnético detectado.', fiction: true },
 ];
 
 // ---------------- Eventos ----------------
@@ -264,13 +268,13 @@ const MED_DEVICES = [
 ];
 
 const RADIO_MESSAGES = [
-  { full: 'ATENCAO NAVE: TEMPESTADE SOLAR EM 2 DIAS. REFORCEM O ESCUDO', answer: 'Uma tempestade solar está chegando', options: ['Uma tempestade solar está chegando', 'Pontes-01 não existe', 'Voltem para a Terra', 'Liguem os aquecedores'] },
+  { full: 'ATENCAO NAVE: TEMPESTADE SOLAR EM 2 DIAS. REFORCEM O ESCUDO', answer: 'Uma tempestade solar está chegando', options: ['Uma tempestade solar está chegando', 'Pontes-01b não existe', 'Voltem para a Terra', 'Liguem os aquecedores'] },
   { full: 'ROTA CORRIGIDA: DESVIEM 3 GRAUS PARA EVITAR DETRITOS', answer: 'Devem desviar a rota por causa de detritos', options: ['Devem desviar a rota por causa de detritos', 'O combustível acabou na Terra', 'Uma nova tripulação vai embarcar', 'Desliguem a comunicação'] },
   { full: 'TROQUEM O LOTE DE REMEDIOS: ESTOQUE PODE ESTAR VENCIDO', answer: 'Os remédios podem estar vencidos', options: ['Os remédios podem estar vencidos', 'A estufa precisa de mais luz', 'O casco está rachado', 'A rota está perfeita'] },
-  { full: 'PONTES-01 CONFIRMADO: AGUA LIQUIDA DETECTADA NA SUPERFICIE', answer: 'Há água líquida em Pontes-01', options: ['Há água líquida em Pontes-01', 'Pontes-01 é um gigante gasoso', 'A Terra foi evacuada', 'Precisam parar a nave'] },
+  { full: 'PONTES-01b CONFIRMADO: AGUA LIQUIDA DETECTADA NA SUPERFICIE', answer: 'Há água líquida em Pontes-01b', options: ['Há água líquida em Pontes-01b', 'Pontes-01b é um gigante gasoso', 'A Terra foi evacuada', 'Precisam parar a nave'] },
 ];
 
-// Locais de pouso em Pontes-01
+// Locais de pouso em Pontes-01b
 const LANDING_SITES = [
   { id: 'vale', name: 'Vale Equatorial', pros: 'Temperatura amena (≈ 19 °C), rios próximos', cons: 'Tempestades de poeira sazonais', score: { atmosfera: 1, agua: 2, solo: 1, radiacao: 1 } },
   { id: 'planalto', name: 'Planalto Norte', pros: 'Solo firme e rico em minerais', cons: 'Frio intenso (≈ −5 °C), pouca água', score: { atmosfera: 1, agua: 0, solo: 2, radiacao: 0 } },

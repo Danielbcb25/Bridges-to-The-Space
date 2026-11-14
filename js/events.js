@@ -837,7 +837,7 @@ ACTIONS.leaveStation = () => {
   if (!id) return toast('Escolha primeiro o planeta de destino.', 'warn');
   if (id === 'pontes') {
     if (S.explore.analyzed.includes('pontes') && !S.explore.bonusPaid) { S.explore.bonusPaid = true; addPoints(60, 'Análise científica correta'); }
-    narrate('Controle da Missão: rota confirmada para Pontes-01. Raio parecido com o da Terra, temperatura amena e estrela calma.');
+    narrate('Controle da Missão: rota confirmada para Pontes-01b. Raio parecido com o da Terra, temperatura amena e estrela calma.');
     S.explore.chosen = 'pontes';
     return leaveStation();
   }
@@ -862,7 +862,7 @@ ACTIONS.detourReturn = () => {
   const exo = EXOPLANETS.find(e => e.id === S.detour.id); const c = tripCost(exo, true);
   if (S.res.combustivel < c.fuel) {
     applyTripCost({ fuel: S.res.combustivel, o2: Math.min(S.res.oxigenio, c.o2), food: Math.min(S.res.comida, c.food), days: c.days });
-    return fail(`Sem combustível para voltar de ${exo.name} (precisava de ${c.fuel} kg). A nave ficou presa lá, longe de Pontes-01.`);
+    return fail(`Sem combustível para voltar de ${exo.name} (precisava de ${c.fuel} kg). A nave ficou presa lá, longe de Pontes-01b.`);
   }
   applyTripCost(c);
   if (S.res.oxigenio <= 0) return fail('O oxigênio acabou durante a volta à Estação Ponte-Alfa.');
@@ -891,7 +891,7 @@ ACTIONS.planetAnalyze = p => {
   toast(`Análise de ${an.name} concluída.${txt}`, 'good');
 };
 const CHALLENGES = [
-  { id: 'aclimatacao', name: 'Aclimatação ao ar de Pontes-01', desc: 'O ar tem 19% de O₂ e pressão um pouco menor. A tripulação precisa se adaptar.', need: 9,
+  { id: 'aclimatacao', name: 'Aclimatação ao ar de Pontes-01b', desc: 'O ar tem 19% de O₂ e pressão um pouco menor. A tripulação precisa se adaptar.', need: 9,
     mods: () => [[has('enfermaria') ? 2 : 0, 'enfermaria'], [roleAlive('paramedico') ? 2 : 0, 'paramédico'], [S.planet.analyzed.includes('atmosfera') ? 2 : 0, 'atmosfera analisada'], [moralIndex() < 40 ? -2 : 0, 'moral baixa']],
     fail: () => { moral(-10); const v = pick(alive().filter(c => c.id !== 'cmd')); if (v) { v.status = 'ferido'; v.statusT = 60; } return 'Tonturas e desmaios: um tripulante ferido, moral −10.'; } },
   { id: 'cultivo', name: 'Primeiro cultivo no solo alienígena', desc: 'O solo precisa de microrganismos terrestres para que as plantas cresçam.', need: 11,
@@ -940,6 +940,6 @@ ACTIONS.land = () => {
   if (S.fail) return;
   if (alive().length < 3) reasons.push('Restaram menos de 3 tripulantes.');
   if (reasons.length) { fail(reasons.join(' ')); return; }
-  addPoints(200, 'Chegada a Pontes-01');
-  startColony(site, score); // o jogo continua na superfície de Pontes-01
+  addPoints(200, 'Chegada a Pontes-01b');
+  startColony(site, score); // o jogo continua na superfície de Pontes-01b
 };
