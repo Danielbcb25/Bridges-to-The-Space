@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
@@ -117,9 +117,8 @@
 <section class="sec" id="multiplayer">
 <div class="wrap">
 <h2 data-i18n="s66">Multiplayer (até 6 jogadores + Comandante)</h2>
-<p data-i18n="s67">O jogo funciona sozinho no navegador (modo solo, com bots). Para jogar em grupo, rode o servidor incluído — sem dependências — e abra o jogo pelo endereço dele:</p>
-<pre><code>node server/server.js
-# abra http://localhost:8080 (ou o IP da máquina na rede local)</code></pre>
+<p data-i18n="s67b">Funciona direto pelo navegador, inclusive hospedado na Vercel ou no GitHub Pages: o Comandante clica em <b>Multiplayer → Criar sala</b> e passa o código de 5 letras; os amigos entram com o código pela internet, sem servidor e sem VPN (conexão P2P via WebRTC).</p>
+<p class="muted small" data-i18n="s67c">Opcional: para jogar numa rede local com servidor próprio, rode <code>node server/server.js</code> e informe ws://SEU-IP:8080/ws em “Avançado”.</p>
 <p data-i18n="s68">Quem cria a sala é o Comandante; os outros entram com o código e assumem um tripulante. Lugares vazios ficam com bots.</p>
       <p data-i18n="n6">Todos conversam pelo <b>chat da sala</b> e trabalham juntos na colônia: cada jogador anda pela superfície, constrói e acende o farol enquanto as naves descem.</p>
 </div>
@@ -132,6 +131,7 @@
 <script src="js/i18n.js"></script>
 <script src="js/lang-en.js"></script>
 <script src="js/lang-es.js"></script>
+<script src="js/lang-extra.js"></script>
 <script src="js/sprites.js"></script>
 <script src="js/data.js"></script>
 <script src="js/engine.js"></script>
@@ -142,6 +142,7 @@
 <script src="js/ui.js"></script>
 <script src="js/city.js"></script>
 <script src="js/chat.js"></script>
+<script src="js/vendor/peerjs.min.js"></script>
 <script src="js/net.js"></script>
 <script src="js/main.js"></script>
 </body>

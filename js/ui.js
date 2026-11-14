@@ -113,8 +113,8 @@ function avatarScreen() {
   const sw = (key, list, cur, isPair) => list.map((c, i) => `<button class="sw ${cur === i ? 'on' : ''}" style="background:${isPair ? c[0] : c}" data-ui="av" data-arg="${key}:${i}"></button>`).join('');
   const swc = (key, list, cur) => list.map(c => `<button class="sw ${cur === c ? 'on' : ''}" style="background:${c}" data-ui="avc" data-arg="${key}:${c}"></button>`).join('');
   const opts = (key, obj, cur, names) => Object.keys(obj).map(k => `<button class="chip ${cur === k ? 'on' : ''}" data-ui="avs" data-arg="${key}:${k}">${names[k] || k}</button>`).join('');
-  const hairNames = { careca: 'Careca', lateral: 'Repartido', curto: 'Curto', franja: 'Franja', longo: 'Longo', moicano: 'Moicano', blackpower: 'Black power', coque: 'Coque', raspado: 'Raspado', topete: 'Topete' };
-  const accNames = { nenhum: 'Nenhum', oculos: 'Óculos escuros', oculosRedondos: 'Óculos', barba: 'Barba', bigode: 'Bigode', cicatriz: 'Cicatriz', fone: 'Headset', bone: 'Boné', bandana: 'Bandana', sardas: 'Sardas' };
+  const hairNames = { careca: 'Careca', lateral: 'Repartido', curto: 'Curto', franja: 'Franja', longo: 'Longo', moicano: 'Moicano', blackpower: 'Black power', coque: 'Coque', raspado: 'Raspado', topete: 'Topete', rabo: 'Rabo de cavalo', trancas: 'Tranças', chanel: 'Chanel', cacheado: 'Cacheado', chiquinhas: 'Maria-chiquinha', ondulado: 'Ondulado', franjaLonga: 'Longo com franja' };
+  const accNames = { nenhum: 'Nenhum', oculos: 'Óculos escuros', oculosRedondos: 'Óculos', barba: 'Barba', bigode: 'Bigode', cicatriz: 'Cicatriz', fone: 'Headset', bone: 'Boné', bandana: 'Bandana', sardas: 'Sardas', laco: 'Laço', tiara: 'Tiara', flor: 'Flor', presilha: 'Presilha' };
   const paintPal = ['#000000', '#ffffff', '#ff0734', '#ff9019', '#fbff28', '#2fa84f', '#24c3ff', '#0026ff', '#7a3cff', '#ff4fa3', '#8e5529', '#ffb27f', 'erase'];
   return `<div class="avatar-screen">
     <div class="av-left">
@@ -128,14 +128,18 @@ function avatarScreen() {
     </div>
     <div class="av-right scroll">
       <label class="field">Nome <input id="av-name" maxlength="14" value="${esc(a.name)}"></label>
+      <div class="grp"><b>Estilo rápido</b><button class="chip" data-ui="avPreset" data-arg="fem">♀ Feminino</button><button class="chip" data-ui="avPreset" data-arg="masc">♂ Masculino</button><button class="chip" data-ui="avRandom">🎲 Aleatório</button></div>
       <div class="grp"><b>Pele</b>${sw('skin', SKIN_TONES, a.skin)}</div>
       <div class="grp"><b>Cabelo</b>${opts('hair', HAIR, a.hair, hairNames)}</div>
       <div class="grp"><b>Cor do cabelo</b>${sw('hairColor', HAIR_COLORS, a.hairColor)}</div>
       <div class="grp"><b>Olhos</b>${sw('eyes', EYE_COLORS, a.eyes, true)}</div>
+      <div class="grp"><b>Rosto</b><button class="chip ${a.lashes ? 'on' : ''}" data-ui="avt" data-arg="lashes">Cílios</button><button class="chip ${a.blush ? 'on' : ''}" data-ui="avt" data-arg="blush">Blush</button><button class="chip ${a.earrings ? 'on' : ''}" data-ui="avt" data-arg="earrings">Brincos</button></div>
+      <div class="grp"><b>Batom</b><button class="chip ${!a.lips ? 'on' : ''}" data-ui="avc" data-arg="lips:">Nenhum</button>${swc('lips', LIP_COLORS, a.lips)}</div>
       <div class="grp"><b>Acessório</b>${opts('acc', ACCESSORIES, a.acc, accNames)}</div>
       <div class="grp"><b>Cor do acessório</b>${swc('accColor', ['#e03030', '#2f7fff', '#ffd34c', '#2fa84f', '#7a3cff', '#151515', '#ffffff'], a.accColor)}</div>
       <div class="grp"><b>Camiseta</b>${sw('shirt', CLOTH_COLORS, a.shirt)} <button class="chip ${a.longSleeve ? 'on' : ''}" data-ui="avt" data-arg="longSleeve">Manga longa</button></div>
-      <div class="grp"><b>Calça / short</b>${sw('pants', CLOTH_COLORS, a.pants)} <button class="chip ${a.shorts ? 'on' : ''}" data-ui="avt" data-arg="shorts">Short</button></div>
+      <div class="grp"><b>Parte de baixo</b>${[['calca', 'Calça'], ['short', 'Short'], ['saia', 'Saia'], ['vestido', 'Vestido']].map(([k, n]) => `<button class="chip ${avBottom(a) === k ? 'on' : ''}" data-ui="avs" data-arg="bottom:${k}">${n}</button>`).join('')}</div>
+      <div class="grp"><b>Cor da calça / saia</b>${sw('pants', CLOTH_COLORS, a.pants)}</div>
       <div class="grp"><b>Traje espacial</b>${sw('suit', SUIT_COLORS, a.suit)}</div>
       <div class="grp"><b>Mochila de O₂</b>${swc('pack', ['#ff9411', '#e8e8e8', '#38e07b', '#ff4fa3', '#24c3ff', '#ffd34c'], a.pack)}</div>
       <div class="grp"><b>Visor</b>${sw('visor', VISOR_COLORS, a.visor, true)}</div>
@@ -164,12 +168,12 @@ function drawAvatarPreviews() {
 
 // ---------- lobby multiplayer ----------
 function lobbyScreen() {
-  const L = U.lobby || {};
-  const def = (location.protocol === 'https:' ? 'wss://' : 'ws://') + (location.host || 'localhost:8080') + '/ws';
+  const LB = U.lobby || {};
   if (Net.role === 'host' && Net.room) {
     return `<div class="panel center wide">
       <h2>SALA <span class="code">${esc(Net.room)}</span></h2>
       <p class="muted">Passe o código para até 6 amigos. Cada um assume um tripulante; os lugares vazios ficam com bots.</p>
+      <p class="small cyan">${Net.mode === 'p2p' ? '🌐 Sala online (P2P): funciona pela internet, sem servidor e sem VPN. Mantenha esta aba aberta.' : '🖧 Servidor próprio'}</p>
       <div class="seats">${ROLES.map(r => { const p = Object.values(Net.players).find(x => x.role === r.id); return `<div class="seat ${p ? 'human' : ''}"><b>${r.name}</b><span>${p ? '🎮 ' + esc(p.name) : '🤖 Bot'}</span></div>`; }).join('')}</div>
       <div class="cards two">
         <button class="card" data-ui="startGame" data-arg="completa"><h3>🚀 Jornada Completa</h3></button>
@@ -183,12 +187,16 @@ function lobbyScreen() {
   }
   return `<div class="panel center">
     <h2>MULTIPLAYER</h2>
-    <p class="muted">Até 6 jogadores na tripulação + o Comandante (quem cria a sala). Requer o servidor: <code>node server/server.js</code>.</p>
-    <label class="field">Servidor <input id="net-url" value="${esc(L.url || def)}"></label>
-    <div class="row"><button class="btn primary" data-ui="netHost">Criar sala (Comandante)</button></div>
-    <label class="field">Código da sala <input id="net-code" maxlength="5" value="${esc(L.code || '')}" style="text-transform:uppercase"></label>
-    <div class="row"><button class="btn" data-ui="netJoin">Entrar como tripulante</button></div>
-    <p class="err">${esc(L.err || '')}</p>
+    <p class="muted">Até 6 jogadores na tripulação + o Comandante (quem cria a sala). Funciona online direto pelo navegador: não precisa de servidor nem de VPN.</p>
+    <div class="row"><button class="btn primary" data-ui="netHost" ${LB.busy ? 'disabled' : ''}>Criar sala (Comandante)</button></div>
+    <label class="field">Código da sala <input id="net-code" maxlength="5" value="${esc(LB.code || '')}" style="text-transform:uppercase" autocomplete="off"></label>
+    <div class="row"><button class="btn" data-ui="netJoin" ${LB.busy ? 'disabled' : ''}>Entrar como tripulante</button></div>
+    ${LB.busy ? `<p class="cyan">⏳ ${esc(LB.busy)}</p>` : ''}
+    <p class="err">${esc(LB.err || '')}</p>
+    <details class="small"${LB.url ? ' open' : ''}><summary>Avançado: servidor próprio</summary>
+      <p class="muted">Deixe em branco para usar a conexão online (P2P). Para usar o servidor incluído, rode <code>node server/server.js</code> e informe o endereço, ex.: ws://localhost:8080/ws</p>
+      <label class="field">Servidor <input id="net-url" value="${esc(LB.url || '')}" placeholder="ws://localhost:8080/ws" autocomplete="off"></label>
+    </details>
     <div class="row"><button class="btn" data-ui="title">◀ Voltar</button></div>
   </div>`;
 }
@@ -364,7 +372,7 @@ function eventPanel() {
     <div class="timer">${bar(ev.t, ev.dur, 'time')}<b>${Math.ceil(ev.t)} s</b></div>
     <ol class="evsteps">${steps}</ol>${extra}
     ${ev.puzzle ? puzzleHTML(ev) : ''}
-    <div class="evlog">${S.log.slice(-4).map(l => `<div class="${l.kind}">${esc(l.text)}</div>`).join('')}</div></div>`;
+    <div class="evlog">${S.log.filter(l => Net.role || l.kind !== 'say').slice(-4).map(l => `<div class="${l.kind}">${esc(l.text)}</div>`).join('')}</div></div>`;
 }
 
 function puzzleHTML(ev) {
@@ -518,13 +526,14 @@ function kitchenPanel() {
     const warn = [];
     for (const c of alive()) for (const slot of fd.menu) {
       const tags = RECIPES.find(r => r.id === slot) ? RECIPES.find(r => r.id === slot).tags : CROPS[slot] ? CROPS[slot].tags : [];
-      if (tags.some(t => c.allergy.includes(t))) warn.push(`${c.name} tem alergia a ${c.allergy.join(', ')}!`);
+      if (tags.some(t => c.allergy.includes(t))) warn.push(L(K(`${c.name} tem alergia a ${tagNames(c.allergy)}!`, `${c.name} is allergic to ${tagNames(c.allergy)}!`, `¡${c.name} es alérgico/a a ${tagNames(c.allergy)}!`)));
     }
     return tabs + `<h4>Refeições do dia</h4>${meals.map((m, i) => `<div class="sysline"><span>${m}</span><select data-actsel="menu" data-slot="${i}">${avail.map(([k, n]) => `<option value="${k}" ${fd.menu[i] === k ? 'selected' : ''}>${esc(n)}</option>`).join('')}${avail.find(a => a[0] === fd.menu[i]) ? '' : `<option selected value="${fd.menu[i]}">${esc(fd.menu[i])} (acabou → ração)</option>`}</select></div>`).join('')}
       ${warn.length && roleAlive('paramedico') ? `<div class="alert bad">Paramédico: ${esc([...new Set(warn)].join(' '))}</div>` : ''}
+      <p class="small muted">${esc(L(K('Cada alimento dá energia (E), proteína (P) e vitaminas (V). Só ração deixa a tripulação sem vitaminas.', 'Each food gives energy (E), protein (P) and vitamins (V). Rations alone leave the crew short on vitamins.', 'Cada alimento da energía (E), proteína (P) y vitaminas (V). Solo ración deja a la tripulación sin vitaminas.')))} ${avail.map(([k, n]) => { const v = foodNutr(k); return `<span class="nchip">${esc(T(n.split(' (')[0]))}: E${v[0]} P${v[1]} V${v[2]}</span>`; }).join(' ')}</p>
       <h4>Racionamento</h4><div class="opts">${[['pleno', 'Pleno', '0,6 kg/pessoa/dia'], ['reduzido', 'Reduzido', '0,4 kg · humor −2/dia · −1 nas rolagens'], ['minimo', 'Mínimo', '0,2 kg · humor −5/dia · −2 · risco de desmaio']].map(([k, n, d]) => `<button class="opt ${fd.racionamento === k ? 'on' : ''}" data-act="ration" data-p='${J({ level: k })}'><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <h4>A Mesa (refeição da noite)</h4><div class="opts">${[['completa', 'Mesa completa', 'todos param · humor +3 · sorteio de convivência'], ['revezamento', 'Revezamento', 'sistemas cobertos · humor +1'], ['posto', 'Comer no posto', 'sem tempo perdido · humor −1']].map(([k, n, d]) => `<button class="opt ${fd.mesa === k ? 'on' : ''}" data-act="mesa" data-p='${J({ mode: k })}'><b>${n}</b><span>${d}</span></button>`).join('')}</div>
-      <h4>Gostos da tripulação</h4><div class="prefs">${alive().map(c => `<div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small><br>❤ ${c.likes.join(', ') || '—'} ${c.avoid.length ? '· ✖ ' + c.avoid.join(', ') : ''} ${c.allergy.length ? '· <span class="red">alergia: ' + c.allergy.join(', ') + '</span>' : ''}</div>`).join('')}</div>
+      <h4>Gostos da tripulação</h4><div class="prefs">${alive().map(c => `<div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small><br>❤ ${esc(tagNames(c.likes)) || '—'} ${c.avoid.length ? '· ✖ ' + esc(tagNames(c.avoid)) : ''} ${c.allergy.length ? '· <span class="red">' + esc(L(K('alergia', 'allergy', 'alergia'))) + ': ' + esc(tagNames(c.allergy)) + '</span>' : ''}</div>`).join('')}</div>
       ${!fd.banquete ? `<div class="row"><button class="btn small" data-act="banquete">🎉 Banquete do Dia da Terra (4 kg, uma vez)</button></div>` : ''}`;
   }
   if (tab === 'cozinhar') {
@@ -560,7 +569,7 @@ function reportPanel() {
 }
 function crewList() {
   return `<div class="crewlist">${S.crew.map(c => `<div class="crew ${c.alive ? '' : 'dead'}"><img src="${spriteURL(c.avatar, 'suit', c.alive && c.humor >= 40 ? 'happy' : 'sad', 2)}" alt=""><div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small> ${c.owner && c.owner !== 'bot' ? '<span class="tag">🎮 jogador</span>' : '<span class="tag">🤖 bot</span>'}<br>
-    ${c.alive ? `Humor ${bar(c.humor, 100)} Saciedade ${bar(c.saciedade, 100)} Nutrição ${bar(c.nutricao, 100)}<br><small>${c.hibernating ? '💤 hibernando' : c.sickness ? '🤒 doente' : c.status === 'ok' ? '✔ ok' : '✚ ' + c.status}${c.task ? ' · ' + esc(c.task.label) : ''} · ❤ ${c.likes.join(', ')}${c.allergy.length ? ' · alergia: ' + c.allergy.join(', ') : ''}</small>` : '☠ morto'}</div></div>`).join('')}</div>`;
+    ${c.alive ? `<div class="meters"><span>Humor</span>${bar(c.humor, 100)}<span>Saciedade</span>${bar(c.saciedade, 100)}<span>Nutrição</span>${bar(c.nutricao, 100)}<span class="nutr" title="${esc(L(NUTR_NAMES[0]))} / ${esc(L(NUTR_NAMES[1]))} / ${esc(L(NUTR_NAMES[2]))}">${(c.nut || [80, 80, 80]).map((v, i) => `<i class="n${i} ${v < 25 ? 'low' : ''}" style="height:${Math.round(v)}%"></i>`).join('')}</span></div>${c.nut && c.nut[2] < 25 ? `<small class="orange">${esc(L(K('Faltam vitaminas: sirva comida fresca.', 'Low on vitamins: serve fresh food.', 'Faltan vitaminas: sirva comida fresca.')))}</small><br>` : ''}<small><span>${c.hibernating ? '💤 ' + esc(L(K('hibernando', 'hibernating', 'hibernando'))) : c.sickness ? '🤒 ' + esc(L(K('doente', 'sick', 'enfermo/a'))) : c.status === 'ok' ? '✔ ok' : '✚ ' + esc(T(c.status))}</span>${c.task ? ' · <span>' + esc(T(c.task.label)) + '</span>' : ''} · ❤ ${esc(tagNames(c.likes))}${c.allergy.length ? ' · ' + esc(L(K('alergia', 'allergy', 'alergia'))) + ': ' + esc(tagNames(c.allergy)) : ''}</small>` : '☠ morto'}</div></div>`).join('')}</div>`;
 }
 function fundPanel() {
   const o = [['peca', 'Peça de reposição', 2], ['medico', 'Tratamento médico urgente (todos)', 3], ['energia', 'Baterias de emergência (+20 kWh)', 2], ['oxigenio', 'Oxigênio de emergência (+15 kg)', 2]];
@@ -707,9 +716,14 @@ UIH.lobby = () => { U.screen = 'lobby'; };
 UIH.buy = id => { const it = SHOP.find(i => i.id === id); if (!it || Save.owns(id) || Save.data.credits < it.price) return; Save.data.credits -= it.price; Save.data.owned.push(id); Save.write(); Sfx.ok(); };
 UIH.avatar = () => { U.screen = 'avatar'; U.avatarDraft = JSON.parse(JSON.stringify(Object.assign({}, DEFAULT_AVATAR, Save.data.avatar || {}))); U.avatarDirty = true; };
 UIH.av = arg => { const [k, v] = arg.split(':'); U.avatarDraft[k] = +v; U.avatarDirty = true; };
-UIH.avc = arg => { const i = arg.indexOf(':'); U.avatarDraft[arg.slice(0, i)] = arg.slice(i + 1); U.avatarDirty = true; };
+UIH.avc = arg => { const i = arg.indexOf(':'); U.avatarDraft[arg.slice(0, i)] = arg.slice(i + 1) || null; U.avatarDirty = true; };
 UIH.avs = arg => { const [k, v] = arg.split(':'); U.avatarDraft[k] = v; U.avatarDirty = true; };
 UIH.avt = k => { U.avatarDraft[k] = !U.avatarDraft[k]; U.avatarDirty = true; };
+UIH.avPreset = g => {
+  const n = U.avatarDraft.name, keep = { skin: U.avatarDraft.skin, suit: U.avatarDraft.suit, name: n };
+  U.avatarDraft = Object.assign(randomAvatar(Math.random, g === 'fem'), keep);
+  U.avatarDirty = true;
+};
 UIH.avRandom = () => { const n = U.avatarDraft.name; U.avatarDraft = Object.assign(randomAvatar(), { name: n, suit: Math.floor(Math.random() * SUIT_COLORS.length) }); U.avatarDirty = true; };
 UIH.paintColor = c => { U.paintColor = c; U.avatarDirty = true; };
 UIH.paintClear = () => { U.avatarDraft.paint = {}; };
@@ -770,8 +784,8 @@ UIH.cook = () => { act('cook', { ing: U.cook.slice() }); U.cook = []; };
 UIH.pilot = d => act('puzzle', { op: 'move', d: +d * 0.08 });
 UIH.quitAsk = () => { U.confirmQuit = true; };
 UIH.quit = () => { Narrator.stop(); if (Net.role) Net.leave(); S = null; U.screen = 'title'; U.panel = null; Music.play('intro'); };
-UIH.netHost = () => { const url = $('#net-url').value.trim(); U.lobby = { url }; Net.host(url); };
-UIH.netJoin = () => { const url = $('#net-url').value.trim(); const code = $('#net-code').value.trim().toUpperCase(); U.lobby = { url, code }; Net.join(url, code); };
+UIH.netHost = () => { const el = $('#net-url'); const url = el ? el.value.trim() : ''; U.lobby = { url }; Net.host(url); };
+UIH.netJoin = () => { const el = $('#net-url'); const url = el ? el.value.trim() : ''; const code = $('#net-code').value.trim().toUpperCase(); U.lobby = { url, code }; Net.join(url, code); };
 UIH.netLeave = () => { Net.leave(); U.screen = 'lobby'; };
 ACTIONS.tut = p => { if (S.tutorial < p.n) S.tutorial = p.n; };
 

@@ -123,7 +123,9 @@ function buildEarth() {
   for (let x = 0; x < EARTH_W + 200; x += 18 + rnd() * 20) far.push({ x, w: 16 + rnd() * 26, h: 40 + rnd() * 70 });
   for (let x = 40; x < EARTH_W; x += 70 + rnd() * 60) near.push({ x, w: 40 + rnd() * 40, h: 70 + rnd() * 70, chim: rnd() < 0.4, col: pick(['#3b3328', '#2f2a24', '#46392a', '#353038']) });
   const signs = ['AR PÉSSIMO • IQA 312', 'ÁGUA: RACIONAMENTO NÍVEL 4', 'TEMPERATURA: 46 °C', 'USE MÁSCARA', 'CO₂: 420+ ppm (NASA)', 'MAR: +10 cm DESDE 1993', 'COLÔNIA EM MARTE: VAGAS ESGOTADAS', '6.000+ EXOPLANETAS CONFIRMADOS', 'PROJETO PONTES-01: ALISTAMENTO'];
-  signs.forEach((t, i) => props.push({ type: 'sign', x: 120 + i * 372, t }));
+  // placas nos vãos entre os prédios da cidade (longe das portas e das pessoas)
+  const signX = [110, 440, 870, 1170, 1720, 2010, 2400, 2790, 2980];
+  signs.forEach((t, i) => props.push({ type: 'sign', x: signX[i] != null ? signX[i] : 120 + i * 372, t }));
   for (let i = 0; i < 18; i++) props.push({ type: 'trash', x: 80 + rnd() * (EARTH_W - 160) });
   for (let i = 0; i < 10; i++) props.push({ type: 'tree', x: 120 + rnd() * (EARTH_W - 240) });
   for (let i = 0; i < 10; i++) npcs.push({ x: 100 + rnd() * (EARTH_W - 200), dir: rnd() < 0.5 ? -1 : 1, av: randomAvatar(rnd), t: rnd() * 5 });
@@ -171,15 +173,13 @@ function drawEarth(dt, player) {
   // props
   for (const p of L.props) {
     const x = Math.round(p.x - cam); if (x < -80 || x > VW + 80) continue;
-    if (p.type === 'sign') {
-      cx.font = '8px "Silkscreen", monospace'; const w = Math.ceil(cx.measureText(p.t).width) + 12;
-      cx.fillStyle = '#222'; cx.fillRect(x + 20, GROUND - 40, 3, 40); cx.fillStyle = '#111'; cx.fillRect(x + 21 - w / 2, GROUND - 62, w, 22);
-      cx.fillStyle = (Math.floor(R.t * 2) % 2) ? '#ff5a3a' : '#ffb03a'; cx.fillRect(x + 22 - w / 2, GROUND - 61, w - 2, 1); text(p.t, x + 21, GROUND - 55, '#ffcf6a', 8, 'center');
-    }
     if (p.type === 'trash') { cx.drawImage(getItemSprite('lata'), x, GROUND - 6); cx.drawImage(getItemSprite('garrafa'), x + 8, GROUND - 8); cx.drawImage(getItemSprite('papel'), x + 16, GROUND - 5); }
     if (p.type === 'tree') { cx.fillStyle = '#2a1e14'; cx.fillRect(x, GROUND - 30, 3, 30); cx.fillRect(x - 6, GROUND - 26, 6, 2); cx.fillRect(x + 3, GROUND - 22, 7, 2); cx.fillRect(x - 3, GROUND - 32, 2, 4); }
   }
   drawCity(dt, cam);
+  // placas na frente dos prédios (desenhadas depois deles)
+  for (const p of L.props) if (p.type === 'sign') drawStreetSign(p, Math.round(p.x - cam));
+  if (R.cityBubble) { const b = R.cityBubble; R.cityBubble = null; bubble(b.text, b.x, b.y, 170, 9); }
   // NPCs com máscara
   for (const n of L.npcs) {
     n.t += dt; n.x += n.dir * 14 * dt; if (n.x < 40 || n.x > EARTH_W - 60) n.dir *= -1;
@@ -187,6 +187,26 @@ function drawEarth(dt, player) {
     drawChar(n.av, 'civil', x, GROUND, n.dir, Math.floor(n.t * 6) % 4, 'sad', true);
   }
   return cam;
+}
+
+function signLines(t) {
+  cx.font = '8px "Silkscreen", monospace';
+  const words = T(t).split(' '); const lines = []; let cur = '';
+  for (const w of words) { const n = cur ? cur + ' ' + w : w; if (cur && cx.measureText(n).width > 92) { lines.push(cur); cur = w; } else cur = n; }
+  if (cur) lines.push(cur);
+  return lines.slice(0, 3);
+}
+function drawStreetSign(p, x) {
+  if (x < -80 || x > VW + 80) return;
+  const lines = signLines(p.t);
+  cx.font = '8px "Silkscreen", monospace';
+  const w = Math.ceil(Math.max(...lines.map(l => cx.measureText(l).width))) + 10, h = lines.length * 9 + 6;
+  const top = GROUND - 30 - h;
+  cx.fillStyle = '#1a1612'; cx.fillRect(x - 1, top + h, 3, GROUND - top - h);           // poste
+  cx.fillStyle = '#ffb03a'; cx.fillRect(x - w / 2 - 2, top - 2, w + 4, h + 4);             // moldura
+  cx.fillStyle = '#16120e'; cx.fillRect(x - w / 2, top, w, h);
+  cx.fillStyle = (Math.floor(R.t * 2) % 2) ? '#ff5a3a' : '#ffb03a'; cx.fillRect(x - w / 2, top, w, 1);
+  lines.forEach((l, i) => text(l, x, top + 4 + i * 9, '#ffcf6a', 8, 'center'));
 }
 
 // ---------- personagem ----------
@@ -198,15 +218,16 @@ function drawChar(av, outfit, x, floorY, face, walkFrame, mood, mask) {
   else cx.drawImage(spr, X, Y);
   if (mask && outfit === 'civil') { cx.fillStyle = '#e8e8e8'; cx.fillRect(X + 6, Y + 11, 8, 3); cx.fillStyle = '#9a9a9a'; cx.fillRect(X + 5, Y + 11, 1, 1); cx.fillRect(X + 14, Y + 11, 1, 1); }
 }
-function bubble(str, x, y) {
-  str = T(str);
+function bubble(str, x, y, maxW = 120, maxLines = 4) {
+  str = T(L(str));
   cx.font = '8px "Silkscreen", monospace';
   const words = str.split(' '); const lines = []; let cur = '';
-  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (cx.measureText(t).width > 120) { lines.push(cur); cur = w; } else cur = t; }
+  for (const w of words) { const t = cur ? cur + ' ' + w : w; if (cur && cx.measureText(t).width > maxW) { lines.push(cur); cur = w; } else cur = t; }
   if (cur) lines.push(cur);
-  const shown = lines.slice(0, 4);
-  const w = Math.min(128, Math.max(...shown.map(l => cx.measureText(l).width)) + 8), h = shown.length * 9 + 5;
-  let bx = Math.round(clamp(x - w / 2, 2, VW - w - 2)), by = Math.round(y - h - 6);
+  const shown = lines.slice(0, maxLines);
+  const w = Math.min(maxW + 8, Math.max(...shown.map(l => cx.measureText(l).width)) + 8), h = shown.length * 9 + 5;
+  const off = -cx.getTransform().e / (cx.getTransform().a || 1); // compensa a câmera (coordenadas do mundo)
+  let bx = Math.round(clamp(x - w / 2, off + 2, off + VW - w - 2)), by = Math.round(y - h - 6);
   if (by < 2) by = 2;
   cx.fillStyle = '#000'; cx.fillRect(bx - 1, by - 1, w + 2, h + 2);
   cx.fillStyle = '#f4f7ff'; cx.fillRect(bx, by, w, h);

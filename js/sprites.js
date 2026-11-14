@@ -86,6 +86,19 @@ BODY_BROKEN[6] = '...NUNUUUUUUUUNUNb..';
 BODY_BROKEN[7] = '...NUNUUUUUUUUNUNO..';
 BODY_BROKEN[8] = '...NUNUUUUUUUUNUNbO.';
 
+// Saia e vestido (linhas 23..30): pernas à mostra
+const LEGS_SKIRT = [
+  '....N.NPPPPPPN.N....',
+  '.....NPPPPPPPPN.....',
+  '....NPPPPPPPPPPN....',
+  '....NNNNNNNNNNNN....',
+  '......NSN..NSN......',
+  '......NSN..NSN......',
+  '......NSN..NSN......',
+  '......NNN..NNN......',
+];
+const avBottom = a => a.bottom || (a.shorts ? 'short' : 'calca');
+
 // Estilos de cabelo: sobreposições nas linhas 0..11
 const HAIR = {
   careca: [],
@@ -145,6 +158,86 @@ const HAIR = {
     [4, '....hhhhhhhhhhhh....'],
     [5, '....h..........h....'],
   ],
+  rabo: [ // rabo de cavalo
+    [4, '...OHHHHHHHHHHHHO...'],
+    [5, '....HH........HHOOO.'],
+    [6, '....H..........HOHHO'],
+    [7, '................OHHO'],
+    [8, '................OHHO'],
+    [9, '.................OHO'],
+    [10, '.................OO.'],
+  ],
+  trancas: [ // duas tranças
+    [4, '...OHHHHHHHHHHHHO...'],
+    [5, '...OHH........HHO...'],
+    [6, '.OHO............OHO.'],
+    [7, '.OhO............OhO.'],
+    [8, '.OHO............OHO.'],
+    [9, '.OhO............OhO.'],
+    [10, '.OHO............OHO.'],
+    [11, '.OhO............OhO.'],
+    [12, '.OXO............OXO.'],
+    [13, '..O..............O..'],
+  ],
+  chanel: [ // corte chanel
+    [3, '...OOOOOOOOOOOOOO...'],
+    [4, '..OHHHHHHHHHHHHHHO..'],
+    [5, '..OHHHHHHHHHHHHHHO..'],
+    [6, '..OHH..........HHO..'],
+    [7, '..OHH..........HHO..'],
+    [8, '..OHH..........HHO..'],
+    [9, '..OHHO........OHHO..'],
+    [10, '...OO..........OO...'],
+  ],
+  cacheado: [ // longo cacheado
+    [1, '....OOOOOOOOOOOO....'],
+    [2, '...OHHhHHhHHhHHHO...'],
+    [3, '..OHhHHHhHHHHhHHHO..'],
+    [4, '..OHHHhHHHHhHHHhHO..'],
+    [5, '.OHhHH........HHhHO.'],
+    [6, '.OHHh..........hHHO.'],
+    [7, '.OhHH..........HHhO.'],
+    [8, '.OHHh..........hHHO.'],
+    [9, '.OHhHO........OHhHO.'],
+    [10, '.OHHHO........OHHHO.'],
+    [11, '.OhHHO........OHHhO.'],
+    [12, '..OOO..........OOO..'],
+  ],
+  chiquinhas: [ // maria-chiquinha
+    [4, '...OHHHHHHHHHHHHO...'],
+    [5, '.OXOHH........HHOXO.'],
+    [6, 'OHHO............OHHO'],
+    [7, 'OHhO............OhHO'],
+    [8, 'OHHO............OHHO'],
+    [9, '.OO..............OO.'],
+  ],
+  ondulado: [ // longo ondulado com franja de lado
+    [3, '...OOOOOOOOOOOOOO...'],
+    [4, '..OHHHHHHHHHHHHHHO..'],
+    [5, '..OHHHHHHHHH....HO..'],
+    [6, '..OH...........HHO..'],
+    [7, '..OHh..........hHO..'],
+    [8, '..OHH..........HHO..'],
+    [9, '.OHhH..........HhHO.'],
+    [10, '.OHHO..........OHHO.'],
+    [11, '.OhHO..........OHhO.'],
+    [12, '.OHHO..........OHHO.'],
+    [13, '..OO............OO..'],
+  ],
+  franjaLonga: [ // longo liso com franja
+    [3, '...OOOOOOOOOOOOOO...'],
+    [4, '..OHHHHHHHHHHHHHHO..'],
+    [5, '..OHHHHHHHHHHHHHHO..'],
+    [6, '..OHH..........HHO..'],
+    [7, '..OHH..........HHO..'],
+    [8, '..OHH..........HHO..'],
+    [9, '..OHH..........HHO..'],
+    [10, '..OHH..........HHO..'],
+    [11, '..OHHO........OHHO..'],
+    [12, '..OHHO........OHHO..'],
+    [13, '..OHHO........OHHO..'],
+    [14, '..OOO..........OOO..'],
+  ],
   topete: [
     [1, '.........OOOO.......'],
     [2, '.......OOHHHHO......'],
@@ -165,6 +258,11 @@ const ACCESSORIES = {
   bone: [[3, '....AAAAAAAAAAAA....'], [4, '...AAAAAAAAAAAAAAAA.'], [5, '....................']],
   bandana: [[4, '...AAAAAAAAAAAAAAA..'], [5, '................AA..']],
   sardas: [[8, '.....F.F....F.F.....']],
+  laco: [[2, '..........AA.AA.....'], [3, '..........AAAAA.....'], [4, '..........AA.AA.....']],
+  tiara: [[2, '.....A..A..A..A.....'], [3, '.....AAAAAAAAAA.....']],
+  flor: [[2, '...A................'], [3, '..AZA...............'], [4, '...A................']],
+  presilha: [[4, '............AAA.....']],
+
 };
 
 // Paletas
@@ -181,6 +279,7 @@ const DEFAULT_AVATAR = {
   shirt: 0, pants: 5, shorts: true, longSleeve: false,
   suit: 0, pack: '#ff9411', visor: 0, badge: '#20a04f',
   acc: 'nenhum', accColor: '#e03030', paint: {},
+  bottom: 'short', lashes: false, lips: null, blush: false, earrings: false,
 };
 
 function shade(hex, f) {
@@ -203,11 +302,13 @@ function avatarPalette(a) {
   return {
     O: '#000000', N: '#00052a', S: skin, e: eye[0], E: eye[1], M: '#000000',
     H: hair, h: shade(hair, 1.35), T: shirt, P: pants,
-    A: a.longSleeve ? shirt : skin, L: a.shorts ? skin : pants,
+    A: a.longSleeve ? shirt : skin, L: avBottom(a) === 'calca' ? pants : skin,
     U: suit, B: shade(a.pack, 0.85), b: a.pack,
     G: a.badge, g: shade(a.badge, 1.6), Q: shade(a.badge, 0.7), R: shade(a.badge, 2.0),
     W: '#ffffff', V: vis[0], v: vis[1], L2: '#ffffff', K: '#151515', I: '#9fe8ff',
     C: '#c0504d', F: shade(skin, 0.72),
+    X: a.accColor || '#e03030', Y: '#ff8fa8', Z: '#ffd34c',
+    M: a.lips || '#000000',
   };
 }
 
@@ -221,6 +322,8 @@ function composeGrid(a, outfit, mood) {
   const helmet = outfit === 'helmet' || outfit === 'broken';
   const body = outfit === 'civil' ? BODY_CIVIL : outfit === 'broken' ? BODY_BROKEN : BODY_SUIT;
   put(body, 12);
+  const bt = avBottom(a);
+  if (outfit === 'civil' && (bt === 'saia' || bt === 'vestido')) put(bt === 'vestido' ? LEGS_SKIRT.map(r => r.replace(/P/g, 'T')) : LEGS_SKIRT, 23);
   if (helmet) {
     put(HEAD_HELMET, 3);
     // o capacete troca 'L' (reflexo) por branco
@@ -233,6 +336,9 @@ function composeGrid(a, outfit, mood) {
     if (mood === 'sick') { g[6][6] = 'E'; g[6][13] = 'E'; g[7][6] = 'S'; g[7][13] = 'S'; }
     for (const [y, r] of (HAIR[a.hair] || [])) for (let x = 0; x < SPR_W; x++) if (r[x] !== '.') g[y][x] = r[x];
     for (const [y, r] of (ACCESSORIES[a.acc] || [])) for (let x = 0; x < SPR_W; x++) if (r[x] !== '.') g[y][x] = r[x];
+    if (a.lashes) { g[6][5] = 'O'; g[6][14] = 'O'; g[5][6] = g[5][6] === 'S' ? 'O' : g[5][6]; g[5][13] = g[5][13] === 'S' ? 'O' : g[5][13]; }
+    if (a.blush) { g[9][5] = 'Y'; g[9][14] = 'Y'; }
+    if (a.earrings) { g[10][2] = 'Z'; g[11][2] = 'Z'; g[10][17] = 'Z'; g[11][17] = 'Z'; }
   }
   return g;
 }
@@ -250,7 +356,8 @@ function getSprite(a, outfit = 'suit', mood = 'happy', walk = 0) {
   if (walk) { // levanta uma perna 1px
     const xs = walk === 1 ? [6, 7, 8] : [11, 12, 13];
     for (const x of xs) {
-      for (let y = 26; y <= 30; y++) g[y - 1][x] = g[y][x];
+      const y0 = (outfit === 'civil' && ['saia', 'vestido'].includes(avBottom(a))) ? 27 : 26;
+      for (let y = y0; y <= 30; y++) g[y - 1][x] = g[y][x];
       g[30][x] = '.';
     }
   }
@@ -307,14 +414,21 @@ function getItemSprite(id) {
   return (_itemCache[id] = c);
 }
 
-function randomAvatar(rng = Math.random) {
+const FEM_HAIR = ['rabo', 'trancas', 'chanel', 'cacheado', 'chiquinhas', 'ondulado', 'franjaLonga', 'longo', 'coque', 'blackpower'];
+const MASC_HAIR = ['lateral', 'curto', 'raspado', 'topete', 'moicano', 'careca', 'franja', 'blackpower'];
+const LIP_COLORS = ['#c2185b', '#e03040', '#8e2a4a', '#d9668a', '#7a3cff'];
+function randomAvatar(rng = Math.random, fem) {
   const pick = arr => arr[Math.floor(rng() * arr.length)];
-  const hairs = Object.keys(HAIR);
+  if (fem == null) fem = rng() < 0.5;
+  const accF = ['nenhum', 'nenhum', 'laco', 'tiara', 'flor', 'presilha', 'oculosRedondos', 'bandana', 'sardas'];
+  const accM = ['nenhum', 'nenhum', 'barba', 'bigode', 'oculos', 'oculosRedondos', 'bone', 'fone', 'cicatriz', 'sardas'];
   return {
-    name: '', skin: Math.floor(rng() * SKIN_TONES.length), hair: pick(hairs),
+    name: '', skin: Math.floor(rng() * SKIN_TONES.length), hair: pick(fem ? FEM_HAIR : MASC_HAIR),
     hairColor: Math.floor(rng() * 6), eyes: Math.floor(rng() * EYE_COLORS.length),
     shirt: Math.floor(rng() * CLOTH_COLORS.length), pants: Math.floor(rng() * CLOTH_COLORS.length),
-    shorts: rng() < 0.5, longSleeve: rng() < 0.3, suit: 0, pack: '#ff9411', visor: 0, badge: '#20a04f',
-    acc: rng() < 0.6 ? 'nenhum' : pick(Object.keys(ACCESSORIES)), accColor: pick(['#e03030', '#2f7fff', '#ffd34c', '#2fa84f']), paint: {},
+    bottom: fem ? pick(['saia', 'vestido', 'calca', 'short']) : pick(['calca', 'short']), longSleeve: rng() < 0.3,
+    suit: 0, pack: '#ff9411', visor: 0, badge: '#20a04f',
+    acc: pick(fem ? accF : accM), accColor: pick(['#e03030', '#2f7fff', '#ffd34c', '#2fa84f', '#ff4fa3', '#7a3cff']), paint: {},
+    lashes: fem && rng() < 0.85, lips: fem && rng() < 0.55 ? pick(LIP_COLORS) : null, blush: fem && rng() < 0.4, earrings: fem && rng() < 0.5, fem,
   };
 }

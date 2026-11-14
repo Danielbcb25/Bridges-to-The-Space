@@ -27,6 +27,7 @@ const ROLES = [
   { id: 'engenheiro2', name: 'Engenheiro 2', short: 'Engenheiro 2', home: 'suporte', likes: ['pao', 'doce'], avoid: [], allergy: ['soja'], eng: true },
   { id: 'pesquisador', name: 'Pesquisador Chefe', short: 'Pesquisador', home: 'lab', likes: ['diferente'], avoid: [], allergy: [] },
 ];
+const FEM_NAMES = ['Ana', 'Carla', 'Elisa', 'Gabi', 'Iara', 'Luana', 'Nina', 'Paula', 'Sofia', 'Yara'];
 const CREW_NAMES = ['Ana', 'Bruno', 'Carla', 'Davi', 'Elisa', 'Felipe', 'Gabi', 'Heitor', 'Iara', 'João', 'Kaique', 'Luana', 'Marcos', 'Nina', 'Otávio', 'Paula', 'Rafa', 'Sofia', 'Tiago', 'Yara'];
 const FOOD_TAGS = ['sopa', 'apimentado', 'salada', 'carne', 'batata', 'pao', 'doce', 'diferente', 'algas', 'soja'];
 
@@ -282,3 +283,27 @@ const PLANET_ANALYSES = [
   { id: 'radiacao', name: 'Radiação', cost: 15, result: 'Campo magnético fraco (≈ 40% do terrestre). UV alto na costa, moderado no vale.' },
   { id: 'biologia', name: 'Biologia', cost: 30, result: 'Tapetes microbianos e algas nativas. Nenhum patógeno conhecido detectado.' },
 ];
+
+// ---------- Nutrição: pontos de [energia, proteína, vitaminas] por refeição ----------
+// A Nutrição de cada tripulante mostra a variedade da dieta: só ração mantém
+// energia e proteína, mas as vitaminas caem — é preciso comida fresca.
+const FOOD_NUTR = {
+  racao: [30, 24, 9], alface: [6, 4, 36], batata: [32, 6, 12], soja: [14, 36, 8], pimenta: [6, 4, 34], algas: [10, 22, 24],
+};
+function foodNutr(item) {
+  if (FOOD_NUTR[item]) return FOOD_NUTR[item];
+  const r = RECIPES.find(x => x.id === item);
+  if (!r) return FOOD_NUTR.racao;
+  const sum = [0, 0, 0];
+  r.ing.forEach(i => { const n = FOOD_NUTR[i] || FOOD_NUTR.racao; for (let k = 0; k < 3; k++) sum[k] += n[k]; });
+  return sum.map(v => Math.min(40, Math.round(v * 0.75)));
+}
+const NUTR_NAMES = [K('Energia', 'Energy', 'Energía'), K('Proteína', 'Protein', 'Proteína'), K('Vitaminas', 'Vitamins', 'Vitaminas')];
+
+// nomes dos gostos/alergias da tripulação (traduzidos)
+const FOOD_TAG_NAMES = {
+  sopa: K('sopa', 'soup', 'sopa'), apimentado: K('apimentado', 'spicy', 'picante'), salada: K('salada', 'salad', 'ensalada'),
+  carne: K('carne', 'meat', 'carne'), batata: K('batata', 'potato', 'papa'), pao: K('pão', 'bread', 'pan'), doce: K('doce', 'sweets', 'dulces'),
+  diferente: K('pratos diferentes', 'new dishes', 'platos distintos'), algas: K('algas', 'algae', 'algas'), soja: K('soja', 'soy', 'soja'),
+};
+const tagNames = list => list.map(t => L(FOOD_TAG_NAMES[t] || t)).join(', ');

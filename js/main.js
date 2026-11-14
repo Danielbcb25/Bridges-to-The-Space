@@ -103,9 +103,6 @@ function draw(dt) {
       const p = U.earth.p;
       drawEarth(dt, p);
       drawChar(Object.assign({}, crewById('cmd').avatar), 'civil', p.x - R.earthCam, GROUND, p.face, p.moving ? Math.floor(p.walkT * 8) : 0, 'happy');
-      // placa próxima
-      const sign = !cityBusy() && earthLayout.props.find(s => s.type === 'sign' && Math.abs(s.x + 20 - p.x) < 46);
-      if (sign) bubble(sign.t, p.x - R.earthCam, GROUND - 34);
       break;
     }
     case 'setup': drawSetupBg(dt); break;
@@ -142,7 +139,7 @@ window.addEventListener('keydown', e => {
   const inGame = S && U.screen === 'game';
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && inGame) e.preventDefault();
   if (!inGame) return;
-  if (e.code === 'Enter' && S.scene !== 'intro' && !U.comms) { e.preventDefault(); Chat.focus(); return; }
+  if (e.code === 'Enter' && Net.role && S.scene !== 'intro' && !U.comms) { e.preventDefault(); Chat.focus(); return; }
   if (S.scene === 'earth') {
     if (e.code === 'Escape') cityEsc();
     if (e.code === 'KeyE' || e.code === 'Space') cityInteract();

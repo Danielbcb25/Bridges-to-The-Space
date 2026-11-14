@@ -1,6 +1,8 @@
 'use strict';
 // Dicionário es (chave = texto em português).
 Object.assign(I18N_DICT.es, {
+  "s67b": "Funciona directo en el navegador, incluso alojado en Vercel o GitHub Pages: el Comandante hace clic en <b>Multijugador → Crear sala</b> y comparte el código de 5 letras; los amigos entran con el código por internet, sin servidor y sin VPN (conexión P2P vía WebRTC).",
+  "s67c": "Opcional: para jugar en una red local con servidor propio, ejecute <code>node server/server.js</code> e indique ws://SU-IP:8080/ws en “Avanzado”.",
   "(opcional)": "(opcional)",
   "+ dedicado": "+ dedicado",
   "...mas uma esperança nos guia:": "...pero una esperanza nos guía:",

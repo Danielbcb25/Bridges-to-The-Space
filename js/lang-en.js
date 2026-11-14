@@ -1,6 +1,8 @@
 'use strict';
 // Dicionário en (chave = texto em português).
 Object.assign(I18N_DICT.en, {
+  "s67b": "It works right in the browser, even hosted on Vercel or GitHub Pages: the Commander clicks <b>Multiplayer → Create room</b> and shares the 5-letter code; friends join with the code over the internet, with no server and no VPN (P2P connection via WebRTC).",
+  "s67c": "Optional: to play on a local network with your own server, run <code>node server/server.js</code> and enter ws://YOUR-IP:8080/ws under “Advanced”.",
   "(opcional)": "(optional)",
   "+ dedicado": "+ dedicated",
   "...mas uma esperança nos guia:": "...but one hope guides us:",

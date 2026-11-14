@@ -6,13 +6,8 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 ## Jogar
 
 - **Solo (com bots):** abra `index.html` por qualquer servidor estático (ex.: GitHub Pages) ou rode o servidor abaixo.
-- **Multiplayer (até 6 tripulantes + Comandante):**
-
-```bash
-node server/server.js
-```
-
-Abra `http://localhost:8080` (ou o IP da máquina na rede). O Comandante cria a sala em *Multiplayer*; os outros entram com o código.
+- **Multiplayer (até 6 tripulantes + Comandante):** funciona direto no site (Vercel, GitHub Pages ou qualquer hospedagem estática), sem servidor e sem VPN. O Comandante clica em *Multiplayer → Criar sala* e passa o código de 5 letras; os amigos entram com o código. A conexão é P2P (WebRTC, biblioteca PeerJS em `js/vendor/`).
+- **Servidor próprio (opcional, rede local):** rode `node server/server.js`, abra `http://localhost:8080` e informe `ws://SEU-IP:8080/ws` em *Avançado*.
 
 ## Novidades
 
@@ -20,7 +15,8 @@ Abra `http://localhost:8080` (ou o IP da máquina na rede). O Comandante cria a 
 - **Terra explorável**: cidade com 8 edifícios educativos (dados da NASA) e 8 moradores com diálogos; o **Diário do Explorador** (J) dá até +3 pontos de verba.
 - **Qualquer destino na Estação Ponte-Alfa**: escolha até os exoplanetas errados — a viagem custa combustível, oxigênio, comida e dias, e mostra por que o planeta não serve (mais dados do NASA Exoplanet Archive).
 - **O jogo continua em Pontes-01**: construa campo solar, água, estufa, torre e pista; transmita dados à Terra; acenda o farol e receba 3 naves de tripulação (colonos) para fechar o final.
-- **Chat**: no multiplayer, conversa em tempo real entre os jogadores (Enter); no solo, converse com a tripulação e com o Controle da Missão (curiosidades da NASA).
+- **Chat**: só no multiplayer (Enter). No modo solo a tripulação e as pessoas da cidade falam em balões de fala.
+- **Idiomas**: inglês (padrão), português e espanhol.
 
 ## O que tem
 

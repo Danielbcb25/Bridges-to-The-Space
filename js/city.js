@@ -156,7 +156,9 @@ function drawCity(dt, cam) {
     const seen = E.read['npc:' + n.id];
     if (!seen) text('!', x, GROUND - SPR_H - 12 + Math.sin(R.t * 4) * 2, '#ffd34c', 10, 'center');
     const hot = near && near.type === 'n' && near.o === n;
-    if (hot) text('[E] ' + n.name, x, GROUND - SPR_H - 12, '#fff', 8, 'center');
+    if (hot && !talk) text('[E] ' + n.name, x, GROUND - SPR_H - 12, '#fff', 8, 'center');
+    if (talk) text(n.name, x, GROUND - SPR_H - 12, '#ffd34c', 8, 'center');
+    if (talk) R.cityBubble = { text: n.say[E.dialog.i], x, y: GROUND - SPR_H - 4 }; // desenhado depois das placas
   }
 }
 
@@ -166,11 +168,10 @@ function cityScreen() {
   if (U.comms) return commsScreen();
   const n = cityCount();
   let ov = '';
-  if (E.dialog) ov = cityDialog();
-  else if (E.panel) ov = cityPanel();
+  if (E.panel) ov = cityPanel();
   else if (E.diary) ov = cityDiary();
   const near = !cityBusy() ? cityNear() : null;
-  const prompt = near ? `<b>E</b> — ${near.type === 'b' ? esc(L(K('Entrar: ', 'Enter: ', 'Entrar: '))) + esc(L(near.o.name)) : esc(L(K('Conversar com ', 'Talk to ', 'Hablar con '))) + esc(near.o.name)}` : esc(L(K('← → / A D para andar · explore os prédios e converse com as pessoas', '← → / A D to walk · explore the buildings and talk to people', '← → / A D para caminar · explore los edificios y hable con la gente')));
+  const prompt = E.dialog ? `<b>E</b> — ${esc(L(K('Próxima fala ▶', 'Next line ▶', 'Siguiente ▶')))} · <b>Esc</b> — ${esc(L(K('sair', 'leave', 'salir')))}` : near ? `<b>E</b> — ${near.type === 'b' ? esc(L(K('Entrar: ', 'Enter: ', 'Entrar: '))) + esc(L(near.o.name)) : esc(L(K('Conversar com ', 'Talk to ', 'Hablar con '))) + esc(near.o.name)}` : esc(L(K('← → / A D para andar · explore os prédios e converse com as pessoas', '← → / A D to walk · explore the buildings and talk to people', '← → / A D para caminar · explore los edificios y hable con la gente')));
   return `<div class="earth-hud">
     <div class="tbox tl small"><b>TERRA · 2091</b><br>Qualidade do ar: <span class="red">péssima (IQA 312)</span><br>Temperatura: <span class="orange">46 °C</span><br>Água: racionamento nível 4</div>
     <div class="tbox tr small">${esc(L(K('Explore a cidade.', 'Explore the city.', 'Explore la ciudad.')))}<br>${esc(L(K('Comunicado em', 'Announcement in', 'Comunicado en')))} <b>${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}</b><br>🔍 ${esc(L(K('Descobertas', 'Discoveries', 'Descubrimientos')))}: <b>${n}/${CITY_TOTAL}</b> · ${esc(L(K('verba extra', 'extra budget', 'presupuesto extra')))}: <b>+${cityBonus()}</b><br><button class="btn tiny" data-ui="cityDiary">📓 ${esc(L(K('Diário', 'Diary', 'Diario')))} [J]</button> <button class="btn tiny" data-ui="earthSkip">⏭ ${esc(L(K('Ir ao comunicado', 'Skip to announcement', 'Ir al comunicado')))}</button></div>

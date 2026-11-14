@@ -106,9 +106,9 @@ function newGame(journey, mode) {
   const crew = [{
     id: 'cmd', role: 'comandante', roleName: 'Comandante', name: cmdAvatar.name || 'Comandante', avatar: cmdAvatar,
   }];
-  ROLES.forEach((r, i) => crew.push({ id: r.id, role: r.id, roleName: r.name, name: names[i], avatar: Object.assign(randomAvatar(), { name: names[i] }) }));
+  ROLES.forEach((r, i) => crew.push({ id: r.id, role: r.id, roleName: r.name, name: names[i], avatar: Object.assign(randomAvatar(Math.random, FEM_NAMES.includes(names[i])), { name: names[i] }) }));
   crew.forEach((c, i) => Object.assign(c, {
-    alive: true, status: 'ok', statusT: 0, humor: 85 + Math.floor(Math.random() * 10), saciedade: 90, nutricao: 80,
+    alive: true, status: 'ok', statusT: 0, humor: 85 + Math.floor(Math.random() * 10), saciedade: 90, nutricao: 80, nut: [80, 80, 80],
     x: 0, deck: 'U', tx: 0, tdeck: 'U', climb: 0, face: 1, walkT: 0, moving: false, task: null, idleT: Math.random() * 4,
     bubble: null, owner: c.id === 'cmd' ? 'host' : null, likes: [], avoid: [], allergy: [], sickness: null, noFoodDays: 0,
     outfit: 'suit', hibernating: false,
@@ -146,7 +146,7 @@ function applySetup() {
   const route = ROUTES.find(r => r.id === st.route);
   S.totalDays = Math.round((S.journey === 'curta' ? 12 : 30) * route.days);
   S.res = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: 60, plantacao: 40, dados: 200, medicos: 10, lixo: 0 };
-  S.cap = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: 120, plantacao: 80, dados: 400, medicos: 20, lixo: 40 };
+  S.cap = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: 60, plantacao: 40, dados: 400, medicos: 10, lixo: 40 };
   const addR = (k, v) => { S.res[k] += v; S.cap[k] = Math.max(S.cap[k], S.res[k]); };
   if (has('tanqueExtra')) { addR('combustivel', 100); }
   if (has('baterias')) { S.cap.energia += 20; S.res.energia += 20; }
@@ -201,6 +201,8 @@ function buildSchedule() {
 function addRes(k, v, reason) {
   if (!S.res.hasOwnProperty(k)) return;
   const before = S.res[k];
+  // estoques recebidos além da capacidade inicial (trocas, colheitas) ampliam o depósito em vez de sumir
+  if (v > 0 && S.cap[k] != null && ['comida', 'plantacao', 'agua', 'oxigenio', 'medicos'].includes(k) && before + v > S.cap[k]) S.cap[k] = before + v;
   S.res[k] = clamp(before + v, 0, S.cap[k] != null ? S.cap[k] * (k === 'lixo' ? 10 : 1) : 1e9);
   const real = S.res[k] - before;
   if (!reason) return real;
@@ -227,6 +229,8 @@ function effIndex() {
   for (const c of a) {
     if (c.status === 'ferido') e -= 4; if (c.status === 'incapacitado') e -= 7; if (c.sickness) e -= 5;
     if (c.saciedade < 30) e -= 3;
+    if (c.nut && c.nut[2] < 25) e -= 3; // sem vitaminas: cansaço
+    if (c.nut && (c.nut[0] < 20 || c.nut[1] < 20)) e -= 2;
   }
   const m = moralIndex(); if (m < 40) e -= 10; else if (m < 60) e -= 4;
   e -= (6 - (a.length - 1)) * 3;
@@ -319,7 +323,7 @@ function tickCrew(dt) {
   for (const c of S.crew) {
     if (!c.alive) continue;
     if (c.bubble) { c.bubble.t -= dt; if (c.bubble.t <= 0) c.bubble = null; }
-    if (c.statusT > 0) { c.statusT -= dt * (has('enfermaria') ? 1.6 : 1); if (c.statusT <= 0) { c.status = 'ok'; c.statusT = 0; if (c.id !== 'cmd') say(c, 'Estou melhor, voltando ao posto.'); } }
+    if (c.statusT > 0) { c.statusT -= dt * (has('enfermaria') ? 1.6 : 1) * (c.nut && c.nut[2] < 25 ? 0.6 : 1); if (c.statusT <= 0) { c.status = 'ok'; c.statusT = 0; if (c.id !== 'cmd') say(c, 'Estou melhor, voltando ao posto.'); } }
     if (c.hibernating) continue;
     const isHuman = c.owner && c.owner !== 'bot';
     if (c.task) {
@@ -430,6 +434,9 @@ function simulate(dt) {
     if (c.sickness) decay += 4;
     c.humor = clamp(c.humor - decay * f, 0, 100);
     c.saciedade = clamp(c.saciedade - 60 * f, 0, 100);
+    if (!c.nut) c.nut = [80, 80, 80];
+    for (let k = 0; k < 3; k++) c.nut[k] = clamp(c.nut[k] - 35 * f, 0, 100);
+    c.nutricao = (c.nut[0] + c.nut[1] + c.nut[2]) / 3;
     if (c.sickness) { c.sickT = (c.sickT || 0) + f; }
   }
   // Morte por falta de O2/água (limite de tempo real)
@@ -506,6 +513,7 @@ function serveMeal(slot) {
     }
   }
   if (!label) { eaters.forEach(c => c.noFood = true); logMsg('Sem comida para a refeição!', 'bad'); return; }
+  const nutr = foodNutr(tags.includes('racao') ? 'racao' : item);
   addRes('lixo', 0.05 * n, 'Restos de comida');
   fd.meals++;
   for (const c of eaters) {
@@ -523,7 +531,10 @@ function serveMeal(slot) {
     if (tags.includes('diferente') && c.likes.includes('diferente')) h += 1;
     c.humor = clamp(c.humor + h * 0.5, 0, 100);
     c.saciedade = clamp(c.saciedade + s, 0, 100);
-    c.nutricao = clamp(c.nutricao + (tags.includes('racao') ? -3 : 6), 0, 100);
+    if (!c.nut) c.nut = [80, 80, 80];
+    const lv = { pleno: 1, reduzido: 0.67, minimo: 0.33 }[fd.racionamento];
+    for (let k = 0; k < 3; k++) c.nut[k] = clamp(c.nut[k] + nutr[k] * lv, 0, 100);
+    c.nutricao = (c.nut[0] + c.nut[1] + c.nut[2]) / 3;
   }
   // mesa na refeição da noite
   if (slot === 2) {

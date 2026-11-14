@@ -45,7 +45,8 @@ const Chat = {
     this.render(true);
     setInterval(() => this.tick(), 500);
   },
-  visible() { return (typeof S !== 'undefined' && S && U.screen === 'game') || (Net.role && U.screen === 'lobby'); },
+  // o chat só existe no multiplayer; no modo solo a tripulação fala em balões
+  visible() { return !!Net.role && ((typeof S !== 'undefined' && S && U.screen === 'game') || U.screen === 'lobby'); },
   toggle(v) {
     this.open = v == null ? !this.open : v;
     if (this.open) { this.unread = 0; this.dirty = true; }
@@ -69,6 +70,10 @@ const Chat = {
   sysAll(k, kind) {
     const m = { sys: true, kind: kind || 'mc', k };
     if (typeof Net !== 'undefined' && Net.role === 'client') return; // clientes só recebem
+    if (typeof Net === 'undefined' || !Net.role) { // solo: sem chat — curiosidades viram aviso do rádio
+      if (kind === 'fact' && typeof S !== 'undefined' && S) S.toast = { text: k, kind: 'info', t: 8, id: Math.random() };
+      return;
+    }
     this.add(Object.assign({}, m));
     if (typeof Net !== 'undefined' && Net.role === 'host') Net.send({ t: 'bcast', msg: { t: 'chat', m } });
   },
@@ -194,6 +199,15 @@ const Chat = {
     this.els.host.style.display = vis ? '' : 'none';
     if (!vis) return;
     if (Date.now() < this.peekUntil + 600) this.render();
+    // solo: tripulantes comentam em balões de fala
+    if (typeof S !== 'undefined' && S && U.screen === 'game' && !Net.role && ['ship', 'colony'].includes(S.scene) && !S.paused && !(S.event && S.event.phase === 'run')) {
+      this.talkT = (this.talkT == null ? 25 : this.talkT) - 0.5;
+      if (this.talkT <= 0) {
+        this.talkT = 30 + Math.random() * 30;
+        const crew = S.crew.filter(c => c.alive && c.id !== U.me && !c.bubble && !c.hibernating && !c.eva);
+        if (crew.length) { const c = pick(crew); const line = this.crewAnswer(c, Math.random() < 0.25 ? 'status' : 'chat'); if (line) say(c, line.startsWith(c.name + ': ') ? line.slice(c.name.length + 2) : line, 7); }
+      }
+    }
     // curiosidades automáticas do Controle da Missão (host / solo)
     if (typeof S !== 'undefined' && S && U.screen === 'game' && Net.role !== 'client' && ['ship', 'station', 'detour', 'planet', 'migration'].includes(S.scene) && !S.paused) {
       this.factT -= 0.5;

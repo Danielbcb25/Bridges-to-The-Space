@@ -5,35 +5,113 @@
 // ============================================================
 'use strict';
 
+// Transporte:
+//  • "p2p" (padrão): WebRTC via PeerJS — funciona em sites estáticos (Vercel,
+//    GitHub Pages) sem servidor próprio e sem VPN. O host vira o "servidor".
+//  • "ws": servidor próprio opcional (node server/server.js).
+const PEER_PREFIX = 'pontes01-v1-';
+const PEER_ICE = [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:global.stun.twilio.com:3478' },
+  // relé TURN público (Open Relay Project) para redes que bloqueiam conexão direta
+  { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+];
+const roomCode = () => { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = ''; for (let i = 0; i < 5; i++) c += A[Math.floor(Math.random() * A.length)]; return c; };
+
 const Net = {
-  ws: null, role: null, room: null, players: {}, myRoleName: null, sendT: 0, posT: 0,
-  connect(url, onOpen) {
+  ws: null, peer: null, conn: null, conns: {}, nextPid: 1, mode: null, open: false,
+  role: null, room: null, players: {}, myRoleName: null, sendT: 0, posT: 0,
+  err(t) { U.lobby = Object.assign({}, U.lobby, { err: t, busy: false }); },
+  info(t) { U.lobby = Object.assign({}, U.lobby, { err: '', busy: t }); },
+  // ---------- envio ----------
+  send(m) {
+    if (this.mode === 'ws') { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(m)); return; }
+    if (this.mode !== 'p2p') return;
+    if (this.role === 'host') {
+      if (m.t === 'bcast') { const s = JSON.stringify(m.msg); for (const pid in this.conns) { const c = this.conns[pid]; if (c.open) try { c.send(s); } catch (e) { /* */ } } }
+      else if (m.t === 'to') { const c = this.conns[m.pid]; if (c && c.open) try { c.send(JSON.stringify(m.msg)); } catch (e) { /* */ } }
+    } else if (this.conn && this.conn.open) { try { this.conn.send(JSON.stringify(m)); } catch (e) { /* */ } }
+  },
+  ready() { return this.mode === 'ws' ? !!(this.ws && this.ws.readyState === 1) : this.mode === 'p2p' && (this.role === 'host' ? !!this.peer && this.open : !!(this.conn && this.conn.open)); },
+  // ---------- WebSocket (servidor próprio) ----------
+  connectWS(url, onOpen) {
     this.leave(true);
     let ws;
-    try { ws = new WebSocket(url); } catch (e) { return this.err('URL inválida.'); }
-    this.ws = ws;
+    try { ws = new WebSocket(url); } catch (e) { return this.err(T('URL inválida.')); }
+    this.ws = ws; this.mode = 'ws';
     ws.onopen = onOpen;
     ws.onmessage = ev => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } this.onMsg(m); };
-    ws.onerror = () => this.err('Não foi possível conectar ao servidor. Rode “node server/server.js” e abra o jogo por ele.');
-    ws.onclose = () => { if (this.ws === ws) { const was = this.role; this.ws = null; this.role = null; if (was === 'client') { S = null; U.screen = 'lobby'; this.err('Conexão encerrada.'); } } };
+    ws.onerror = () => this.err(T('Não foi possível conectar ao servidor. Rode “node server/server.js” e abra o jogo por ele.'));
+    ws.onclose = () => { if (this.ws === ws) { const was = this.role; this.ws = null; this.role = null; this.mode = null; if (was === 'client') { S = null; U.screen = 'lobby'; this.err(T('Conexão encerrada.')); } } };
   },
-  err(t) { U.lobby = Object.assign({}, U.lobby, { err: t }); },
-  send(m) { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(m)); },
-  host(url) { this.connect(url, () => this.send({ t: 'host' })); },
+  // ---------- P2P (PeerJS) ----------
+  peerOpts() { return Object.assign({ debug: 0, config: { iceServers: PEER_ICE } }, window.PEER_OPTS || {}); },
+  hasPeer() { if (typeof Peer === 'undefined') { this.err(T('Biblioteca de rede não carregou. Verifique a conexão.')); return false; } return true; },
+  hostP2P(tries = 0) {
+    this.leave(true); if (!this.hasPeer()) return;
+    const code = roomCode();
+    this.mode = 'p2p'; this.info(T('Criando sala...'));
+    const peer = new Peer(PEER_PREFIX + code, this.peerOpts()); this.peer = peer;
+    peer.on('open', () => { if (this.peer !== peer) return; this.open = true; this.onMsg({ t: 'room', code }); });
+    peer.on('connection', conn => {
+      const pid = String(this.nextPid++);
+      conn.on('open', () => { this.conns[pid] = conn; });
+      conn.on('data', d => {
+        let m; try { m = typeof d === 'string' ? JSON.parse(d) : d; } catch (e) { return; }
+        if (!m || typeof m !== 'object') return;
+        if (m.t === 'join' && Object.keys(this.players).length >= 6) { try { conn.send(JSON.stringify({ t: 'error', msg: T('Sala cheia.') })); } catch (e) { /* */ } return; }
+        m.pid = pid; this.onMsg(m);
+      });
+      const bye = () => { if (!this.conns[pid]) return; delete this.conns[pid]; this.onMsg({ t: 'leave', pid }); };
+      conn.on('close', bye); conn.on('error', bye);
+    });
+    peer.on('error', e => {
+      if (this.peer !== peer) return;
+      if (e.type === 'unavailable-id' && tries < 3) return this.hostP2P(tries + 1);
+      this.err(T('Erro de conexão online') + ' (' + e.type + ').');
+    });
+    peer.on('disconnected', () => { if (this.peer === peer && !peer.destroyed) try { peer.reconnect(); } catch (e) { /* */ } });
+  },
+  joinP2P(code, hello) {
+    this.leave(true); if (!this.hasPeer()) return;
+    this.mode = 'p2p'; this.info(T('Conectando...'));
+    const peer = new Peer(this.peerOpts()); this.peer = peer;
+    const timer = setTimeout(() => { if (this.peer === peer && !(this.conn && this.conn.open)) this.err(T('Não foi possível alcançar a sala. Confira o código e tente de novo.')); }, 20000);
+    peer.on('open', () => {
+      const conn = peer.connect(PEER_PREFIX + code, { reliable: true }); this.conn = conn;
+      conn.on('open', () => { clearTimeout(timer); this.room = code; this.send(hello); });
+      conn.on('data', d => { let m; try { m = typeof d === 'string' ? JSON.parse(d) : d; } catch (e) { return; } this.onMsg(m); });
+      conn.on('close', () => { if (this.conn === conn && this.role === 'client') this.onMsg({ t: 'closed' }); });
+    });
+    peer.on('error', e => {
+      if (this.peer !== peer) return;
+      clearTimeout(timer);
+      this.err(e.type === 'peer-unavailable' ? T('Sala não encontrada.') : T('Erro de conexão online') + ' (' + e.type + ').');
+    });
+  },
+  // ---------- API usada pela interface ----------
+  host(url) { if (url) this.connectWS(url, () => this.send({ t: 'host' })); else this.hostP2P(); },
   join(url, code) {
-    if (!code) return this.err('Digite o código da sala.');
+    if (!code) return this.err(T('Digite o código da sala.'));
     const av = Object.assign({}, DEFAULT_AVATAR, Save.data.avatar || {});
-    this.connect(url, () => this.send({ t: 'join', code, name: av.name || 'Tripulante', avatar: av }));
+    const hello = { t: 'join', code, name: av.name || 'Tripulante', avatar: av };
+    if (url) this.connectWS(url, () => this.send(hello)); else this.joinP2P(code, hello);
   },
   leave(silent) {
     if (this.ws) { try { this.ws.close(); } catch (e) { /* */ } }
-    this.ws = null; this.role = null; this.room = null; this.players = {};
-    if (S) S.crew.forEach(c => { if (c.owner && c.owner !== 'host') c.owner = null; });
+    if (this.conn) { try { this.conn.close(); } catch (e) { /* */ } }
+    for (const pid in this.conns) { try { this.conns[pid].close(); } catch (e) { /* */ } }
+    if (this.peer) { try { this.peer.destroy(); } catch (e) { /* */ } }
+    this.ws = null; this.peer = null; this.conn = null; this.conns = {}; this.open = false; this.mode = null;
+    this.role = null; this.room = null; this.players = {};
+    if (typeof S !== 'undefined' && S) S.crew.forEach(c => { if (c.owner && c.owner !== 'host') c.owner = null; });
     if (!silent) U.lobby = null;
   },
   onMsg(m) {
     switch (m.t) {
-      case 'room': this.role = 'host'; this.room = m.code; U.screen = 'lobby'; U.lobby = Object.assign({}, U.lobby, { err: '' }); break;
+      case 'room': this.role = 'host'; this.room = m.code; U.screen = 'lobby'; U.lobby = Object.assign({}, U.lobby, { err: '', busy: false }); break;
       case 'error': this.err(m.msg); break;
       // ---- host ----
       case 'join': {
@@ -73,7 +151,7 @@ const Net = {
       }
       case 'chat': if (this.role === 'host') Chat.fromPlayer(m.pid, m.text); else if (this.role === 'client') Chat.fromNet(m.m); break;
       // ---- cliente ----
-      case 'welcome': this.role = 'client'; this.room = m.code; U.me = m.crew; this.myRoleName = m.roleName; U.screen = 'lobby'; break;
+      case 'welcome': U.lobby = Object.assign({}, U.lobby, { err: '', busy: false }); this.role = 'client'; this.room = m.code; U.me = m.crew; this.myRoleName = m.roleName; U.screen = 'lobby'; break;
       case 'state': {
         if (this.role !== 'client') return;
         const keep = S && crewById(U.me);
@@ -85,7 +163,7 @@ const Net = {
         U.screen = 'game';
         break;
       }
-      case 'closed': S = null; U.screen = 'lobby'; this.role = null; this.err('O Comandante fechou a sala.'); break;
+      case 'closed': { const was = this.role; this.leave(true); if (was === 'client') { S = null; U.screen = 'lobby'; this.err(T('O Comandante fechou a sala.')); } break; }
     }
   },
   assignSeats() {
@@ -96,7 +174,7 @@ const Net = {
     }
   },
   tick(dt) {
-    if (!this.ws || this.ws.readyState !== 1) return;
+    if (!this.ready()) return;
     if (this.role === 'host' && S) {
       this.sendT -= dt;
       if (this.sendT <= 0) { this.sendT = 0.2; this.send({ t: 'bcast', msg: { t: 'state', S } }); }

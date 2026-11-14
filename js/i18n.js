@@ -20,7 +20,7 @@ const I18n = {
   init() {
     let l = null;
     try { l = (Save.data.settings.lang) || null; } catch (e) { /* */ }
-    if (!l) { const n = (navigator.language || 'pt').slice(0, 2).toLowerCase(); l = LANGS.some(x => x.id === n) ? n : 'pt'; }
+    if (!l || !LANGS.some(x => x.id === l)) l = 'en'; // inglês é o idioma padrão
     this.lang = l;
     this.apply();
   },
