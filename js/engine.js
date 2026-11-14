@@ -217,6 +217,36 @@ function available(c) { return c && c.alive && !c.hibernating && c.status !== 'i
 function roleAvailable(role) { return byRole(role).find(available); }
 function roleAlive(role) { return byRole(role).some(c => c.alive); }
 
+// ---------- Funções da tripulação no multiplayer ----------
+// Quem tem a função é chamado primeiro (jogador real ou bot). Se um jogador não
+// for até a estação a tempo, um bot da mesma função assume.
+const CALL_TIMEOUT = 45;
+const isHumanCrew = c => !!(c && c.owner && c.owner !== 'bot');
+function pickForRole(role, except) {
+  const cands = byRole(role).filter(c => available(c) && c.id !== except);
+  return cands.find(isHumanCrew) || cands.find(c => !isHumanCrew(c)) || null;
+}
+function pickBotForRole(role, except) {
+  const free = alive().filter(c => available(c) && !isHumanCrew(c) && c.id !== 'cmd' && c.id !== except);
+  return free.find(c => byRole(role).includes(c)) || free[0] || null;
+}
+function callCrew(c, task, role) {
+  if (isHumanCrew(c)) {
+    assignTask(c, Object.assign({}, task, { called: true, wait: 0, role: role || null }));
+    toast(`📢 ${c.name} foi chamado(a): ${task.label}`, 'info');
+  } else assignTask(c, task);
+}
+function handOffCall(c) {
+  const t = c.task; c.task = null; S.v++;
+  const step = t.key === 'evStep' && S.event ? S.event.steps.find(s => s.id === (t.data || {}).step) : null;
+  if (step && step.claimed === c.id) step.claimed = null;
+  const bot = pickBotForRole(t.role || 'engenheiro', c.id);
+  if (!bot) return toast(`${c.name} não atendeu o chamado.`, 'warn');
+  if (step) step.claimed = bot.id;
+  assignTask(bot, Object.assign({}, t, { called: false, t: 0 }));
+  toast(`${c.name} não atendeu o chamado; ${bot.name} assumiu.`, 'warn');
+}
+
 function moralIndex() {
   const a = alive().filter(c => !c.hibernating);
   if (!a.length) return 0;
@@ -337,6 +367,9 @@ function tickCrew(dt) {
         }
       } else if (!isHuman) {
         goTo(c, c.task.station, 0);
+      } else if (c.task.called && c.task.t === 0 && c.id !== U.me) {
+        c.task.wait = (c.task.wait || 0) + dt;
+        if (c.task.wait > CALL_TIMEOUT) handOffCall(c);
       }
     } else if (!isHuman) {
       // IA dos bots: ficam no posto, vão à mesa, passeiam
@@ -724,10 +757,11 @@ ACTIONS.repair = (p, actor) => {
   const sys = p.sys; if (!S.systems[sys] || S.systems[sys].hp >= 100) return;
   const st = Object.keys(STATIONS).find(k => STATIONS[k].sys === sys) || 'avionica';
   let who = actor;
-  if (p.call) { who = roleAvailable('engenheiro'); if (!who) return toast('Nenhum engenheiro disponível.', 'warn'); }
+  if (p.call) { who = pickForRole('engenheiro', actor && actor.id); if (!who) return toast('Nenhum engenheiro disponível.', 'warn'); }
   if (!available(who)) return toast('Este tripulante está ocupado.', 'warn');
   if (S.peças > 0) S.peças--; else { if (S.res.energia < 5) return toast('Energia insuficiente para o reparo.', 'warn'); addRes('energia', -5, 'Reparos'); }
-  assignTask(who, { station: st, dur: (has('drone') && sys === 'casco') ? 3 : 6, label: 'Reparar ' + SYSTEMS[sys].name, key: 'repair', data: { sys } });
+  const rt = { station: st, dur: (has('drone') && sys === 'casco') ? 3 : 6, label: 'Reparar ' + SYSTEMS[sys].name, key: 'repair', data: { sys } };
+  if (p.call) callCrew(who, rt, 'engenheiro'); else assignTask(who, rt);
 };
 TASK_DONE.repair = (c, d) => {
   let gain = 25 + (c.role.startsWith('engenheiro') ? 10 : 0) + (S.setup.origin === 'engenheiro' && c.id === 'cmd' ? 5 : 0) + (has('tEng') && c.role.startsWith('engenheiro') ? 5 : 0);
@@ -740,9 +774,10 @@ ACTIONS.replaceMeds = (p, actor) => {
   S.meds.validUntil = S.day + 12;
   toast('Estoque de remédios renovado (válido por 12 dias).', 'good');
 };
-ACTIONS.treat = (p) => {
+ACTIONS.treat = (p, actor) => {
   const c = crewById(p.id); if (!c || !c.alive || (c.status === 'ok' && !c.sickness)) return;
-  const cost = has('tMed') ? 1 : 2;
+  // o paramédico (jogador ou bot) trata gastando menos
+  const cost = (has('tMed') || (actor && actor.role === 'paramedico')) ? 1 : 2;
   if (!roleAlive('paramedico')) return toast('Sem paramédico, feridos não são tratados.', 'warn');
   if (S.res.medicos < cost) return toast('Sem recursos médicos.', 'warn');
   addRes('medicos', -cost, 'Tratamento');

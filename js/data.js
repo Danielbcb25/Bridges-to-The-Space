@@ -311,3 +311,13 @@ const FOOD_TAG_NAMES = {
   diferente: K('pratos diferentes', 'new dishes', 'platos distintos'), algas: K('algas', 'algae', 'algas'), soja: K('soja', 'soy', 'soja'),
 };
 const tagNames = list => list.map(t => L(FOOD_TAG_NAMES[t] || t)).join(', ');
+
+// o que cada função faz (mostrado ao jogador no multiplayer)
+const ROLE_DUTIES = {
+  paramedico: K('Trata feridos e doentes (gasta menos recursos), diagnostica na Enfermaria e cuida dos remédios.', 'Treats the injured and sick (uses fewer supplies), diagnoses at the Sickbay and manages medicines.', 'Trata heridos y enfermos (gasta menos recursos), diagnostica en la Enfermería y cuida los medicamentos.'),
+  navegador: K('Pilota na chuva de meteoros, gira a nave na fase térmica e confere o painel e o radar.', 'Pilots through meteor showers, spins the ship in the thermal phase and checks the panel and radar.', 'Pilota en la lluvia de meteoros, gira la nave en la fase térmica y revisa el panel y el radar.'),
+  agricultor: K('Cuida da horta e das colheitas e protege a plantação do frio e do calor.', 'Tends the garden and harvests, and protects the crops from cold and heat.', 'Cuida del huerto y las cosechas y protege el cultivo del frío y del calor.'),
+  engenheiro1: K('Faz os reparos: motores, tanques, filtros de ar, computador, radiadores, persianas e isolamento.', 'Does repairs: engines, tanks, air filters, computer, radiators, louvers and insulation.', 'Hace las reparaciones: motores, tanques, filtros de aire, computadora, radiadores, persianas y aislamiento.'),
+  engenheiro2: K('Faz os reparos: motores, tanques, filtros de ar, computador, radiadores, persianas e isolamento.', 'Does repairs: engines, tanks, air filters, computer, radiators, louvers and insulation.', 'Hace las reparaciones: motores, tanques, filtros de aire, computadora, radiadores, persianas y aislamiento.'),
+  pesquisador: K('Cuida dos equipamentos científicos e dos dados; decide o que desligar na sobrecarga.', 'Looks after the science equipment and data; decides what to switch off during an overload.', 'Cuida de los equipos científicos y los datos; decide qué apagar en la sobrecarga.'),
+};

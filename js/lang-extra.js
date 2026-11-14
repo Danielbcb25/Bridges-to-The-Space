@@ -97,6 +97,10 @@
   P(/^Coletar a maior parte do lixo \((\d+) de (\d+)\)$/, 'Collect most of the trash ($1 of $2)', 'Recoger la mayor parte de la basura ($1 de $2)');
   P(/^Levar toda a tripulação ao abrigo \((\d+)\/(\d+) nos Dormitórios\)$/, 'Take the whole crew to the shelter ($1/$2 in the Quarters)', 'Llevar a toda la tripulación al refugio ($1/$2 en los Dormitorios)');
   P(/^(.+) inutilizável até o fim da fase\.$/, (m, a) => `${t(a)} unusable until the end of the phase.`, (m, a) => `${t(a)} inutilizable hasta el final de la fase.`);
+  P(/^📢 (.+) foi chamado\(a\): (.+)$/, (m, a, b) => `📢 ${a} was called: ${t(b)}`, (m, a, b) => `📢 ${a} fue llamado/a: ${t(b)}`);
+  P(/^(.+) não atendeu o chamado; (.+) assumiu\.$/, '$1 did not answer the call; $2 took over.', '$1 no respondió al llamado; $2 tomó el relevo.');
+  P(/^(.+) não atendeu o chamado\.$/, '$1 did not answer the call.', '$1 no respondió al llamado.');
+  P(/^(.+) cuida pessoalmente: (.+) \(tripulante dedicado\)\.$/, (m, a, b) => `${a} handles it personally: ${t(b)} (dedicated crew member).`, (m, a, b) => `${a} se encarga personalmente: ${t(b)} (tripulante dedicado).`);
   P(/^Rádio — ([\d.,]+) MHz$/, 'Radio — $1 MHz', 'Radio — $1 MHz');
   P(/^Pousamos em (.+)! Mas uma colônia não se faz sozinha\.$/, (m, a) => `We landed at ${t(a)}! But a colony does not build itself.`, (m, a) => `¡Aterrizamos en ${t(a)}! Pero una colonia no se construye sola.`);
 })();
@@ -322,6 +326,15 @@
     'Energia': ['Energy', 'Energía'], 'Proteína': ['Protein', 'Proteína'], 'Vitaminas': ['Vitamins', 'Vitaminas'], 'Nutrição': ['Nutrition', 'Nutrición'], 'Saciedade': ['Fullness', 'Saciedad'], 'Humor': ['Mood', 'Ánimo'],
     'ferido': ['injured', 'herido'], 'incapacitado': ['incapacitated', 'incapacitado'],
     'Comandante com Sangue-frio: uma segunda chance por fase.': ['Commander with Cold blood: a second chance per phase.', 'Comandante con Sangre fría: una segunda oportunidad por fase.'],
+    'AGUARDANDO O COMANDANTE': ['WAITING FOR THE COMMANDER', 'ESPERANDO AL COMANDANTE'], 'Aguardando o Comandante iniciar a jornada e montar a nave...': ['Waiting for the Commander to start the journey and build the ship...', 'Esperando a que el Comandante inicie la travesía y arme la nave...'],
+    'Fechar sala': ['Close room', 'Cerrar sala'], 'SALA': ['ROOM', 'SALA'], 'Sala': ['Room', 'Sala'], 'Sair': ['Leave', 'Salir'], 'CONECTADO': ['CONNECTED', 'CONECTADO'],
+    'Passe o código para até 6 amigos. Cada um assume um tripulante; os lugares vazios ficam com bots.': ['Share the code with up to 6 friends. Each one takes a crew member; empty seats are filled by bots.', 'Pase el código a hasta 6 amigos. Cada uno asume un tripulante; los lugares vacíos quedan con bots.'],
+    'Você será:': ['You will be:', 'Usted será:'], 'Você será': ['You will be', 'Usted será'], 'Você é:': ['You are:', 'Usted es:'], 'Você é': ['You are', 'Usted es'],
+    'fique na estação': ['stay at the station', 'quédese en la estación'], 'Criar sala (Comandante)': ['Create room (Commander)', 'Crear sala (Comandante)'], 'Entrar como tripulante': ['Join as crew member', 'Entrar como tripulante'], 'Código da sala': ['Room code', 'Código de la sala'],
+    'Chamar eng.': ['Call eng.', 'Llamar ing.'], 'Chamar engenheiro': ['Call engineer', 'Llamar ingeniero'], 'Chamar navegador': ['Call navigator', 'Llamar navegante'], 'Chamar paramédico': ['Call paramedic', 'Llamar paramédico'], 'Chamar agricultor': ['Call farmer', 'Llamar agricultor'], 'Chamar pesquisador': ['Call researcher', 'Llamar investigador'], 'Chamar tripulante': ['Call crew member', 'Llamar tripulante'],
+    'Ir até lá': ['Go there', 'Ir allí'], 'a caminho…': ['on the way…', 'en camino…'], 'Eu faço': ['I do it', 'Lo hago yo'],
+    'Engenheiro 1': ['Engineer 1', 'Ingeniero 1'], 'Engenheiro 2': ['Engineer 2', 'Ingeniero 2'],
+    'PROJETO PONTES-01b: ALISTAMENTO': ['PONTES-01b PROJECT: ENLISTMENT', 'PROYECTO PONTES-01b: ALISTAMIENTO'], 'CHEGAMOS A PONTES-01b': ['WE MADE IT TO PONTES-01b', 'LLEGAMOS A PONTES-01b'],
     'Descansar / lazer': ['Rest / leisure', 'Descansar / ocio'],
     'Análises (sonda de reconhecimento)': ['Analyses (reconnaissance probe)', 'Análisis (sonda de reconocimiento)'], 'Análises (nave auxiliar de pouso)': ['Analyses (auxiliary lander)', 'Análisis (nave auxiliar de aterrizaje)'],
     'Perda de dados: −30 GB.': ['Data loss: −30 GB.', 'Pérdida de datos: −30 GB.'], 'Perda de dados: −15 GB.': ['Data loss: −15 GB.', 'Pérdida de datos: −15 GB.'],

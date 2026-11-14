@@ -352,3 +352,6 @@ pre { background: #070b24; border: 1px solid #2f5bd7; padding: 10px 14px; border
 .nutr { display: inline-flex; gap: 1px; align-items: flex-end; height: 1em; width: 1.4em; background: #070b24; border: 1px solid #2a3a7a; padding: 0 1px; }
 .nutr i { flex: 1; background: #ffd23f; } .nutr i.n1 { background: #ff8a5a; } .nutr i.n2 { background: #46e08a; } .nutr i.low { background: var(--red); }
 .nchip { display: inline-block; background: #0d1640; border: 1px solid #22357a; border-radius: 3px; padding: 0 0.3em; margin: 0.1em 0; white-space: nowrap; }
+
+/* chamado de função (multiplayer) */
+.callbar { position: absolute; left: 50%; bottom: 3.4em; transform: translateX(-50%); max-width: 80%; background: rgba(40, 30, 6, 0.95); border: 2px solid var(--yellow); border-radius: 6px; padding: 0.3em 0.8em; display: flex; gap: 0.5em; align-items: center; flex-wrap: wrap; justify-content: center; box-shadow: 0 0 16px rgba(255, 210, 63, 0.4); z-index: 3; }

@@ -106,9 +106,10 @@ function colonyMsg(k, kind) { // mensagem da Terra / sistema: toast + chat + fee
 // ---------- ações ----------
 const bots = () => S.crew.filter(c => c.alive && (!c.owner || c.owner === 'bot'));
 const roleMatch = (c, role) => role === 'engenheiro' ? c.role.startsWith('engenheiro') || (c.id === 'cmd' && S.setup.origin === 'engenheiro') : c.role === role;
-function pickWorker(role) {
-  const free = bots().filter(c => !c.ctask && c.status !== 'incapacitado');
-  return free.find(c => roleMatch(c, role)) || free.find(c => c.id !== 'cmd') || null;
+// quem tem a função é chamado primeiro (jogador ou bot); se ninguém da função estiver livre, um bot ajuda
+function pickWorker(role, except) {
+  const free = S.crew.filter(c => c.alive && !c.ctask && c.status !== 'incapacitado' && c.id !== 'cmd' && c.id !== except);
+  return free.find(c => roleMatch(c, role) && isHumanCrew(c)) || free.find(c => roleMatch(c, role)) || free.find(c => !isHumanCrew(c)) || null;
 }
 function costTxt(c) {
   const a = [];
@@ -167,14 +168,15 @@ ACTIONS.cTask = (p, actor) => {
   if (sp.err) return toast(sp.err, 'warn');
   const pe = canPay(sp.cost); if (pe) return toast(pe, 'warn');
   let who = actor;
-  if (p.call) { who = pickWorker(sp.role); if (!who) return toast(K('Nenhum tripulante livre para ajudar.', 'No free crew member to help.', 'Ningún tripulante libre para ayudar.'), 'warn'); }
+  if (p.call) { who = pickWorker(sp.role, actor && actor.id); if (!who) return toast(K('Nenhum tripulante livre para ajudar.', 'No free crew member to help.', 'Ningún tripulante libre para ayudar.'), 'warn'); }
   else if (Math.abs(who.x - CBUILD[sp.bid].x) > 90) return toast(K('Vá até o local para trabalhar.', 'Walk to the site to work.', 'Vaya al lugar para trabajar.'), 'warn');
   if (!who.alive) return;
   if (who.ctask) return toast(K('Este tripulante já está ocupado.', 'This crew member is busy.', 'Este tripulante está ocupado.'), 'warn');
   if (who.status === 'incapacitado') return toast(K('Tripulante incapacitado.', 'Crew member incapacitated.', 'Tripulante incapacitado.'), 'warn');
   pay(sp.cost);
   const mult = (roleMatch(who, sp.role) ? 1.4 : 1) * clamp(effIndex() / 82, 0.5, 1.3);
-  who.ctask = { key: p.k, bid: sp.bid, dur: sp.cost.dur / mult, t: 0, label: sp.label, data: p };
+  who.ctask = { key: p.k, bid: sp.bid, dur: sp.cost.dur / mult, t: 0, label: sp.label, data: p, role: sp.role, called: !!p.call && isHumanCrew(who), wait: 0 };
+  if (who.ctask.called) toast(K(`📢 ${who.name} foi chamado(a): ${L(sp.label)}`, `📢 ${who.name} was called: ${L(sp.label)}`, `📢 ${who.name} fue llamado/a: ${L(sp.label)}`), 'info');
   S.v++;
 };
 const CTASK_DONE = {
@@ -292,6 +294,10 @@ function tickColony(dt) {
         t.t += dt; c.moving = false;
         if (t.t >= t.dur) { c.ctask = null; S.v++; const fn = CTASK_DONE[t.key]; if (fn) fn(c, t); }
       } else if (!human) moveToward(c, B.x + (Math.random() * 20 - 10), dt, 60);
+      else if (t.called && t.t === 0 && c.id !== U.me) { // jogador chamado que não veio: um bot assume
+        t.wait = (t.wait || 0) + dt;
+        if (t.wait > CALL_TIMEOUT) { c.ctask = null; const bot = S.crew.find(b => b.alive && !b.ctask && !isHumanCrew(b) && b.id !== 'cmd' && b.status !== 'incapacitado' && roleMatch(b, t.role)) || S.crew.find(b => b.alive && !b.ctask && !isHumanCrew(b) && b.id !== 'cmd' && b.status !== 'incapacitado'); if (bot) { bot.ctask = Object.assign({}, t, { called: false, t: 0 }); toast(K(`${c.name} não atendeu; ${bot.name} assumiu.`, `${c.name} didn't answer; ${bot.name} took over.`, `${c.name} no respondió; ${bot.name} tomó el relevo.`), 'warn'); } S.v++; }
+      }
     } else if (!human) {
       c.idleT -= dt;
       if (c.idleT <= 0) { c.idleT = 4 + Math.random() * 8; c.wx = 90 + Math.random() * (COLONY_W - 180); if (Math.random() < 0.5) c.wx = CBUILD[pick(CORDER)].x + (Math.random() * 60 - 30); }
@@ -492,9 +498,11 @@ function colonyHud() {
   let prompt = '';
   if (m && m.ctask) prompt = `⏳ ${esc(L(m.ctask.label))} — ${Math.abs(m.x - CBUILD[m.ctask.bid].x) < 70 ? esc(L(K('fique aqui', 'stay here', 'quédese aquí'))) : esc(L(K('volte ao local!', 'go back to the site!', '¡vuelva al lugar!')))}`;
   else if (nb) prompt = `<b>E</b> — ${esc(L(CSHORT[nb]))}`;
+  let call = '';
+  if (m && m.ctask && m.ctask.called && Math.abs(m.x - CBUILD[m.ctask.bid].x) >= 70) call = `<div class="callbar"><b class="blink">📢</b> ${esc(L(K('Você foi chamado(a):', 'You were called:', 'Lo llamaron:')))} <b>${esc(L(m.ctask.label))}</b> <button class="btn small primary" data-ui="gotoC" data-arg="${m.ctask.bid}">${esc(L(K('Ir até lá', 'Go there', 'Ir allí')))}</button></div>`;
   return `<div class="hud-top"><div class="bars">${items.join('')}</div><div class="clock"><b>${esc(L(K('COLÔNIA · DIA', 'COLONY · DAY', 'COLONIA · DÍA')))} ${C.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}<br><small>${esc(C.site)}${C.storm > 0 ? ' · 🌪' : ''}</small></div></div>
     <div class="objbox"><b>${esc(L(K('MISSÃO PONTES-01b', 'PONTES-01b MISSION', 'MISIÓN PONTES-01b')))} ${doneN}/${obj.length}</b>${obj.map(o => `<div class="${o.done ? 'done' : ''}">${o.done ? '✔' : '▫'} ${esc(L(o.t))}</div>`).join('')}</div>
-    <div class="hud-bottom"><div class="prompt">${prompt}</div>
+    ${call}<div class="hud-bottom"><div class="prompt">${prompt}</div>
     <div class="btns"><button class="btn small" data-ui="panel" data-arg="c:nave">${esc(L(K('Controle', 'Control', 'Control')))}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div></div>`;
 }
 function ctaskBar(bid) {

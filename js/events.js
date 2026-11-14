@@ -107,16 +107,16 @@ ACTIONS.callRole = (p) => {
   const ev = S.event; if (!ev || ev.phase !== 'run') return;
   const step = p.step ? stepById(ev, p.step) : curStep(ev);
   if (!step || step.done) return;
+  const role = p.role || step.role || 'engenheiro';
   let c = null;
   if (p.id) c = crewById(p.id);
-  else c = byRole(p.role || step.role || 'engenheiro').find(x => available(x) && (!x.owner || x.owner === 'bot'));
+  else c = pickForRole(role) || pickBotForRole(role);
   if (!c && has('exemplo') && p.role) return toast('Ninguém disponível. Use “Exemplo em campo”: vá você mesmo.', 'warn');
   if (!c) return toast('Ninguém disponível para essa função.', 'warn');
-  if (c.owner && c.owner !== 'bot') return toast(`${c.name} é controlado por um jogador.`, 'warn');
   if (step.claimed) return;
   step.claimed = c.id;
-  assignTask(c, { station: step.station, dur: step.dur * (roleMatches(c, step.role) ? 1 : 1.5), label: step.label, key: 'evStep', data: { ev: ev.id, step: step.id }, ev: ev.id });
-  say(c, 'Indo agora: ' + step.label.toLowerCase() + '.');
+  callCrew(c, { station: step.station, dur: step.dur * (roleMatches(c, step.role) ? 1 : 1.5), label: step.label, key: 'evStep', data: { ev: ev.id, step: step.id }, ev: ev.id }, role);
+  if (!isHumanCrew(c)) say(c, 'Indo agora: ' + step.label.toLowerCase() + '.');
 };
 function roleMatches(c, role) {
   if (!role) return true;
@@ -670,9 +670,11 @@ ACTIONS.thAct = (p, actor) => {
   if (th.pendingReroll) return;
   // dedicado?
   th.dedic[k] = false; th.exemplo = th.exemplo || {};
-  if (p.dedic) {
-    const c = byRole(a.role).find(x => available(x) && (!x.owner || x.owner === 'bot'));
-    if (c) { th.dedic[k] = true; assignTask(c, { station: a.station, dur: 12 * th.D / 300, label: a.name, key: 'thBusy' }); }
+  // o próprio jogador com a função certa conta como tripulante dedicado
+  if (actor && roleMatches(actor, a.role) && actor.alive && actor.status !== 'incapacitado') { th.dedic[k] = true; thMsg(`${actor.name} cuida pessoalmente: ${a.short} (tripulante dedicado).`); }
+  else if (p.dedic) {
+    const c = pickForRole(a.role);
+    if (c) { th.dedic[k] = true; callCrew(c, { station: a.station, dur: 12 * th.D / 300, label: a.name, key: 'thBusy' }, a.role); }
     else if (has('exemplo')) { th.exemplo[k] = true; th.dedic[k] = true; thMsg('Exemplo em campo: o Comandante assume a função (−1).'); }
     else thMsg('Nenhum ' + a.role + ' disponível para se dedicar.');
   }
@@ -687,7 +689,7 @@ ACTIONS.thAct = (p, actor) => {
     }
   } else {
     const kwh = { rad: 6, heat: thHeatCost(), rep: 4.8, shut: 3 }[k];
-    if (k === 'rep') { const eng = byRole('engenheiro').find(available); if (!eng && !has('exemplo')) return toast('Nenhum engenheiro disponível para o reparo.', 'warn'); if (eng) assignTask(eng, { station: 'eclusa', dur: 12 * th.D / 300, label: 'Reparo do isolamento', key: 'thBusy' }); }
+    if (k === 'rep') { const eng = (actor && roleMatches(actor, 'engenheiro')) ? null : pickForRole('engenheiro'); if (!eng && !(actor && roleMatches(actor, 'engenheiro')) && !has('exemplo')) return toast('Nenhum engenheiro disponível para o reparo.', 'warn'); if (eng) callCrew(eng, { station: 'eclusa', dur: 12 * th.D / 300, label: 'Reparo do isolamento', key: 'thBusy' }, 'engenheiro'); }
     if (S.res.energia < kwh) return toast('Energia insuficiente.', 'warn');
     addRes('energia', -kwh, 'Regulação térmica: ' + a.short); th.kwh += kwh; S.stats.thermalKwh += kwh;
   }
@@ -695,12 +697,13 @@ ACTIONS.thAct = (p, actor) => {
   thRoll(k);
 };
 TASK_DONE.thBusy = () => {};
-ACTIONS.thMaint = (p) => {
+ACTIONS.thMaint = (p, actor) => {
   const th = S.thermal; if (!th) return;
   const k = p.k; const a = TH_ACTIONS[k];
-  const c = byRole(a.role).find(x => available(x) && (!x.owner || x.owner === 'bot'));
+  const c = (actor && roleMatches(actor, a.role) && available(actor)) ? actor : pickForRole(a.role);
   if (!c) return toast('Ninguém disponível para a manutenção.', 'warn');
-  assignTask(c, { station: a.station, dur: 10 * th.D / 300, label: 'Manutenção preventiva: ' + a.short, key: 'thMaint', data: { k } });
+  const mt = { station: a.station, dur: 10 * th.D / 300, label: 'Manutenção preventiva: ' + a.short, key: 'thMaint', data: { k } };
+  if (c === actor) assignTask(c, mt); else callCrew(c, mt, a.role);
   thMsg(`${c.name} faz manutenção preventiva em ${a.short} (1 min).`);
 };
 TASK_DONE.thMaint = (c, d) => { if (S.thermal) { S.thermal.maint[d.k] = true; thMsg(`Manutenção preventiva concluída: ${TH_ACTIONS[d.k].short} +1.`); } };

@@ -123,7 +123,8 @@ const Net = {
         this.send({ t: 'to', pid: m.pid, msg: { t: 'welcome', crew: free.id, roleName: free.name, code: this.room } });
         if (S) this.assignSeats();
         const nm = this.players[m.pid].name;
-        Chat.sysAll(K(`${nm} entrou como ${free.name}.`, `${nm} joined as ${free.name}.`, `${nm} entró como ${free.name}.`), 'join');
+        const rn = l => (I18N_DICT[l] && I18N_DICT[l][free.name]) || free.name;
+        Chat.sysAll(K(`${nm} entrou como ${free.name}.`, `${nm} joined as ${rn('en')}.`, `${nm} entró como ${rn('es')}.`), 'join');
         if (S) toast(`${nm} entrou como ${free.name}.`);
         break;
       }

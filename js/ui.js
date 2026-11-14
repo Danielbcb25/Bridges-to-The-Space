@@ -183,7 +183,7 @@ function lobbyScreen() {
     </div>`;
   }
   if (Net.role === 'client') {
-    return `<div class="panel center"><h2>CONECTADO</h2><p>Sala <span class="code">${esc(Net.room || '')}</span>. Você será: <b>${esc(Net.myRoleName || '...')}</b>.</p><p class="muted">Aguardando o Comandante iniciar a jornada e montar a nave...</p><div class="row"><button class="btn" data-ui="netLeave">◀ Sair</button></div></div>`;
+    return `<div class="panel center"><h2>CONECTADO</h2><p>Sala <span class="code">${esc(Net.room || '')}</span>. Você será: <b>${esc(Net.myRoleName || '...')}</b>.</p><p class="muted">Aguardando o Comandante iniciar a jornada e montar a nave...</p>${ROLE_DUTIES[U.me] ? `<p class="small cyan">${esc(L(K('Sua função:', 'Your role:', 'Su función:')))} ${esc(L(ROLE_DUTIES[U.me]))}</p><p class="small muted">${esc(L(K('Quando chamarem a sua função, aparece um aviso 📢: vá até a estação e pressione E. Se não for em 45 s, um bot assume.', 'When your role is called, a 📢 notice appears: go to the station and press E. If you don\'t go within 45 s, a bot takes over.', 'Cuando llamen a su función aparece un aviso 📢: vaya a la estación y presione E. Si no va en 45 s, un bot toma el relevo.')))}</p>` : ''}<div class="row"><button class="btn" data-ui="netLeave">◀ Sair</button></div></div>`;
   }
   return `<div class="panel center">
     <h2>MULTIPLAYER</h2>
@@ -314,8 +314,14 @@ function hudBottom() {
   }
   if (ev && ev.type === 'lixo' && ev.phase === 'run' && m && S.trash.some(t => t.deck === m.deck && Math.abs(t.x - m.x) < 16)) prompt = '<b>E</b> — recolher lixo';
   if (m && m.task) prompt = `⏳ ${esc(m.task.label)} — fique na estação`;
+  // chamado recebido (multiplayer): a função é sua — vá até a estação
+  let call = '';
+  if (m && m.task && m.task.called && !atStation(m, m.task.station, 20)) {
+    const left = Math.max(0, Math.ceil(CALL_TIMEOUT - (m.task.wait || 0)));
+    call = `<div class="callbar"><b class="blink">📢</b> ${esc(L(K('Você foi chamado(a):', 'You were called:', 'Lo llamaron:')))} <b>${esc(T(m.task.label))}</b> → ${esc(T(STATIONS[m.task.station].name))} <button class="btn small primary" data-ui="goto" data-arg="${m.task.station}">${esc(L(K('Ir até lá', 'Go there', 'Ir allí')))}</button></div>`;
+  }
   const p = S.progress;
-  return `<div class="hud-bottom">
+  return call + `<div class="hud-bottom">
     <div class="track"><span class="lbl">TERRA</span><div class="line"><i style="width:${p * 100}%"></i><em class="mk st" style="left:50%">◆</em><em class="ship" style="left:${p * 100}%">▶</em></div><span class="lbl cyan">PONTES-01b</span></div>
     <div class="prompt">${prompt}</div>
     <div class="btns"><button class="btn small" data-ui="panel" data-arg="report">[R] Relatório</button><button class="btn small" data-ui="panel" data-arg="crew">[T] Tripulação</button><button class="btn small" data-ui="panel" data-arg="fund">[F] Fundo ${S.fund}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div>
@@ -358,7 +364,7 @@ function eventPanel() {
     let btns = '';
     if (active && s.station) {
       btns = `<button class="btn tiny" data-ui="goto" data-arg="${s.station}">Ir até lá</button>`;
-      if (s.role || s.optional) { const rn = s.role === 'engenheiro' ? 'engenheiro' : (ROLES.find(r => r.id === s.role) || {}).short || 'tripulante'; btns += `<button class="btn tiny" data-act="callRole" data-p='${J({ step: s.id, role: s.role || 'engenheiro' })}'>Chamar ${esc(rn)}</button>`; }
+      if (s.role || s.optional) { const rn = s.role === 'engenheiro' ? 'engenheiro' : (ROLES.find(r => r.id === s.role) || {}).short || 'tripulante'; const who = pickForRole(s.role || 'engenheiro') || pickBotForRole(s.role || 'engenheiro'); btns += `<button class="btn tiny" data-act="callRole" data-p='${J({ step: s.id, role: s.role || 'engenheiro' })}'>${esc(L(K('Chamar', 'Call', 'Llamar')))} ${esc(T(rn).toLowerCase())}${who ? ' (' + esc(who.name) + (isHumanCrew(who) ? ' 🎮' : '') + ')' : ''}</button>`; }
       if (s.claimed) { const c = crewById(s.claimed); btns = `<em class="small">${esc(c ? c.name : '')} a caminho…</em>`; }
     }
     return `<li class="${s.done ? 'done' : active ? 'cur' : ''}">${s.done ? '✔' : active ? '▶' : '·'} ${esc(s.label)}${s.optional ? ' <small>(opcional)</small>' : ''}${st ? `<small class="st">📍 ${st}</small>` : ''}<div>${btns}</div></li>`;
@@ -500,8 +506,8 @@ function stationPanel(id) {
       body = `<div class="kv"><span>Lixo a bordo</span><b>${fmt(S.res.lixo, 1)} kg</b><span>Reciclador</span><b>${rec ? 'instalado' : 'não'}</b><span>Oficina 3D</span><b>${imp ? 'instalada' : 'não'}</b><span>Adubo</span><b>${fmt(S.adubo, 1)} kg</b><span>Peças</span><b>${S.peças}</b></div>
       <h4>Destino do lixo</h4><div class="opts">${opts.map(([k, n, d, off]) => `<button class="opt ${tm === k ? 'on' : ''} ${off ? 'cant' : ''}" ${off ? '' : `data-act="trashMode" data-p='${J({ mode: k })}'`}><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div class="row"><button class="btn small" data-act="processTrash">Processar agora (3 kg · 2 kWh)</button></div>
-      <h4>Como o lixo é reaproveitado</h4><p class="small">Lixo → <b>adubo</b> (use na Estufa: nutrientes a 100% e mais colheita) ${rec && imp ? '→ <b>peças de reparo</b> (Oficina 3D)' : ''}. Restos de comida, cascas e plantas estragadas também viram lixo. Sem reaproveitar, o lixo vira peso e tira humor da tripulação.</p>
-      <p class="small">O lixo é o espelho da poluição que expulsou a humanidade da Terra. Acima de 15 kg ele tira humor da tripulação.</p>`;
+      <h4>Como o lixo é reaproveitado</h4><p class="small">${esc(L(K('Lixo', 'Trash', 'Basura')))} → <b>${esc(L(K('adubo', 'fertilizer', 'abono')))}</b> ${esc(L(K('(use na Estufa: nutrientes a 100% e mais colheita)', '(use it in the Greenhouse: nutrients at 100% and a bigger harvest)', '(úselo en el Invernadero: nutrientes al 100% y más cosecha)')))} ${rec && imp ? '→ <b>' + esc(L(K('peças de reparo', 'repair parts', 'piezas de reparación'))) + '</b> (' + esc(L(K('Oficina 3D', '3D workshop', 'Taller 3D'))) + ')' : ''}. ${esc(L(K('Restos de comida, cascas e plantas estragadas também viram lixo. Sem reaproveitar, o lixo vira peso e tira humor da tripulação.', 'Food scraps, peels and spoiled plants also become trash. If it isn\'t reused, trash becomes dead weight and lowers the crew\'s mood.', 'Restos de comida, cáscaras y plantas estropeadas también se vuelven basura. Si no se reaprovecha, la basura es peso muerto y baja el ánimo de la tripulación.')))}</p>
+      <p class="small">${esc(L(K('O lixo é o espelho da poluição que expulsou a humanidade da Terra. Acima de 15 kg ele tira humor da tripulação.', 'Trash mirrors the pollution that drove humanity off Earth. Above 15 kg it lowers the crew\'s mood.', 'La basura es el reflejo de la contaminación que expulsó a la humanidad de la Tierra. Por encima de 15 kg baja el ánimo de la tripulación.')))}</p>`;
       break;
     }
     case 'eclusa': body = repairRow('acoplamento') + `<div class="row"><button class="btn small" data-act="ejectTrash">Ejetar lixo (${fmt(S.res.lixo, 1)} kg)</button></div>`; break;
@@ -786,6 +792,7 @@ UIH.panel = p => {
 UIH.closePanel = () => { U.panel = null; U.tab = null; U.cook = []; };
 UIH.tab = t => { U.tab = t; };
 UIH.goto = st => { U.autopilot = st; };
+UIH.gotoC = bid => { if (typeof CBUILD !== 'undefined' && CBUILD[bid]) U.clickTarget = { x: CBUILD[bid].x }; };
 UIH.farmSel = i => { U.farmSel = +i; };
 UIH.cookToggle = k => { const i = U.cook.indexOf(k); if (i >= 0) U.cook.splice(i, 1); else if (U.cook.length < 3) U.cook.push(k); };
 UIH.cookClear = () => { U.cook = []; };
