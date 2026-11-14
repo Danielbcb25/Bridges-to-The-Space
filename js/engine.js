@@ -292,9 +292,9 @@ function say(id, text, dur = 5) {
   const c = typeof id === 'string' ? crewById(id) : id;
   if (!c || !c.alive) return;
   c.bubble = { text, t: dur };
-  logMsg(`${c.roleName} ${c.name}: “${text}”`, 'say');
+  logMsg(`${c.roleName} ${c.name}: “${ptOf(text)}”`, 'say');
 }
-function sayRole(role, text, dur) { const c = byRole(role).find(x => x.alive); if (c) say(c, text, dur); else logMsg(text, 'say'); }
+function sayRole(role, text, dur) { const c = byRole(role).find(x => x.alive); if (c) say(c, text, dur); else logMsg(ptOf(text), 'say'); }
 function toast(text, kind = 'info') { S.toast = { text, kind, t: 4, id: Math.random() }; logMsg(ptOf(text), kind); }
 function narrate(text) { S.narration = { text, id: Math.random() }; logMsg('Narração: ' + ptOf(text), 'narr'); }
 
@@ -354,7 +354,7 @@ function tickCrew(dt) {
   for (const c of S.crew) {
     if (!c.alive) continue;
     if (c.bubble) { c.bubble.t -= dt; if (c.bubble.t <= 0) c.bubble = null; }
-    if (c.statusT > 0) { c.statusT -= dt * (has('enfermaria') ? 1.6 : 1) * (c.nut && c.nut[2] < 25 ? 0.6 : 1); if (c.statusT <= 0) { c.status = 'ok'; c.statusT = 0; if (c.id !== 'cmd') say(c, 'Estou melhor, voltando ao posto.'); } }
+    if (c.statusT > 0) { c.statusT -= dt * (has('enfermaria') ? 1.6 : 1) * (c.nut && c.nut[2] < 25 ? 0.6 : 1); if (c.statusT <= 0) { c.status = 'ok'; c.statusT = 0; if (c.id !== 'cmd') say(c, F('crew.c17')); } }
     if (c.hibernating) continue;
     const isHuman = c.owner && c.owner !== 'bot';
     if (c.task) {
@@ -565,8 +565,8 @@ function serveMeal(slot) {
     if (tags.some(t => c.avoid.includes(t))) h -= 2;
     if (tags.some(t => c.allergy.includes(t))) {
       const r = d10();
-      if (r === 1) { c.status = 'incapacitado'; c.statusT = 40; say(c, 'Estou com uma reação alérgica forte...'); }
-      else if (r <= 4) { c.status = 'ferido'; c.statusT = 20; say(c, 'Acho que comi algo que me fez mal.'); }
+      if (r === 1) { c.status = 'incapacitado'; c.statusT = 40; say(c, F('crew.c18')); }
+      else if (r <= 4) { c.status = 'ferido'; c.statusT = 20; say(c, F('crew.c19')); }
       else h -= 1;
     }
     if (tags.includes('diferente') && c.likes.includes('diferente')) h += 1;
@@ -604,7 +604,7 @@ function newDay() {
       const r = d10();
       if (r === 1) kill(c, 'fome'); else if (r <= 4) { c.status = 'incapacitado'; c.statusT = 30; } else c.humor = clamp(c.humor - 5, 0, 100);
     }
-    if (fd.racionamento === 'minimo' && (S.minDays || 0) >= 3 && d10() <= 2 && c.status === 'ok') { c.status = 'incapacitado'; c.statusT = 15; say(c, 'Estou fraco... vou desmaiar.'); }
+    if (fd.racionamento === 'minimo' && (S.minDays || 0) >= 3 && d10() <= 2 && c.status === 'ok') { c.status = 'incapacitado'; c.statusT = 15; say(c, F('crew.c20')); }
   }
   S.minDays = fd.racionamento === 'minimo' ? (S.minDays || 0) + 1 : 0;
   // comida fresca estraga
@@ -616,7 +616,7 @@ function newDay() {
     }
   }
   // remédios vencidos
-  if (S.day === S.meds.validUntil) { toast('Os remédios da enfermaria venceram! Troque o estoque na Enfermaria.', 'warn'); sayRole('paramedico', 'Comandante, o lote de remédios venceu. Precisamos trocar.'); }
+  if (S.day === S.meds.validUntil) { toast('Os remédios da enfermaria venceram! Troque o estoque na Enfermaria.', 'warn'); sayRole('paramedico', F('crew.c21')); }
   if (S.day > S.meds.validUntil && Math.random() < 0.18 && !S.event && !S.schedule.some(e => e.type === 'doenca' && e.day < S.day + 2)) {
     S.schedule.push({ type: 'doenca', day: S.day + 0.4 }); S.schedule.sort((a, b) => a.day - b.day);
   }
@@ -855,5 +855,5 @@ ACTIONS.rest = (p, actor) => {
   const c = crewById(p.id || actor.id); if (!available(c)) return;
   assignTask(c, { station: 'dormitorio', dur: 6, label: 'Descansar / lazer', key: 'rest' });
 };
-TASK_DONE.rest = c => { c.humor = clamp(c.humor + 8 + shopBonus().moral / 3, 0, 100); say(c, 'Bem melhor depois de uma pausa.'); };
+TASK_DONE.rest = c => { c.humor = clamp(c.humor + 8 + shopBonus().moral / 3, 0, 100); say(c, F('crew.c22')); };
 ACTIONS.selfTask = (p, actor) => {}; // reservado

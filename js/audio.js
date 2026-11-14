@@ -76,20 +76,35 @@ const Sfx = {
 
 const Narrator = {
   speaking: false, voice: null,
+  // escolhe a voz mais natural disponível no idioma (vozes "Natural/Neural/Online", Google e "Enhanced/Premium" primeiro)
+  voices() {
+    if (!('speechSynthesis' in window)) return [];
+    const lg = I18n.speech().toLowerCase(), base = lg.slice(0, 2);
+    return speechSynthesis.getVoices().filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(base))
+      .map(v => {
+        let sc = 0; const n = v.name.toLowerCase(); const vl = v.lang.replace('_', '-').toLowerCase();
+        if (vl === lg) sc += 5;
+        if (/natural|neural|online/.test(n)) sc += 12;
+        if (/premium|enhanced|aprimorad|mejorad/.test(n)) sc += 9;
+        if (/google/.test(n)) sc += 7;
+        if (/francisca|thalita|luciana|antonio|jenny|aria|guy|samantha|ava|elvira|alvaro|dalia|paulina/.test(n)) sc += 3;
+        if (/espeak|robot|compact|novelty|whisper|bad news|zarvox|trinoids/.test(n)) sc -= 20;
+        if (!v.localService) sc += 1;
+        return { v, sc };
+      }).sort((a, b) => b.sc - a.sc).map(x => x.v);
+  },
   pickVoice() {
-    if (!('speechSynthesis' in window)) return null;
-    const vs = speechSynthesis.getVoices();
-    const lg = I18n.speech(), base = lg.slice(0, 2);
-    this.voice = vs.find(v => v.lang.replace('_', '-').toLowerCase() === lg.toLowerCase()) || vs.find(v => v.lang.toLowerCase().startsWith(base)) || null;
+    const list = this.voices(); const want = Save.data.settings.voice;
+    this.voice = (want && list.find(v => v.name === want)) || list[0] || null;
     return this.voice;
   },
-  say(text) {
+  say(text, opts) {
     if (!Save.data.settings.narration || !('speechSynthesis' in window)) return;
     try {
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(L(text));
-      u.lang = I18n.speech(); u.rate = 1.02; u.pitch = 0.95;
-      if (!this.voice) this.pickVoice();
+      u.lang = I18n.speech(); u.rate = (Save.data.settings.voiceRate || 1) * 0.98; u.pitch = (opts && opts.pitch) || 1;
+      if (!this.voice || !this.voice.lang.toLowerCase().startsWith(I18n.speech().slice(0, 2))) this.pickVoice();
       if (this.voice) u.voice = this.voice;
       u.onstart = () => { this.speaking = true; Music.refreshVolume(); };
       u.onend = u.onerror = () => { this.speaking = false; Music.refreshVolume(); };

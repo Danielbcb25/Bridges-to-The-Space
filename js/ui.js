@@ -54,7 +54,6 @@ function titleScreen() {
       <button class="mbtn" data-ui="lobby">👥 MULTIPLAYER</button>
       <button class="mbtn" data-ui="avatar">🧑‍🚀 CRIAR AVATAR</button>
       <button class="mbtn" data-ui="shop">✦ LOJA <small>${cr} créditos</small></button>
-      <button class="mbtn" data-ui="history">📖 HISTÓRIA</button>
       <button class="mbtn" data-ui="settings">⚙ CONFIGURAÇÕES</button>
     </div>
     <div class="tfoot">UM NOVO MUNDO NOS ESPERA...<b>PONTES01</b></div>
@@ -88,6 +87,8 @@ function settingsScreen(inGame) {
     <label class="field">Música <input type="range" min="0" max="1" step="0.05" value="${st.music}" data-set="music"></label>
     <label class="field">Efeitos <input type="range" min="0" max="1" step="0.05" value="${st.sfx}" data-set="sfx"></label>
     <label class="check"><input type="checkbox" data-set="narration" ${st.narration ? 'checked' : ''}> Narração por voz (pt-BR)</label>
+    <label class="field">${esc(L(K('Voz', 'Voice', 'Voz')))} <select data-set="voice"><option value="">${esc(L(K('Automática (a mais natural)', 'Automatic (most natural)', 'Automática (la más natural)')))}</option>${Narrator.voices().map(v => `<option value="${esc(v.name)}" ${st.voice === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}</select> <button class="btn small" data-ui="voiceTest">🔊</button></label>
+    <label class="field">${esc(L(K('Velocidade da voz', 'Voice speed', 'Velocidad de la voz')))} <input type="range" min="0.7" max="1.3" step="0.05" value="${st.voiceRate || 1}" data-set="voiceRate"></label>
     <label class="check"><input type="checkbox" data-set="showDice" ${st.showDice ? 'checked' : ''}> Modo professor: mostrar as rolagens dos dados</label>
     <label class="check"><input type="checkbox" data-set="fastEarth" ${st.fastEarth ? 'checked' : ''}> Abertura na Terra mais curta (30 s)</label>
     <div class="row"><button class="btn" data-ui="${inGame ? 'closePanel' : 'title'}">◀ Voltar</button></div>
@@ -115,16 +116,12 @@ function avatarScreen() {
   const opts = (key, obj, cur, names) => Object.keys(obj).map(k => `<button class="chip ${cur === k ? 'on' : ''}" data-ui="avs" data-arg="${key}:${k}">${names[k] || k}</button>`).join('');
   const hairNames = { careca: 'Careca', lateral: 'Repartido', curto: 'Curto', franja: 'Franja', longo: 'Longo', moicano: 'Moicano', blackpower: 'Black power', coque: 'Coque', raspado: 'Raspado', topete: 'Topete', rabo: 'Rabo de cavalo', trancas: 'Tranças', chanel: 'Chanel', cacheado: 'Cacheado', chiquinhas: 'Maria-chiquinha', ondulado: 'Ondulado', franjaLonga: 'Longo com franja' };
   const accNames = { nenhum: 'Nenhum', oculos: 'Óculos escuros', oculosRedondos: 'Óculos', barba: 'Barba', bigode: 'Bigode', cicatriz: 'Cicatriz', fone: 'Headset', bone: 'Boné', bandana: 'Bandana', sardas: 'Sardas', laco: 'Laço', tiara: 'Tiara', flor: 'Flor', presilha: 'Presilha' };
-  const paintPal = ['#000000', '#ffffff', '#ff0734', '#ff9019', '#fbff28', '#2fa84f', '#24c3ff', '#0026ff', '#7a3cff', '#ff4fa3', '#8e5529', '#ffb27f', 'erase'];
   return `<div class="avatar-screen">
+    <div class="av-topbtns"><button class="btn" data-ui="avRandom">🎲 Aleatório</button><button class="btn primary" data-ui="avSave">✔ Salvar</button><button class="btn" data-ui="title">◀ Voltar <kbd>Esc</kbd></button></div>
     <div class="av-left">
       <h2>CRIADOR DE AVATAR</h2>
-      <div class="previews"><canvas id="pv-civil" width="60" height="93"></canvas><canvas id="pv-suit" width="60" height="93"></canvas><canvas id="pv-helmet" width="60" height="93"></canvas></div>
-      <div class="muted small">Terra (sem traje) · Nave · Capacete</div>
-      <h3>Pintura livre (pixel a pixel)</h3>
-      <canvas id="paint" width="200" height="310" class="paintgrid"></canvas>
-      <div class="pal">${paintPal.map(c => `<button class="sw ${U.paintColor === c ? 'on' : ''} ${c === 'erase' ? 'erase' : ''}" style="${c === 'erase' ? '' : 'background:' + c}" data-ui="paintColor" data-arg="${c}">${c === 'erase' ? '⌫' : ''}</button>`).join('')}
-        <button class="btn small" data-ui="paintClear">Limpar pintura</button></div>
+      <div class="previews two"><div><canvas id="pv-civil" width="80" height="124"></canvas><small>${esc(L(K('Terra (sem traje)', 'Earth (no suit)', 'Tierra (sin traje)')))}</small></div><div><canvas id="pv-suit" width="80" height="124"></canvas><small>${esc(L(K('Nave (traje)', 'Ship (suit)', 'Nave (traje)')))}</small></div></div>
+      <p class="muted small">${esc(L(K('O capacete é padrão para toda a tripulação.', 'The helmet is standard for the whole crew.', 'El casco es estándar para toda la tripulación.')))}</p>
     </div>
     <div class="av-right scroll">
       <label class="field">Nome <input id="av-name" maxlength="14" value="${esc(a.name)}"></label>
@@ -142,20 +139,19 @@ function avatarScreen() {
       <div class="grp"><b>Cor da calça / saia</b>${sw('pants', CLOTH_COLORS, a.pants)}</div>
       <div class="grp"><b>Traje espacial</b>${sw('suit', SUIT_COLORS, a.suit)}</div>
       <div class="grp"><b>Mochila de O₂</b>${swc('pack', ['#ff9411', '#e8e8e8', '#38e07b', '#ff4fa3', '#24c3ff', '#ffd34c'], a.pack)}</div>
-      <div class="grp"><b>Visor</b>${sw('visor', VISOR_COLORS, a.visor, true)}</div>
       <div class="grp"><b>Insígnia</b>${swc('badge', ['#20a04f', '#e03030', '#2f7fff', '#ffd34c', '#7a3cff'], a.badge)}</div>
-      <div class="row"><button class="btn" data-ui="avRandom">🎲 Aleatório</button><button class="btn primary" data-ui="avSave">✔ Salvar</button><button class="btn" data-ui="title">◀ Voltar</button></div>
     </div>
   </div>`;
 }
 function drawAvatarPreviews() {
   const a = U.avatarDraft; if (!a) return;
   const frame = Math.floor(R.t * 6) % 4;
-  [['pv-civil', 'civil'], ['pv-suit', 'suit'], ['pv-helmet', 'helmet']].forEach(([id, of]) => {
+  [['pv-civil', 'civil'], ['pv-suit', 'suit']].forEach(([id, of]) => {
     const c = document.getElementById(id); if (!c) return;
     const g = c.getContext('2d'); g.imageSmoothingEnabled = false; g.clearRect(0, 0, c.width, c.height);
-    g.drawImage(getSprite(a, of, 'happy', [0, 1, 0, 2][frame]), 0, 0, 60, 93);
+    g.drawImage(getSprite(a, of, 'happy', [0, 1, 0, 2][frame]), 0, 0, c.width, c.height);
   });
+  return;
   const p = document.getElementById('paint'); if (!p) return;
   const g = p.getContext('2d'); g.imageSmoothingEnabled = false;
   g.fillStyle = '#1a2040'; g.fillRect(0, 0, 200, 310);
@@ -202,19 +198,13 @@ function lobbyScreen() {
 }
 
 // =============== CENAS DA PARTIDA ===============
-function introScreen() {
-  const i = U.introIdx, t = L(NARRATION_INTRO[i] || '');
-  const shown = t.slice(0, Math.floor(U.introT * 45));
-  return `<div class="intro"><div class="narr"><p>${esc(shown)}<span class="caret">▌</span></p></div>
-    <div class="row bottom"><button class="btn" data-ui="introSkip">Pular ⏭</button><button class="btn primary" data-ui="introNext">${i < NARRATION_INTRO.length - 1 ? 'Próximo ▶' : 'Começar ▶'}</button></div></div>`;
-}
 function earthScreen() { return cityScreen(); }
 function commsScreen() {
   if (U.comms === 1) return `<div class="modal-bg"><div class="panel center comm"><div class="blink red">● TRANSMISSÃO PRIORITÁRIA</div><h2>COMUNICADO</h2><p class="big">Você foi selecionado para uma missão espacial para salvar o futuro da humanidade.</p><div class="row"><button class="btn primary" data-ui="comms2">Continuar ▶</button></div></div></div>`;
   return `<div class="modal-bg"><div class="panel center comm wide"><div class="blink red">● PRÓXIMO COMUNICADO</div>
     <p>${L(K(`Você tem uma <b>verba limitada (${setupBudget()} pontos)</b> e <b>5 espaços de módulo</b> para montar uma nave de exploração. Não é possível comprar tudo: cada escolha é um sacrifício. Pontos não gastos viram um <b>fundo de contingência</b>.`, `You have a <b>limited budget (${setupBudget()} points)</b> and <b>5 module slots</b> to build an exploration ship. You cannot buy everything: every choice is a sacrifice. Unspent points become a <b>contingency fund</b>.`, `Tiene un <b>presupuesto limitado (${setupBudget()} puntos)</b> y <b>5 espacios de módulo</b> para armar una nave de exploración. No se puede comprar todo: cada elección es un sacrificio. Los puntos sin gastar se convierten en un <b>fondo de contingencia</b>.`))}</p>
     <p class="muted">${L(K('A nave precisa cuidar de: sanidade dos 6 tripulantes, plantações e estoque de alimentos, medicamentos e recursos clínicos, combustível, água, oxigênio, descarte de lixo e reciclagem, comunicação e equipamentos científicos.', 'The ship must look after: the sanity of the 6 crew members, crops and food stock, medicines and clinical supplies, fuel, water, oxygen, waste disposal and recycling, communication and scientific equipment.', 'La nave debe cuidar: la cordura de los 6 tripulantes, los cultivos y la reserva de alimentos, medicinas y recursos clínicos, combustible, agua, oxígeno, eliminación de basura y reciclaje, comunicación y equipos científicos.'))}</p>
-    <div class="seats">${ROLES.map(r => `<div class="seat"><b>${r.name}</b></div>`).join('')}</div>
+    <div class="seats sprites">${ROLES.map(r => { const c = S.crew.find(x => x.role === r.id); return `<div class="seat"><img src="${spriteURL(c ? c.avatar : DEFAULT_AVATAR, 'suit', 'happy', 2)}" alt=""><b>${esc(c ? c.roleName : r.name)}</b><span>${esc(L(ROLE_FN[r.id] || ''))}</span></div>`; }).join('')}</div>
     <div class="row"><button class="btn primary" data-ui="toSetup">Montar a nave ▶</button></div></div></div>`;
 }
 
@@ -291,18 +281,30 @@ function readinessAlerts() {
 }
 
 // ---------- HUD da nave ----------
+// HUD enxuto: 4 barras (oxigênio, fome, humor, armazenamento). ▾ mostra todos os recursos.
+function storagePct() {
+  const ks = ['agua', 'comida', 'energia', 'combustivel', 'medicos'];
+  const f = ks.map(k => clamp(S.cap[k] ? S.res[k] / S.cap[k] : 1, 0, 1));
+  return { avg: f.reduce((a, b) => a + b, 0) / f.length * 100, low: ks.filter((k, i) => f[i] < 0.2) };
+}
 function hudTop() {
   const r = S.res, c = S.cap;
-  const items = RES_META.map(m => {
-    const v = r[m.id], cap = m.id === 'lixo' ? 30 : c[m.id];
-    return `<div class="rb" title="${m.name}: ${fmt(v)} ${m.unit}"><span class="ic">${m.icon}</span>${bar(v, cap, '', m.inverse)}<span class="v">${fmt(v, v < 10 ? 1 : 0)}<small>${m.unit}</small></span></div>`;
-  });
-  const mo = moralIndex(), ef = effIndex();
-  items.push(`<div class="rb" title="Moral (média do humor + bônus)"><span class="ic">☺</span>${bar(mo, 100)}<span class="v">${fmt(mo, 0)}<small>pts</small></span></div>`);
-  items.push(`<div class="rb" title="Eficiência da tripulação"><span class="ic">⚙</span>${bar(ef, 100)}<span class="v">${fmt(ef, 0)}<small>%</small></span></div>`);
+  const crewA = alive().filter(x => !x.hibernating);
+  const fome = crewA.length ? crewA.reduce((a, x) => a + x.saciedade, 0) / crewA.length : 0;
+  const st = storagePct(); const mo = moralIndex();
+  const big = (ic, name, v, max, txt, title, extra) => `<div class="rb big" title="${esc(title)}"><span class="ic">${ic}</span><span class="nm">${esc(L(name))}</span>${bar(v, max)}<span class="v">${txt}</span>${extra || ''}</div>`;
+  const low = st.low.map(k => RES_META.find(m => m.id === k).icon).join('');
+  let items = [
+    big('🫁', K('Oxigênio', 'Oxygen', 'Oxígeno'), r.oxigenio, c.oxigenio, `${fmt(r.oxigenio, 0)}<small>kg</small>`, `O₂: ${fmt(r.oxigenio)} kg`),
+    big('🍱', K('Fome', 'Hunger', 'Hambre'), fome, 100, `${fmt(fome, 0)}<small>%</small>`, L(K('Saciedade média da tripulação · comida: ', 'Average crew fullness · food: ', 'Saciedad media de la tripulación · comida: ')) + fmt(r.comida) + ' kg'),
+    big('☺', K('Humor', 'Mood', 'Ánimo'), mo, 100, `${fmt(mo, 0)}`, L(K('Moral (média do humor + bônus)', 'Morale (average mood + bonus)', 'Moral (promedio del ánimo + bono)'))),
+    big('📦', K('Armazenamento', 'Storage', 'Almacenamiento'), st.avg, 100, `${fmt(st.avg, 0)}<small>%</small>`, ['agua', 'comida', 'energia', 'combustivel', 'medicos'].map(k => { const m = RES_META.find(x => x.id === k); return `${T(m.name)}: ${fmt(r[k], 0)} ${m.unit}`; }).join(' · '), low ? `<b class="lowres blink">${low}</b>` : ''),
+  ].join('');
+  if (U.hudFull) items += '<div class="hudfull">' + RES_META.map(m => { const v = r[m.id], cap = m.id === 'lixo' ? 30 : c[m.id]; return `<div class="rb" title="${m.name}: ${fmt(v)} ${m.unit}"><span class="ic">${m.icon}</span>${bar(v, cap, '', m.inverse)}<span class="v">${fmt(v, v < 10 ? 1 : 0)}<small>${m.unit}</small></span></div>`; }).join('') + '</div>';
   const hh = Math.floor(S.dayT / S.dayLen * 24), mm = Math.floor((S.dayT / S.dayLen * 24 * 60) % 60);
   const stageNames = ['Preparação', 'Partida e viagem', 'Exploração científica', 'O novo mundo', 'Migração'];
-  return `<div class="hud-top"><div class="bars">${items.join('')}</div><div class="clock"><b>DIA ${S.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}<br><small>${stageNames[Math.min(S.stage, 4)]}</small>${S.commDown > 0 ? '<br><small class="red">📡 sem comunicação</small>' : ''}${S.cylinders ? '<br><small class="orange">🫁 cilindros de O₂</small>' : ''}</div></div>`;
+  const fastBtn = `<button class="btn tiny ${S.fast ? 'on' : ''}" data-ui="fast" title="Shift+S">${S.fast ? '⏩ 2x' : '⏩'}</button>`;
+  return `<div class="hud-top slim"><div class="bars">${items}<button class="btn tiny more" data-ui="hudFull" title="${esc(L(K('Todos os recursos', 'All resources', 'Todos los recursos')))}">${U.hudFull ? '▴' : '▾'}</button></div><div class="clock"><b>DIA ${S.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${fastBtn}<br><small>${stageNames[Math.min(S.stage, 4)]}</small>${S.commDown > 0 ? '<br><small class="red">📡 sem comunicação</small>' : ''}${S.cylinders ? '<br><small class="orange">🫁 cilindros de O₂</small>' : ''}</div></div>`;
 }
 function hudBottom() {
   const m = me(); const near = m && m.alive ? stationNear(m) : null;
@@ -339,46 +341,47 @@ function tutorialBox() {
 }
 
 // ---------- painel de evento ----------
+// painel de desafio: menos texto, mais visual (ícones, barras e um passo de cada vez)
+const SYS_IC = { casco: '▣', termico: '🛡', propulsao: '🔥', tanques: '⛽', avionica: '🖥', suporte: '🫁', comunicacao: '📡', acoplamento: '🚪' };
 function eventPanel() {
   const ev = S.event; if (!ev) return '';
   const info = EVENT_INFO[ev.type];
+  const sysChips = info.systems.map(s => `<div class="schip" title="${esc(T(SYSTEMS[s].name))}"><span>${SYS_IC[s] || '⚙'}</span>${bar(sysHp(s), 100)}<em class="dmg ${SYSTEMS[s].dmg}">−${DMG_PCT[SYSTEMS[s].dmg]}%</em></div>`).join('');
+  const head = (cls) => `<div class="evhead ${cls || ''}"><span class="evic">${info.icon}</span><div>${cls === 'warn' ? `<div class="blink red small">⚠ ${esc(L(K('ALERTA', 'ALERT', 'ALERTA')))}</div>` : ''}<h2>${info.title}</h2></div></div>`;
   if (ev.phase === 'warn') {
-    return `<div class="evp warn"><div class="blink red">⚠ ALERTA DE DESAFIO</div><h2>${info.icon} ${info.title}</h2><p>${info.desc}</p>
-      <h4>Partes da nave envolvidas</h4>${info.systems.map(s => `<div class="sysline"><span>${SYSTEMS[s].name}</span><em class="dmg ${SYSTEMS[s].dmg}">Dano ${SYSTEMS[s].dmg} (−${DMG_PCT[SYSTEMS[s].dmg]}%)</em>${bar(sysHp(s), 100)}<b>${fmt(sysHp(s), 0)}%</b></div>`).join('')}
-      ${info.energy ? `<div class="sysline"><span>Energia</span><em class="dmg Médio">reserva</em>${bar(S.res.energia, S.cap.energia)}<b>${fmt(S.res.energia, 0)} kWh</b></div>` : ''}
-      ${has('radar') ? '<p class="cyan small">📡 Radar de longo alcance: aviso antecipado recebido.</p>' : ''}
-      <div class="row"><button class="btn primary" data-act="eventGo">Enfrentar agora (${Math.ceil(ev.warnT)} s)</button></div></div>`;
+    return `<div class="evp warn compact">${head('warn')}<div class="schips">${sysChips}${info.energy ? `<div class="schip"><span>⚡</span>${bar(S.res.energia, S.cap.energia)}</div>` : ''}</div>
+      <details class="evinfo"><summary>ℹ ${esc(L(K('O que está acontecendo?', 'What is happening?', '¿Qué está pasando?')))}</summary><p class="small">${info.desc}</p></details>
+      <div class="row"><button class="btn primary big" data-act="eventGo">${esc(L(K('Enfrentar', 'Face it', 'Enfrentar')))} ▶ <small>${Math.ceil(ev.warnT)}s</small></button></div></div>`;
   }
   if (ev.phase === 'result') {
     const r = ev.result;
-    return `<div class="evp result ${r.ok ? 'ok' : 'bad'}"><h2>${info.icon} ${info.title}</h2><h3 class="${r.ok ? 'green' : 'red'}">${r.grade || (r.ok ? 'SUCESSO' : 'FALHA')}</h3><p>${esc(r.text)}</p>
-      ${ev.type === 'termico' && ev.data.report ? `<div class="kv"><span>Energia gasta</span><b>${fmt(ev.data.report.kwh)} kWh</b><span>Combustível</span><b>${fmt(ev.data.report.fuel, 0)} kg</b><span>Plantação perdida</span><b>${fmt(ev.data.report.plants, 0)} kg</b><span>Falhas</span><b>${ev.data.report.fails}</b></div><p class="quote small">Na Terra, a atmosfera regula a temperatura de graça. Numa nave, tudo isso tem custo.</p>` : ''}
-      <p class="cyan">+${r.points} pontos</p><div class="row"><button class="btn primary" data-act="eventClose">Continuar ▶</button></div></div>`;
+    return `<div class="evp result compact ${r.ok ? 'ok' : 'bad'}">${head()}<div class="bigres ${r.ok ? 'green' : 'red'}">${r.ok ? '✔' : '✖'} ${r.grade || (r.ok ? 'SUCESSO' : 'FALHA')}</div>
+      ${r.points > 0 ? `<p class="cyan">+${r.points} pontos</p>` : ''}
+      ${r.text ? `<details class="evinfo"><summary>ℹ ${esc(L(K('Detalhes', 'Details', 'Detalles')))}</summary><p class="small">${esc(r.text)}</p></details>` : ''}
+      <div class="row"><button class="btn primary" data-act="eventClose">Continuar ▶</button></div></div>`;
   }
   if (ev.type === 'termico') return thermalPanel();
-  const pct = clamp(ev.t / ev.dur, 0, 1);
   const cs = curStep(ev);
-  const steps = ev.steps.map(s => {
-    const st = s.station ? STATIONS[s.station].name : '';
-    const active = !s.done && (s === cs || s.optional);
+  const active = ev.steps.filter(s => !s.done && (s === cs || s.optional));
+  const card = s => {
     let btns = '';
-    if (active && s.station) {
-      btns = `<button class="btn tiny" data-ui="goto" data-arg="${s.station}">Ir até lá</button>`;
-      if (s.role || s.optional) { const rn = s.role === 'engenheiro' ? 'engenheiro' : (ROLES.find(r => r.id === s.role) || {}).short || 'tripulante'; const who = pickForRole(s.role || 'engenheiro') || pickBotForRole(s.role || 'engenheiro'); btns += `<button class="btn tiny" data-act="callRole" data-p='${J({ step: s.id, role: s.role || 'engenheiro' })}'>${esc(L(K('Chamar', 'Call', 'Llamar')))} ${esc(T(rn).toLowerCase())}${who ? ' (' + esc(who.name) + (isHumanCrew(who) ? ' 🎮' : '') + ')' : ''}</button>`; }
-      if (s.claimed) { const c = crewById(s.claimed); btns = `<em class="small">${esc(c ? c.name : '')} a caminho…</em>`; }
+    if (s.station) {
+      btns = `<button class="btn tiny primary" data-ui="goto" data-arg="${s.station}">📍 ${esc(T(STATIONS[s.station].name))}</button>`;
+      if (s.role || s.optional) { const rn = s.role === 'engenheiro' ? 'engenheiro' : (ROLES.find(r => r.id === s.role) || {}).short || 'tripulante'; const who = pickForRole(s.role || 'engenheiro') || pickBotForRole(s.role || 'engenheiro'); btns += `<button class="btn tiny" data-act="callRole" data-p='${J({ step: s.id, role: s.role || 'engenheiro' })}'>${who ? `<img class="mini" src="${spriteURL(who.avatar, 'suit', 'happy', 1)}" alt="">` : ''}${esc(L(K('Chamar', 'Call', 'Llamar')))} ${esc(T(rn).toLowerCase())}${who && isHumanCrew(who) ? ' 🎮' : ''}</button>`; }
+      if (s.claimed) { const c = crewById(s.claimed); btns = `<em class="small">${esc(c ? c.name : '')} ⏳</em>`; }
     }
-    return `<li class="${s.done ? 'done' : active ? 'cur' : ''}">${s.done ? '✔' : active ? '▶' : '·'} ${esc(s.label)}${s.optional ? ' <small>(opcional)</small>' : ''}${st ? `<small class="st">📍 ${st}</small>` : ''}<div>${btns}</div></li>`;
-  }).join('');
+    return `<div class="stepcard ${s === cs ? 'cur' : ''}"><b>▶ ${esc(s.label)}</b>${s.optional ? ' <small>(opcional)</small>' : ''}<div class="row">${btns}</div></div>`;
+  };
+  const chips = ev.steps.map((s, i) => `<span class="dot ${s.done ? 'done' : s === cs ? 'cur' : ''}" title="${esc(T(s.label))}">${s.done ? '✔' : i + 1}</span>`).join('');
   let extra = '';
-  if (ev.type === 'tempestade') extra = `<div class="row"><button class="btn primary" data-act="shelter">Ordenar abrigo a todos</button></div><p class="small">${ev.data.storm ? 'A tempestade está passando...' : 'A tempestade chega em ' + Math.max(0, Math.ceil(ev.t - ev.data.stormAt)) + ' s.'}</p>`;
-  if (ev.type === 'lixo') extra = '<p class="small">' + L(K('Ande pela nave e pressione <b>E</b> perto do lixo flutuante para recolher.', 'Walk around the ship and press <b>E</b> near floating trash to pick it up.', 'Camine por la nave y pulse <b>E</b> cerca de la basura flotante para recogerla.')) + '</p>';
-  if (ev.type === 'traje' && ev.data.victim) extra = `<p class="small red">${esc(crewById(ev.data.victim).name)} está do lado de fora com o traje vazando!</p>`;
-  if (ev.type === 'doenca' && ev.data.victim) extra = `<p class="small">Doente: <b>${esc(crewById(ev.data.victim).name)}</b>. Remédios ${S.day > S.meds.validUntil ? '<span class="red">VENCIDOS</span>' : 'válidos até o dia ' + S.meds.validUntil}.</p>`;
-  return `<div class="evp run"><h2>${info.icon} ${info.title}</h2>
-    <div class="timer">${bar(ev.t, ev.dur, 'time')}<b>${Math.ceil(ev.t)} s</b></div>
-    <ol class="evsteps">${steps}</ol>${extra}
-    ${ev.puzzle ? puzzleHTML(ev) : ''}
-    <div class="evlog">${S.log.filter(l => Net.role || l.kind !== 'say').slice(-4).map(l => `<div class="${l.kind}">${esc(l.text)}</div>`).join('')}</div></div>`;
+  if (ev.type === 'tempestade') extra = `<div class="row"><button class="btn primary" data-act="shelter">🛏 ${esc(L(K('Todos ao abrigo', 'Everyone to shelter', 'Todos al refugio')))}</button><b class="${ev.data.storm ? 'red' : 'orange'}">☀ ${ev.data.storm ? '!!!' : Math.max(0, Math.ceil(ev.t - ev.data.stormAt)) + 's'}</b></div>`;
+  if (ev.type === 'lixo') extra = `<p class="small">🗑 <b>E</b> / ${esc(L(K('Espaço', 'Space', 'Espacio')))} ${esc(L(K('perto do lixo flutuante', 'near floating trash', 'cerca de la basura flotante')))}</p>`;
+  if (ev.type === 'traje' && ev.data.victim) { const v = crewById(ev.data.victim); extra = `<p class="small red"><img class="mini" src="${spriteURL(v.avatar, 'broken', 'sad', 1)}" alt=""> ${esc(v.name)} 🫁!</p>`; }
+  if (ev.type === 'doenca' && ev.data.victim) { const v = crewById(ev.data.victim); extra = `<p class="small"><img class="mini" src="${spriteURL(v.avatar, 'suit', 'sick', 1)}" alt=""> 🤒 <b>${esc(v.name)}</b> · 💊 ${S.day > S.meds.validUntil ? '<span class="red">✖</span>' : '✔'}</p>`; }
+  return `<div class="evp run compact">${head()}
+    <div class="timer">${bar(ev.t, ev.dur, 'time')}<b>${Math.ceil(ev.t)}s</b></div>
+    <div class="dots-row">${chips}</div>${active.map(card).join('')}${extra}
+    ${ev.puzzle ? puzzleHTML(ev) : ''}</div>`;
 }
 
 function puzzleHTML(ev) {
@@ -673,7 +676,7 @@ function endScreen() {
 function renderUI() {
   let scr = '', hud = '', side = '', modal = '';
   if (!S || U.screen !== 'game') {
-    const map = { title: titleScreen, journey: journeyScreen, history: historyScreen, settings: () => settingsScreen(false), shop: shopScreen, avatar: () => U.avatarDirty ? avatarScreen() : U.cache.scr, lobby: lobbyScreen };
+    const map = { story: storyScreen, title: titleScreen, journey: journeyScreen, history: historyScreen, settings: () => settingsScreen(false), shop: shopScreen, avatar: () => U.avatarDirty ? avatarScreen() : U.cache.scr, lobby: lobbyScreen };
     scr = (map[U.screen] || titleScreen)();
     U.avatarDirty = false;
   } else if (Net.role === 'client' && !['ship', 'station', 'detour', 'planet', 'migration', 'colony', 'end'].includes(S.scene)) {
@@ -685,7 +688,7 @@ function renderUI() {
       case 'setup': scr = U.setupDirty ? setupScreen() : U.cache.scr; U.setupDirty = false; break;
       case 'launch': scr = ''; break;
       case 'ship':
-        hud = hudTop() + tutorialBox() + hudBottom();
+        hud = hudTop() + assistMini() + hudBottom();
         side = eventPanel();
         if (U.panel === 'report') modal = reportPanel();
         else if (U.panel === 'crew') modal = `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Tripulação</h2>${crewList()}</div></div>`;
@@ -697,7 +700,7 @@ function renderUI() {
       case 'station': scr = stationScreen(); break;
       case 'detour': scr = S.detour ? detourScreen() : ''; break;
       case 'colony':
-        hud = colonyHud();
+        hud = colonyHud() + assistMini();
         if (S.colony.tut === 0) modal = colonyIntro();
         else if (U.panel === 'menu') modal = menuPanel();
         else if (U.panel === 'settings') modal = `<div class="modal-bg">${settingsScreen(true)}</div>`;
@@ -709,6 +712,9 @@ function renderUI() {
       case 'end': scr = endScreen(); break;
     }
   }
+  if (S && U.screen === 'game' && !hud && !['intro', 'launch', 'end'].includes(S.scene) && !(S.scene === 'earth' && U.comms)) hud = assistMini();
+  if (U.help && S && U.screen === 'game') modal = helpPanel();
+  sitePlayMode();
   const gameEl = document.getElementById('game'); const sc = S && U.screen === 'game' ? S.scene : 'menu'; if (gameEl.dataset.scene !== sc) gameEl.dataset.scene = sc;
   setHTML('scr', scr); setHTML('hud', hud); setHTML('side', side); setHTML('modal', modal);
   document.getElementById('side').className = S && S.event && S.event.type === 'termico' && S.event.phase === 'run' ? 'wide' : '';
@@ -722,6 +728,8 @@ function renderUI() {
 
 // =============== HANDLERS ===============
 const UIH = {};
+UIH.voiceTest = () => { Narrator.voice = null; Narrator.say(K('Olá, Comandante. Esta é a voz da missão Pontes-01b.', 'Hello, Commander. This is the voice of the Pontes-01b mission.', 'Hola, Comandante. Esta es la voz de la misión Pontes-01b.')); };
+UIH.hudFull = () => { U.hudFull = !U.hudFull; };
 UIH.title = () => { U.screen = 'title'; Music.play('intro'); };
 UIH.journey = () => { U.screen = 'journey'; S = null; };
 UIH.history = () => { U.screen = 'history'; };
@@ -742,23 +750,19 @@ UIH.avPreset = g => {
 UIH.avRandom = () => { const n = U.avatarDraft.name; U.avatarDraft = Object.assign(randomAvatar(), { name: n, suit: Math.floor(Math.random() * SUIT_COLORS.length) }); U.avatarDirty = true; };
 UIH.paintColor = c => { U.paintColor = c; U.avatarDirty = true; };
 UIH.paintClear = () => { U.avatarDraft.paint = {}; };
-UIH.avSave = () => { const n = $('#av-name'); if (n) U.avatarDraft.name = n.value.trim() || 'Comandante'; Save.data.avatar = U.avatarDraft; Save.write(); Sfx.ok(); UIH.title(); };
+UIH.avSave = () => { if (U.avatarDraft) { delete U.avatarDraft.paint; U.avatarDraft.visor = DEFAULT_AVATAR.visor; } const n = $('#av-name'); if (n) U.avatarDraft.name = n.value.trim() || 'Comandante'; Save.data.avatar = U.avatarDraft; Save.write(); Sfx.ok(); UIH.title(); };
 UIH.startGame = journey => {
   const mode = Net.role === 'host' ? 'host' : 'solo';
   newGame(journey, mode);
   if (Net.role === 'host') Net.assignSeats();
-  U.screen = 'game'; U.introIdx = 0; U.introT = 0; U.panel = null; U.me = 'cmd';
-  S.scene = 'intro'; Narrator.say(NARRATION_INTRO[0]); Music.play('intro');
+  U.screen = 'game'; U.panel = null; U.me = 'cmd'; U.help = false;
+  S.scene = 'intro'; Music.play('intro');
+  modeIntroStart(Net.role === 'host' ? 'multi' : journey); // introdução interativa do modo escolhido
 };
-UIH.introNext = () => {
-  if (U.introT * 45 < L(NARRATION_INTRO[U.introIdx]).length) { U.introT = 999; return; }
-  U.introIdx++; U.introT = 0;
-  if (U.introIdx >= NARRATION_INTRO.length) return UIH.introSkip();
-  Narrator.say(NARRATION_INTRO[U.introIdx]);
-};
-UIH.introSkip = () => { Narrator.stop(); S.scene = 'earth'; cityInit(); };
+UIH.introNext = () => UIH.mNext();
+UIH.introSkip = () => { Narrator.stop(); U.mintro = null; S.scene = 'earth'; cityInit(); };
 UIH.earthSkip = () => { cityComms(); };
-UIH.comms2 = () => { U.comms = 2; Narrator.say('Próximo comunicado: você tem uma verba limitada para montar uma nave de exploração.'); };
+UIH.comms2 = () => { U.comms = 2; Narrator.say(F('comms.next')); };
 UIH.toSetup = () => { S.earthBonus = cityBonus(); S.scene = 'setup'; U.setupStep = 0; U.setupDirty = true; Music.play('fase'); };
 UIH.setStep = i => { U.setupStep = +i; U.setupDirty = true; };
 UIH.setNext = () => { U.setupStep = Math.min(SETUP_STEPS.length - 1, U.setupStep + 1); U.setupDirty = true; };
@@ -821,7 +825,7 @@ function bindUI() {
   layer.addEventListener('input', e => {
     const t = e.target;
     if (t.id === 'av-name' && U.avatarDraft) U.avatarDraft.name = t.value;
-    if (t.dataset.set) { const st = Save.data.settings; st[t.dataset.set] = t.type === 'checkbox' ? t.checked : +t.value; Save.write(); Music.refreshVolume(); if (t.dataset.set === 'narration' && !t.checked) Narrator.stop(); }
+    if (t.dataset.set) { const st = Save.data.settings; st[t.dataset.set] = t.type === 'checkbox' ? t.checked : t.tagName === 'SELECT' ? t.value : +t.value; Save.write(); if (t.dataset.set === 'voice') Narrator.voice = null; Music.refreshVolume(); if (t.dataset.set === 'narration' && !t.checked) Narrator.stop(); }
   });
   layer.addEventListener('change', e => {
     const t = e.target;

@@ -54,14 +54,7 @@ const CSHIPS = [
   { n: 2, name: 'Arca-3', size: 15, sup: { kwh: 12, agua: 100, comida: 30 } },
   { n: 3, name: 'Arca-4', size: 20, sup: { kwh: 15, agua: 120, comida: 40 } },
 ];
-const CFACTS = [
-  K('Controle da Missão: na ISS, os astronautas perdem 1% a 1,5% da massa óssea por mês sem gravidade e treinam cerca de 2 horas por dia para reduzir isso (NASA).', 'Mission Control: on the ISS, astronauts lose 1–1.5% of bone mass per month in microgravity and exercise about 2 hours a day to reduce it (NASA).', 'Control de la Misión: en la ISS los astronautas pierden entre 1% y 1,5% de masa ósea por mes sin gravedad y entrenan unas 2 horas al día para reducirlo (NASA).'),
-  K('Controle da Missão: um astronauta na ISS recebe cerca de 80 mSv de radiação em 6 meses; na Terra, a média natural é ≈ 3 mSv por ano (NASA).', 'Mission Control: an ISS astronaut gets about 80 mSv of radiation in 6 months; on Earth the natural average is ≈ 3 mSv a year (NASA).', 'Control de la Misión: un astronauta en la ISS recibe unos 80 mSv de radiación en 6 meses; en la Tierra el promedio natural es ≈ 3 mSv al año (NASA).'),
-  K('Controle da Missão: a Voyager 1, lançada em 1977, viaja a 17 km/s e já está a cerca de um dia-luz de nós. Mesmo assim, levaria ~75 mil anos para chegar à estrela mais próxima.', 'Mission Control: Voyager 1, launched in 1977, travels at 17 km/s and is already about one light-day away. Even so, it would take ~75,000 years to reach the nearest star.', 'Control de la Misión: la Voyager 1, lanzada en 1977, viaja a 17 km/s y ya está a casi un día luz. Aun así, tardaría ~75.000 años en llegar a la estrella más cercana.'),
-  K('Controle da Missão: já são mais de 6.000 exoplanetas confirmados no NASA Exoplanet Archive. Poucos estão na zona habitável da estrela.', 'Mission Control: there are over 6,000 confirmed exoplanets in the NASA Exoplanet Archive. Few lie in their star\'s habitable zone.', 'Control de la Misión: hay más de 6.000 exoplanetas confirmados en el NASA Exoplanet Archive. Pocos están en la zona habitable de su estrella.'),
-  K('Controle da Missão: o telescópio James Webb observa a luz das estrelas atravessando atmosferas de exoplanetas para descobrir de que gases elas são feitas.', 'Mission Control: the James Webb telescope watches starlight pass through exoplanet atmospheres to learn which gases they contain.', 'Control de la Misión: el telescopio James Webb observa la luz de las estrellas atravesando atmósferas de exoplanetas para saber de qué gases están hechas.'),
-  K('Controle da Missão: recicle tudo! Na ISS, o lixo vai embora em cargueiros que queimam na reentrada; numa colônia, o lixo é matéria-prima.', 'Mission Control: recycle everything! On the ISS trash leaves on cargo ships that burn up on reentry; in a colony, waste is raw material.', 'Control de la Misión: ¡reciclen todo! En la ISS la basura sale en cargueros que se queman al reentrar; en una colonia, los residuos son materia prima.'),
-];
+const CFACTS = []; // preenchido por data/falas.json
 
 // ---------- estado ----------
 function startColony(site, score) {
@@ -233,10 +226,10 @@ function landShip(sh) {
   const mods = C.b.pista * 2 + (sh.beacon ? 4 : 0) + (C.b.torre >= 2 ? 1 : 0) + (sysHp('comunicacao') >= 70 ? 1 : 0) + (C.storm > 0 ? -3 : 0);
   const r = d20(); const ok = r === 20 || (r !== 1 && r + mods >= 9);
   if (!ok) {
-    sh.state = 'abort'; C.ships = C.ships.filter(x => x !== sh);
+    S.fast = 0; sh.state = 'abort'; C.ships = C.ships.filter(x => x !== sh);
     return colonyMsg(K('Pouso abortado! A ' + sh.name + ' voltou à órbita por falta de guiagem' + (C.storm > 0 ? ' e por causa da tempestade de poeira' : '') + '. Acenda o farol e melhore a pista, depois chame de novo.', 'Landing aborted! Ship ' + sh.name + ' went back to orbit for lack of guidance' + (C.storm > 0 ? ' and because of the dust storm' : '') + '. Light the beacon and improve the pad, then call again.', '¡Aterrizaje abortado! La nave ' + sh.name + ' volvió a órbita por falta de guía' + (C.storm > 0 ? ' y por la tormenta de polvo' : '') + '. Encienda la baliza y mejore la pista, luego llame de nuevo.'), 'bad');
   }
-  sh.state = 'landed'; C.shipsLanded++; C.colonists += sh.size;
+  S.fast = 0; sh.state = 'landed'; C.shipsLanded++; C.colonists += sh.size;
   addRes('energia', def.sup.kwh, 'Suprimentos da nave'); addRes('agua', def.sup.agua, 'Suprimentos da nave'); addRes('comida', def.sup.comida, 'Suprimentos da nave');
   moral(6); addPoints(60, 'Nave de tripulação recebida');
   colonyMsg(K(sh.name + ' pousou! +' + sh.size + ' colonos chegaram a Pontes-01b trazendo suprimentos. População: ' + colonyPop() + '.', sh.name + ' landed! +' + sh.size + ' colonists arrived on Pontes-01b with supplies. Population: ' + colonyPop() + '.', sh.name + ' aterrizó! +' + sh.size + ' colonos llegaron a Pontes-01b con suministros. Población: ' + colonyPop() + '.'), 'good');
@@ -262,7 +255,7 @@ function colonyNewDay() {
   }
   if (C.short.comida >= 3 || C.short.agua >= 3) return fail(C.short.comida >= 3 ? 'A colônia ficou sem comida por 3 dias. Sem produção de alimentos local, a vida em outro planeta não se sustenta.' : 'A colônia ficou sem água por 3 dias. Sem água, não há colônia.');
   if (C.day > 3 && C.storm <= 0 && C.b.solar > 0 && Math.random() < 0.14) {
-    C.storm = 2;
+    C.storm = 2; S.fast = 0;
     colonyMsg(K('Tempestade de poeira! A produção solar cai pela metade por 2 dias e pousos ficam mais difíceis. (Em Marte, tempestades de poeira já cobriram o planeta inteiro e silenciaram o rover Opportunity em 2018.)', 'Dust storm! Solar output drops by half for 2 days and landings get harder. (On Mars, dust storms have covered the whole planet and silenced the Opportunity rover in 2018.)', '¡Tormenta de polvo! La producción solar baja a la mitad por 2 días y los aterrizajes se complican. (En Marte, las tormentas de polvo han cubierto todo el planeta y silenciaron al rover Opportunity en 2018.)'), 'bad');
   }
   for (const c of alive()) { c.humor = clamp(c.humor + (lack.length ? -2 : 1), 0, 100); }
@@ -334,7 +327,7 @@ function moveColonyHuman(c, dt) {
   if (L_ || R_) U.clickTarget = null;
   let dx = (R_ ? 1 : 0) - (L_ ? 1 : 0);
   if (!dx && U.clickTarget) { const d = U.clickTarget.x - c.x; if (Math.abs(d) < 3) U.clickTarget = null; else dx = Math.sign(d); }
-  if (dx) { c.x = clamp(c.x + dx * (c.status === 'ferido' ? 40 : 75) * dt, 24, COLONY_W - 24); c.face = dx; c.moving = true; c.walkT += dt; }
+  if (dx) { c.x = clamp(c.x + dx * (c.status === 'ferido' ? 40 : 75) * (keys.ShiftLeft || keys.ShiftRight ? RUN_MULT : 1) * dt, 24, COLONY_W - 24); c.face = dx; c.moving = true; c.walkT += dt; }
   else c.moving = false;
   c.deck = 'L'; c.tx = c.x;
 }
@@ -396,7 +389,7 @@ function drawColony(dt) {
   const order = S.crew.filter(c => c.alive).sort((a, b) => a.x - b.x);
   for (const c of order) {
     const x = Math.round(c.x - cam); if (x < -30 || x > VW + 30) continue;
-    drawChar(c.avatar, 'suit', x, CGROUND + 14, c.face, c.moving ? Math.floor(c.walkT * 8) : 0, c.humor < 35 ? 'sad' : 'happy');
+    drawChar(c.avatar, 'suit', x, CGROUND + 14 - (c.jy || 0), c.face, c.moving ? Math.floor(c.walkT * 8) : 0, c.humor < 35 ? 'sad' : 'happy');
     const mine = c.id === U.me;
     text(c.name, x, CGROUND + 14 - SPR_H - 10, mine ? '#ffd34c' : (c.owner && c.owner !== 'bot' ? '#7dffb0' : '#bcd3ff'), 7, 'center');
     if (c.ctask) { const B = CBUILD[c.ctask.bid]; const pr = clamp(c.ctask.t / c.ctask.dur, 0, 1); cx.fillStyle = '#000'; cx.fillRect(x - 12, CGROUND + 14 - SPR_H - 3, 24, 4); cx.fillStyle = Math.abs(c.x - B.x) < 70 ? '#46e08a' : '#ffd23f'; cx.fillRect(x - 11, CGROUND + 14 - SPR_H - 2, Math.round(22 * pr), 2); }

@@ -1,0 +1,663 @@
+{
+ "_info": "Falas do jogo Pontes01 (PT/EN/ES). Edite aqui os textos falados: narração, moradores, tripulação e Controle da Missão.",
+ "story": [
+  {
+   "pt": "Em razão do iminente colapso terrestre, há tempos, as principais lideranças do planeta se reuniam em prol da sobrevivência humana.",
+   "en": "Because of Earth's imminent collapse, for a long time the planet's main leaders had been meeting for the sake of human survival.",
+   "es": "A causa del inminente colapso terrestre, desde hacía tiempo los principales líderes del planeta se reunían en favor de la supervivencia humana."
+  },
+  {
+   "pt": "Em meio ao caos, observatórios do mundo todo se uniram com o objetivo de localizar o planeta habitável mais próximo da Terra. E assim o fizeram.",
+   "en": "Amid the chaos, observatories around the world joined forces to find the habitable planet closest to Earth. And they did.",
+   "es": "En medio del caos, los observatorios de todo el mundo se unieron para localizar el planeta habitable más cercano a la Tierra. Y lo lograron."
+  },
+  {
+   "pt": "Nomeado de “Pontes-01b”, este passou a ser a única esperança de sobrevivência da Terra.",
+   "en": "Named “Pontes-01b”, it became Earth's only hope of survival.",
+   "es": "Llamado “Pontes-01b”, pasó a ser la única esperanza de supervivencia de la Tierra."
+  },
+  {
+   "pt": "Você passará a gerenciar uma das centenas de estações e naves espaciais lançadas ao espaço: seus recursos, sua tripulação e a rota para Pontes-01b.",
+   "en": "You will manage one of the hundreds of stations and spaceships launched into space: its resources, its crew and the route to Pontes-01b.",
+   "es": "Usted gestionará una de las cientos de estaciones y naves espaciales lanzadas al espacio: sus recursos, su tripulación y la ruta hacia Pontes-01b."
+  },
+  {
+   "pt": "Durante a expedição, você enfrentará chuvas de asteroides, radiação, microgravidade, a escassez de recursos e o psicológico de todos a bordo.",
+   "en": "During the expedition you will face asteroid showers, radiation, microgravity, scarce resources and everyone's psychological strain on board.",
+   "es": "Durante la expedición enfrentará lluvias de asteroides, radiación, microgravedad, la escasez de recursos y la presión psicológica de todos a bordo."
+  },
+  {
+   "pt": "Atenção! O jogo possui apenas um final. Caso este não seja alcançado, o jogador falha.",
+   "en": "Attention! The game has only one ending. If it is not reached, the player fails.",
+   "es": "¡Atención! El juego tiene un solo final. Si no se alcanza, el jugador fracasa."
+  }
+ ],
+ "npc": {
+  "lia": {
+   "name": "Ms. Lia",
+   "role": {
+    "pt": "Vendedora de água",
+    "en": "Water seller",
+    "es": "Vendedora de agua"
+   },
+   "say": [
+    {
+     "pt": "Ei, você! Isso, você mesmo! Chegue mais perto, não tenha medo.",
+     "en": "Hey, you! Yes, you! Come closer, don't be afraid.",
+     "es": "¡Eh, tú! ¡Sí, tú! Acércate, no tengas miedo."
+    },
+    {
+     "pt": "Olha esta cidade: lixo por todo lado, ar que arde, 46 °C… Dizem que estão alistando gente para Pontes-01b.",
+     "en": "Look at this city: trash everywhere, burning air, 46 °C… They say they are enlisting people for Pontes-01b.",
+     "es": "Mira esta ciudad: basura por todas partes, aire que quema, 46 °C… Dicen que están alistando gente para Pontes-01b."
+    },
+    {
+     "pt": "Racionamento nível 4… Cada gota conta. Você viu como os astronautas reciclam até o suor?",
+     "en": "Rationing level 4… every drop counts. Did you see how astronauts recycle even their sweat?",
+     "es": "Racionamiento nivel 4… cada gota cuenta. ¿Vio cómo los astronautas reciclan hasta el sudor?"
+    },
+    {
+     "pt": "A NASA diz: “o café de ontem é o café de amanhã”. Brincadeira de quem recicla a água da ISS!",
+     "en": "NASA jokes: “yesterday's coffee is tomorrow's coffee”. A joke from people who recycle ISS water!",
+     "es": "La NASA bromea: “el café de ayer es el café de mañana”. ¡Broma de quienes reciclan el agua de la ISS!"
+    },
+    {
+     "pt": "Leve água no coração, Comandante.",
+     "en": "Carry water in your heart, Commander.",
+     "es": "Lleve agua en el corazón, Comandante."
+    }
+   ]
+  },
+  "teo": {
+   "name": "Professor Théo",
+   "role": {
+    "pt": "Astrofísico",
+    "en": "Astrophysicist",
+    "es": "Astrofísico"
+   },
+   "say": [
+    {
+     "pt": "Quando eu era criança contava estrelas. Hoje contamos planetas: já passam de 6.000 os exoplanetas confirmados!",
+     "en": "As a kid I counted stars. Today we count planets: over 6,000 exoplanets are confirmed!",
+     "es": "De niño contaba estrellas. Hoy contamos planetas: ¡ya pasan de 6.000 los exoplanetas confirmados!"
+    },
+    {
+     "pt": "Nem todo planeta “parecido com a Terra” é bom. Perto de anãs vermelhas, as erupções da estrela podem arrancar a atmosfera.",
+     "en": "Not every “Earth-like” planet is good. Near red dwarfs, the star's flares can strip the atmosphere.",
+     "es": "No todo planeta “parecido a la Tierra” es bueno. Cerca de enanas rojas las erupciones pueden arrancar la atmósfera."
+    },
+    {
+     "pt": "Se um dia na estação alguém lhe oferecer um planeta “perfeito”… confira os dados antes de acelerar!",
+     "en": "If one day at the station someone offers you a “perfect” planet… check the data before you accelerate!",
+     "es": "Si un día en la estación le ofrecen un planeta “perfecto”… ¡revise los datos antes de acelerar!"
+    }
+   ]
+  },
+  "mari": {
+   "name": "Mari",
+   "role": {
+    "pt": "Estudante, 9 anos",
+    "en": "Student, age 9",
+    "es": "Estudiante, 9 años"
+   },
+   "say": [
+    {
+     "pt": "Meu professor disse que o astronauta Scott Kelly passou 340 dias na ISS e voltou ~5 cm mais alto!",
+     "en": "My teacher said astronaut Scott Kelly spent 340 days on the ISS and came back ~5 cm taller!",
+     "es": "¡Mi profesor dijo que el astronauta Scott Kelly pasó 340 días en la ISS y volvió ~5 cm más alto!"
+    },
+    {
+     "pt": "Sem gravidade a coluna se estica. Mas depois volta ao normal. Eu queria ver estrelas sem poluição…",
+     "en": "Without gravity the spine stretches. But it goes back to normal. I wish I could see stars without pollution…",
+     "es": "Sin gravedad la columna se estira. Pero luego vuelve a la normalidad. Quisiera ver estrellas sin contaminación…"
+    },
+    {
+     "pt": "Promete que vai mandar uma foto de Pontes-01b?",
+     "en": "Promise you'll send a photo of Pontes-01b?",
+     "es": "¿Promete que enviará una foto de Pontes-01b?"
+    }
+   ]
+  },
+  "ramos": {
+   "name": "Mr. Ramos",
+   "role": {
+    "pt": "Engenheiro aposentado",
+    "en": "Retired engineer",
+    "es": "Ingeniero jubilado"
+   },
+   "say": [
+    {
+     "pt": "Vi o pouso do Perseverance em Marte, em 2021, pela TV: os “7 minutos de terror” da descida, tudo sozinho, sem ninguém na Terra poder ajudar.",
+     "en": "I watched the Perseverance Mars landing in 2021 on TV: the “7 minutes of terror” of the descent, all alone, with nobody on Earth able to help.",
+     "es": "Vi el aterrizaje de Perseverance en Marte en 2021 por la tele: los “7 minutos de terror” del descenso, todo solo, sin nadie en la Tierra que pudiera ayudar."
+    },
+    {
+     "pt": "Depois disso o helicóptero Ingenuity voou 72 vezes em Marte, bem mais que as 5 previstas. Quem projeta bem, sobra margem.",
+     "en": "After that the Ingenuity helicopter flew 72 times on Mars, far more than the 5 planned. Good design leaves margin.",
+     "es": "Después el helicóptero Ingenuity voló 72 veces en Marte, bastante más que las 5 previstas. Quien diseña bien deja margen."
+    },
+    {
+     "pt": "Conselho de velho: leve peças sobressalentes!",
+     "en": "An old-timer's advice: bring spare parts!",
+     "es": "Consejo de viejo: ¡lleve piezas de repuesto!"
+    }
+   ]
+  },
+  "bia": {
+   "name": "Bia",
+   "role": {
+    "pt": "Enfermeira",
+    "en": "Nurse",
+    "es": "Enfermera"
+   },
+   "say": [
+    {
+     "pt": "No espaço os remédios também envelhecem mais rápido, por causa da radiação. A nave precisa renovar o estoque.",
+     "en": "In space medicines also age faster because of radiation. The ship must renew its stock.",
+     "es": "En el espacio los medicamentos también envejecen más rápido por la radiación. La nave debe renovar el stock."
+    },
+    {
+     "pt": "Se alguém ficar com enjoo, dor de cabeça ou febre: meça, compare os sintomas e só então escolha o remédio.",
+     "en": "If someone gets nausea, headache or fever: measure, compare symptoms and only then pick the medicine.",
+     "es": "Si alguien tiene náuseas, dolor de cabeza o fiebre: mida, compare los síntomas y solo entonces elija el medicamento."
+    }
+   ]
+  },
+  "gui": {
+   "name": "Gui",
+   "role": {
+    "pt": "Programador",
+    "en": "Programmer",
+    "es": "Programador"
+   },
+   "say": [
+    {
+     "pt": "Eu escrevo software de navegação. Um grau de erro na partida vira milhões de km de erro na chegada.",
+     "en": "I write navigation software. One degree of error at departure becomes millions of km at arrival.",
+     "es": "Escribo software de navegación. Un grado de error en la partida son millones de km de error en la llegada."
+    },
+    {
+     "pt": "A sonda DSOC da NASA já mandou vídeo por laser de 31 milhões de km, a 267 Mbps. Rádio é o passado!",
+     "en": "NASA's DSOC test sent laser video from 31 million km at 267 Mbps. Radio is the past!",
+     "es": "¡La prueba DSOC de la NASA mandó video por láser desde 31 millones de km a 267 Mbps. La radio es el pasado!"
+    }
+   ]
+  },
+  "nina": {
+   "name": "Professor Nina",
+   "role": {
+    "pt": "Professora de ciências",
+    "en": "Science teacher",
+    "es": "Profesora de ciencias"
+   },
+   "say": [
+    {
+     "pt": "Na Terra, a atmosfera regula a temperatura de graça. Numa nave tudo tem custo: calor só sai por radiação.",
+     "en": "On Earth the atmosphere regulates temperature for free. On a ship everything has a cost: heat only leaves by radiation.",
+     "es": "En la Tierra la atmósfera regula la temperatura gratis. En una nave todo tiene un costo: el calor solo sale por radiación."
+    },
+    {
+     "pt": "Por isso é mais fácil manter a Terra habitável do que habitar outro planeta. Lembre disso lá longe.",
+     "en": "That is why it is easier to keep Earth habitable than to inhabit another planet. Remember that out there.",
+     "es": "Por eso es más fácil mantener habitable la Tierra que habitar otro planeta. Recuerde eso allá lejos."
+    }
+   ]
+  },
+  "beto": {
+   "name": "Tio Beto",
+   "role": {
+    "pt": "Feirante de sementes",
+    "en": "Seed vendor",
+    "es": "Vendedor de semillas"
+   },
+   "say": [
+    {
+     "pt": "Batata, soja, alface, pimenta… Alface cresce em 4 dias, batata demora mais, mas rende mais. Planejar a horta é planejar a viagem.",
+     "en": "Potato, soy, lettuce, chile… Lettuce grows in 4 days, potato takes longer but yields more. Planning the garden is planning the trip.",
+     "es": "Papa, soja, lechuga, chile… La lechuga crece en 4 días, la papa tarda más pero rinde más. Planificar la huerta es planificar el viaje."
+    },
+    {
+     "pt": "Ah! E não esqueça das alergias da tripulação. Soja para quem é alérgico? Nem pensar.",
+     "en": "Oh! And don't forget the crew's allergies. Soy for someone allergic? No way.",
+     "es": "¡Ah! Y no olvide las alergias de la tripulación. ¿Soja para un alérgico? Ni pensar."
+    }
+   ]
+  }
+ },
+ "crew": {
+  "c2": {
+   "pt": "Não consegui de primeira, vou tentar de novo...",
+   "en": "Didn't get it the first time, trying again...",
+   "es": "No me salió a la primera, lo intento de nuevo..."
+  },
+  "c3": {
+   "pt": "Vou no lugar dele!",
+   "en": "I'll go in their place!",
+   "es": "¡Voy en su lugar!"
+  },
+  "c4": {
+   "pt": "A velocidade está caindo! O tanque principal não está alimentando o motor.",
+   "en": "Speed is dropping! The main tank is not feeding the engine.",
+   "es": "¡La velocidad está cayendo! El tanque principal no alimenta el motor."
+  },
+  "c5": {
+   "pt": "O painel enlouqueceu! O mapa mostra que estamos perto de Júpiter...",
+   "en": "The panel went crazy! The map says we are near Jupiter...",
+   "es": "¡El panel enloqueció! El mapa dice que estamos cerca de Júpiter..."
+  },
+  "c6": {
+   "pt": "Tem lixo flutuando por toda a nave! E acho que algo entrou no motor.",
+   "en": "There's trash floating all over the ship! And I think something got into the engine.",
+   "es": "¡Hay basura flotando por toda la nave! Y creo que algo entró en el motor."
+  },
+  "c7": {
+   "pt": "O rádio só chia... estamos recebendo pedaços de mensagem da Terra.",
+   "en": "The radio only crackles... we are getting pieces of a message from Earth.",
+   "es": "La radio solo chisporrotea... recibimos trozos de un mensaje de la Tierra."
+  },
+  "c8": {
+   "pt": "Meu traje está vazando! Não vou aguentar muito tempo!",
+   "en": "My suit is leaking! I can't hold out much longer!",
+   "es": "¡Mi traje tiene una fuga! ¡No voy a aguantar mucho tiempo!"
+  },
+  "c9": {
+   "pt": "Se a nave ficar parada, um lado cozinha e o outro vira gelo. Posso girá-la devagar, mas isso gasta combustível.",
+   "en": "If the ship stays still, one side cooks and the other turns to ice. I can rotate it slowly, but that uses fuel.",
+   "es": "Si la nave se queda quieta, un lado se cocina y el otro se congela. Puedo girarla despacio, pero eso gasta combustible."
+  },
+  "c10": {
+   "pt": "Aqui o calor só sai por radiação. Se não abrirmos os radiadores, ele fica preso.",
+   "en": "Out here heat only leaves by radiation. If we don't open the radiators, it stays trapped.",
+   "es": "Aquí el calor solo sale por radiación. Si no abrimos los radiadores, queda atrapado."
+  },
+  "c11": {
+   "pt": "Os propulsores estão fazendo um ruído estranho... não sei se aguentam girar a nave por muito tempo.",
+   "en": "The thrusters are making a strange noise... not sure they can keep spinning the ship for long.",
+   "es": "Los propulsores hacen un ruido extraño... no sé si aguantan girar la nave mucho tiempo."
+  },
+  "c12": {
+   "pt": "Nossos instrumentos esquentam muito. Podemos desligar alguns, mas perdemos dados.",
+   "en": "Our instruments run hot. We can turn some off, but we lose data.",
+   "es": "Nuestros instrumentos se calientan mucho. Podemos apagar algunos, pero perdemos datos."
+  },
+  "c13": {
+   "pt": "A tripulação está sentindo frio. Se continuar assim, o corpo perde energia e o raciocínio piora.",
+   "en": "The crew is getting cold. If this goes on, the body loses energy and thinking gets worse.",
+   "es": "La tripulación siente frío. Si sigue así, el cuerpo pierde energía y el razonamiento empeora."
+  },
+  "c14": {
+   "pt": "Rotação estável.",
+   "en": "Rotation stable.",
+   "es": "Rotación estable."
+  },
+  "c15": {
+   "pt": "Conserto feito, voltando!",
+   "en": "Fix done, coming back!",
+   "es": "¡Reparación hecha, vuelvo!"
+  },
+  "c16": {
+   "pt": "O propulsor travou! A nave parou de girar!",
+   "en": "The thruster jammed! The ship stopped spinning!",
+   "es": "¡El propulsor se trabó! ¡La nave dejó de girar!"
+  },
+  "c17": {
+   "pt": "Estou melhor, voltando ao posto.",
+   "en": "I feel better, heading back to my post.",
+   "es": "Estoy mejor, vuelvo a mi puesto."
+  },
+  "c18": {
+   "pt": "Estou com uma reação alérgica forte...",
+   "en": "I'm having a strong allergic reaction...",
+   "es": "Tengo una reacción alérgica fuerte..."
+  },
+  "c19": {
+   "pt": "Acho que comi algo que me fez mal.",
+   "en": "I think I ate something that made me sick.",
+   "es": "Creo que comí algo que me hizo mal."
+  },
+  "c20": {
+   "pt": "Estou fraco... vou desmaiar.",
+   "en": "I'm weak... I'm going to faint.",
+   "es": "Estoy débil... me voy a desmayar."
+  },
+  "c21": {
+   "pt": "Comandante, o lote de remédios venceu. Precisamos trocar.",
+   "en": "Commander, the medicine batch expired. We need to replace it.",
+   "es": "Comandante, el lote de medicamentos venció. Tenemos que cambiarlo."
+  },
+  "c22": {
+   "pt": "Bem melhor depois de uma pausa.",
+   "en": "Much better after a break.",
+   "es": "Mucho mejor después de una pausa."
+  }
+ },
+ "nasa": [
+  {
+   "pt": "Controle da Missão: a atmosfera da Terra tem hoje mais de 420 ppm de CO₂, contra ≈ 280 ppm antes da era industrial (NASA/NOAA).",
+   "en": "Mission Control: Earth's atmosphere now holds over 420 ppm of CO₂, versus ≈ 280 ppm before the industrial era (NASA/NOAA).",
+   "es": "Control de la Misión: la atmósfera terrestre tiene hoy más de 420 ppm de CO₂, frente a ≈ 280 ppm antes de la era industrial (NASA/NOAA)."
+  },
+  {
+   "pt": "Controle da Missão: a temperatura média da Terra já subiu ≈ 1,2 °C desde o fim do século XIX; os 10 anos mais quentes da história são os 10 últimos (NASA GISS).",
+   "en": "Mission Control: Earth's average temperature has risen ≈ 1.2 °C since the late 1800s; the 10 warmest years on record are the last 10 (NASA GISS).",
+   "es": "Control de la Misión: la temperatura media de la Tierra subió ≈ 1,2 °C desde fines del siglo XIX; los 10 años más cálidos registrados son los últimos 10 (NASA GISS)."
+  },
+  {
+   "pt": "Controle da Missão: satélites da NASA medem que o nível do mar subiu cerca de 10 cm desde 1993, e o ritmo está acelerando.",
+   "en": "Mission Control: NASA satellites show sea level has risen about 10 cm since 1993, and the pace is accelerating.",
+   "es": "Control de la Misión: los satélites de la NASA miden que el nivel del mar subió unos 10 cm desde 1993 y el ritmo se acelera."
+  },
+  {
+   "pt": "Controle da Missão: a ISS dá uma volta na Terra a cada ~90 minutos, a 28.000 km/h. Os astronautas veem 16 nasceres do sol por dia!",
+   "en": "Mission Control: the ISS circles Earth every ~90 minutes at 28,000 km/h. Astronauts see 16 sunrises a day!",
+   "es": "Control de la Misión: la ISS da una vuelta a la Tierra cada ~90 minutos a 28.000 km/h. ¡Los astronautas ven 16 amaneceres al día!"
+  },
+  {
+   "pt": "Controle da Missão: um astronauta respira cerca de 0,84 kg de oxigênio por dia. Na ISS, o O₂ vem da eletrólise da água.",
+   "en": "Mission Control: an astronaut breathes about 0.84 kg of oxygen a day. On the ISS, O₂ comes from splitting water by electrolysis.",
+   "es": "Control de la Misión: un astronauta respira cerca de 0,84 kg de oxígeno por día. En la ISS el O₂ sale de la electrólisis del agua."
+  },
+  {
+   "pt": "Controle da Missão: no espaço não há ar para espalhar o calor — a nave só se esfria irradiando. A diferença entre sol e sombra passa de 200 °C.",
+   "en": "Mission Control: in space there is no air to spread heat — a ship cools only by radiating. The sun–shade difference can top 200 °C.",
+   "es": "Control de la Misión: en el espacio no hay aire que reparta el calor: la nave solo se enfría irradiando. La diferencia entre sol y sombra supera los 200 °C."
+  },
+  {
+   "pt": "Controle da Missão: o sinal de rádio de Marte leva de 3 a 22 minutos para chegar à Terra. Conversas ao vivo são impossíveis!",
+   "en": "Mission Control: a radio signal from Mars takes 3 to 22 minutes to reach Earth. Live conversations are impossible!",
+   "es": "Control de la Misión: la señal de radio desde Marte tarda de 3 a 22 minutos en llegar a la Tierra. ¡Las conversaciones en vivo son imposibles!"
+  },
+  {
+   "pt": "Controle da Missão: o telescópio Kepler (2009–2018) descobriu mais de 2.600 planetas observando pequenas quedas no brilho das estrelas (método do trânsito).",
+   "en": "Mission Control: the Kepler telescope (2009–2018) found over 2,600 planets by watching tiny dips in starlight (the transit method).",
+   "es": "Control de la Misión: el telescopio Kepler (2009–2018) descubrió más de 2.600 planetas observando pequeñas caídas en el brillo de las estrellas (método del tránsito)."
+  }
+ ],
+ "colonyFacts": [
+  {
+   "pt": "Controle da Missão: na ISS, os astronautas perdem 1% a 1,5% da massa óssea por mês sem gravidade e treinam cerca de 2 horas por dia para reduzir isso (NASA).",
+   "en": "Mission Control: on the ISS, astronauts lose 1–1.5% of bone mass per month in microgravity and exercise about 2 hours a day to reduce it (NASA).",
+   "es": "Control de la Misión: en la ISS los astronautas pierden entre 1% y 1,5% de masa ósea por mes sin gravedad y entrenan unas 2 horas al día para reducirlo (NASA)."
+  },
+  {
+   "pt": "Controle da Missão: um astronauta na ISS recebe cerca de 80 mSv de radiação em 6 meses; na Terra, a média natural é ≈ 3 mSv por ano (NASA).",
+   "en": "Mission Control: an ISS astronaut gets about 80 mSv of radiation in 6 months; on Earth the natural average is ≈ 3 mSv a year (NASA).",
+   "es": "Control de la Misión: un astronauta en la ISS recibe unos 80 mSv de radiación en 6 meses; en la Tierra el promedio natural es ≈ 3 mSv al año (NASA)."
+  },
+  {
+   "pt": "Controle da Missão: a Voyager 1, lançada em 1977, viaja a 17 km/s e já está a cerca de um dia-luz de nós. Mesmo assim, levaria ~75 mil anos para chegar à estrela mais próxima.",
+   "en": "Mission Control: Voyager 1, launched in 1977, travels at 17 km/s and is already about one light-day away. Even so, it would take ~75,000 years to reach the nearest star.",
+   "es": "Control de la Misión: la Voyager 1, lanzada en 1977, viaja a 17 km/s y ya está a casi un día luz. Aun así, tardaría ~75.000 años en llegar a la estrella más cercana."
+  },
+  {
+   "pt": "Controle da Missão: já são mais de 6.000 exoplanetas confirmados no NASA Exoplanet Archive. Poucos estão na zona habitável da estrela.",
+   "en": "Mission Control: there are over 6,000 confirmed exoplanets in the NASA Exoplanet Archive. Few lie in their star's habitable zone.",
+   "es": "Control de la Misión: hay más de 6.000 exoplanetas confirmados en el NASA Exoplanet Archive. Pocos están en la zona habitable de su estrella."
+  },
+  {
+   "pt": "Controle da Missão: o telescópio James Webb observa a luz das estrelas atravessando atmosferas de exoplanetas para descobrir de que gases elas são feitas.",
+   "en": "Mission Control: the James Webb telescope watches starlight pass through exoplanet atmospheres to learn which gases they contain.",
+   "es": "Control de la Misión: el telescopio James Webb observa la luz de las estrellas atravesando atmósferas de exoplanetas para saber de qué gases están hechas."
+  },
+  {
+   "pt": "Controle da Missão: recicle tudo! Na ISS, o lixo vai embora em cargueiros que queimam na reentrada; numa colônia, o lixo é matéria-prima.",
+   "en": "Mission Control: recycle everything! On the ISS trash leaves on cargo ships that burn up on reentry; in a colony, waste is raw material.",
+   "es": "Control de la Misión: ¡reciclen todo! En la ISS la basura sale en cargueros que se queman al reentrar; en una colonia, los residuos son materia prima."
+  }
+ ],
+ "comms": {
+  "selected": {
+   "pt": "Você foi selecionado para uma missão espacial para salvar o futuro da humanidade.",
+   "en": "You have been selected for a space mission to save the future of humanity.",
+   "es": "Usted fue seleccionado para una misión espacial para salvar el futuro de la humanidad."
+  },
+  "next": {
+   "pt": "Próximo comunicado: você tem uma verba limitada para montar uma nave de exploração.",
+   "en": "Next announcement: you have a limited budget to build an exploration ship.",
+   "es": "Próximo comunicado: tiene un presupuesto limitado para armar una nave de exploración."
+  }
+ },
+ "modes": {
+  "completa": [
+   {
+    "node": "terra",
+    "t": {
+     "pt": "Jornada Completa: cerca de 30 dias de viagem e 9 desafios. Tudo começa na Terra: explore a cidade e aceite a missão.",
+     "en": "Full Journey: about 30 days of travel and 9 challenges. It all starts on Earth: explore the city and accept the mission.",
+     "es": "Jornada Completa: unos 30 días de viaje y 9 desafíos. Todo empieza en la Tierra: explore la ciudad y acepte la misión."
+    }
+   },
+   {
+    "node": "montagem",
+    "t": {
+     "pt": "Monte a nave com 45 pontos de verba e 5 espaços de módulo. Não dá para ter tudo: cada escolha é um sacrifício.",
+     "en": "Build the ship with 45 budget points and 5 module slots. You can't have everything: every choice is a sacrifice.",
+     "es": "Arme la nave con 45 puntos de presupuesto y 5 espacios de módulo. No se puede tener todo: cada elección es un sacrificio."
+    }
+   },
+   {
+    "node": "viagem",
+    "t": {
+     "pt": "Na viagem, ande pela nave e use as estações. Cuide do oxigênio, da fome, do humor e do armazenamento. O computador de bordo (H) sempre mostra o próximo passo.",
+     "en": "During the trip, walk around the ship and use the stations. Watch oxygen, hunger, mood and storage. The onboard computer (H) always shows the next step.",
+     "es": "En el viaje, camine por la nave y use las estaciones. Cuide el oxígeno, el hambre, el ánimo y el almacenamiento. La computadora de a bordo (H) siempre muestra el próximo paso."
+    }
+   },
+   {
+    "node": "estacao",
+    "t": {
+     "pt": "Na metade do caminho fica a Estação Ponte-Alfa: analise exoplanetas reais da NASA e escolha o destino — até os errados.",
+     "en": "Halfway there is Ponte-Alfa Station: analyze real NASA exoplanets and pick your destination — even the wrong ones.",
+     "es": "A mitad de camino está la Estación Ponte-Alfa: analice exoplanetas reales de la NASA y elija el destino, incluso los equivocados."
+    }
+   },
+   {
+    "node": "orbita",
+    "t": {
+     "pt": "Em órbita de Pontes-01b: faça análises, enfrente a adaptação e escolha onde pousar.",
+     "en": "In orbit around Pontes-01b: run analyses, face adaptation and choose where to land.",
+     "es": "En órbita de Pontes-01b: haga análisis, enfrente la adaptación y elija dónde aterrizar."
+    }
+   },
+   {
+    "node": "colonia",
+    "t": {
+     "pt": "Na superfície, construa a colônia, envie dados à Terra e receba as naves de tripulação. Só existe um final!",
+     "en": "On the surface, build the colony, send data to Earth and receive the crew ships. There is only one ending!",
+     "es": "En la superficie, construya la colonia, envíe datos a la Tierra y reciba las naves de tripulación. ¡Solo hay un final!"
+    }
+   }
+  ],
+  "curta": [
+   {
+    "node": "terra",
+    "t": {
+     "pt": "Jornada Curta: cerca de 12 dias e 4 desafios — ideal para aulas. Comece pela cidade na Terra.",
+     "en": "Short Journey: about 12 days and 4 challenges — great for classes. Start in the city on Earth.",
+     "es": "Jornada Corta: unos 12 días y 4 desafíos, ideal para clases. Empiece por la ciudad en la Tierra."
+    }
+   },
+   {
+    "node": "montagem",
+    "t": {
+     "pt": "Monte a nave com verba limitada: módulos de sobrevivência primeiro!",
+     "en": "Build the ship on a limited budget: survival modules first!",
+     "es": "Arme la nave con presupuesto limitado: ¡primero los módulos de supervivencia!"
+    }
+   },
+   {
+    "node": "viagem",
+    "t": {
+     "pt": "Viaje, resolva os desafios e use ⏩ (Shift+S) para acelerar o tempo até o próximo evento.",
+     "en": "Travel, solve the challenges and use ⏩ (Shift+S) to speed up time until the next event.",
+     "es": "Viaje, resuelva los desafíos y use ⏩ (Shift+S) para acelerar el tiempo hasta el próximo evento."
+    }
+   },
+   {
+    "node": "colonia",
+    "t": {
+     "pt": "Chegue a Pontes-01b e erga a colônia. Aperte H sempre que estiver em dúvida.",
+     "en": "Reach Pontes-01b and raise the colony. Press H whenever you are unsure.",
+     "es": "Llegue a Pontes-01b y levante la colonia. Pulse H siempre que tenga dudas."
+    }
+   }
+  ],
+  "multi": [
+   {
+    "node": "terra",
+    "t": {
+     "pt": "Multiplayer: você é o Comandante. Os amigos que entrarem na sala viram tripulantes; os lugares vazios ficam com bots.",
+     "en": "Multiplayer: you are the Commander. Friends who join the room become crew members; empty seats go to bots.",
+     "es": "Multijugador: usted es el Comandante. Los amigos que entren en la sala se vuelven tripulantes; los lugares vacíos quedan con bots."
+    }
+   },
+   {
+    "node": "crew",
+    "t": {
+     "pt": "Cada jogador tem uma função: paramédico, navegador, agricultor, dois engenheiros e pesquisador. Quando um desafio chamar a sua função, vá até a estação!",
+     "en": "Each player has a role: paramedic, navigator, farmer, two engineers and researcher. When a challenge calls your role, go to the station!",
+     "es": "Cada jugador tiene una función: paramédico, navegante, agricultor, dos ingenieros e investigador. ¡Cuando un desafío llame a su función, vaya a la estación!"
+    }
+   },
+   {
+    "node": "viagem",
+    "t": {
+     "pt": "Combinem tudo pelo chat da sala (Enter). Juntos vocês cuidam do oxigênio, da fome, do humor e do armazenamento.",
+     "en": "Plan everything in the room chat (Enter). Together you look after oxygen, hunger, mood and storage.",
+     "es": "Coordinen todo por el chat de la sala (Enter). Juntos cuidan el oxígeno, el hambre, el ánimo y el almacenamiento."
+    }
+   },
+   {
+    "node": "colonia",
+    "t": {
+     "pt": "Em Pontes-01b, cada um anda pela superfície, constrói e acende o farol para as naves pousarem.",
+     "en": "On Pontes-01b, everyone walks the surface, builds and lights the beacon so the ships can land.",
+     "es": "En Pontes-01b, cada uno camina por la superficie, construye y enciende la baliza para que aterricen las naves."
+    }
+   }
+  ]
+ },
+ "modeNames": {
+  "completa": {
+   "pt": "Jornada Completa",
+   "en": "Full Journey",
+   "es": "Jornada Completa"
+  },
+  "curta": {
+   "pt": "Jornada Curta",
+   "en": "Short Journey",
+   "es": "Jornada Corta"
+  },
+  "multi": {
+   "pt": "Multiplayer",
+   "en": "Multiplayer",
+   "es": "Multijugador"
+  }
+ },
+ "nodes": {
+  "terra": {
+   "pt": "Terra",
+   "en": "Earth",
+   "es": "Tierra"
+  },
+  "montagem": {
+   "pt": "Montagem",
+   "en": "Build",
+   "es": "Montaje"
+  },
+  "viagem": {
+   "pt": "Viagem",
+   "en": "Trip",
+   "es": "Viaje"
+  },
+  "estacao": {
+   "pt": "Estação",
+   "en": "Station",
+   "es": "Estación"
+  },
+  "orbita": {
+   "pt": "Órbita",
+   "en": "Orbit",
+   "es": "Órbita"
+  },
+  "colonia": {
+   "pt": "Colônia",
+   "en": "Colony",
+   "es": "Colonia"
+  },
+  "crew": {
+   "pt": "Tripulação",
+   "en": "Crew",
+   "es": "Tripulación"
+  }
+ },
+ "crewChat": {
+  "paramedico": [
+   {
+    "pt": "Estou de olho na saúde de todos. Beba água e durma bem!",
+    "en": "I'm watching everyone's health. Drink water and sleep well!",
+    "es": "Vigilo la salud de todos. ¡Beban agua y duerman bien!"
+   },
+   {
+    "pt": "Na microgravidade os ossos perdem massa. Lembrem de se exercitar!",
+    "en": "In microgravity bones lose mass. Remember to exercise!",
+    "es": "En microgravedad los huesos pierden masa. ¡Recuerden hacer ejercicio!"
+   }
+  ],
+  "navegador": [
+   {
+    "pt": "A rota está sob controle. Cada grau de desvio custa combustível.",
+    "en": "The route is under control. Every degree of drift costs fuel.",
+    "es": "La ruta está bajo control. Cada grado de desvío cuesta combustible."
+   },
+   {
+    "pt": "As estrelas não mentem: Pontes-01b está logo ali.",
+    "en": "The stars don't lie: Pontes-01b is right there.",
+    "es": "Las estrellas no mienten: Pontes-01b está justo ahí."
+   }
+  ],
+  "agricultor": [
+   {
+    "pt": "As plantas estão firmes! Alface em 4 dias, batata demora mais.",
+    "en": "The plants are doing great! Lettuce in 4 days, potatoes take longer.",
+    "es": "¡Las plantas están firmes! Lechuga en 4 días, la papa tarda más."
+   },
+   {
+    "pt": "Na ISS já colheram até pimenta. Aqui vai ter tempero!",
+    "en": "On the ISS they even harvested chile peppers. We'll have spice here!",
+    "es": "En la ISS hasta cosecharon chile. ¡Aquí habrá sabor!"
+   }
+  ],
+  "eng": [
+   {
+    "pt": "Posso consertar quase tudo com uma boa peça e um pouco de energia.",
+    "en": "I can fix almost anything with a good part and a bit of power.",
+    "es": "Puedo arreglar casi todo con una buena pieza y algo de energía."
+   },
+   {
+    "pt": "Os sistemas estão rodando. Se algo apitar, eu corro!",
+    "en": "Systems are running. If anything beeps, I'll run!",
+    "es": "Los sistemas funcionan. ¡Si algo suena, corro!"
+   }
+  ],
+  "pesquisador": [
+   {
+    "pt": "Os dados que coletamos valem ouro para a Terra.",
+    "en": "The data we collect is gold for Earth.",
+    "es": "Los datos que recogemos valen oro para la Tierra."
+   },
+   {
+    "pt": "Sabia que já são mais de 6.000 exoplanetas confirmados?",
+    "en": "Did you know there are over 6,000 confirmed exoplanets?",
+    "es": "¿Sabía que ya hay más de 6.000 exoplanetas confirmados?"
+   }
+  ],
+  "comandante": [
+   {
+    "pt": "Aqui é o Comandante. Seguimos a missão.",
+    "en": "Commander here. We continue the mission.",
+    "es": "Aquí el Comandante. Seguimos con la misión."
+   }
+  ]
+ }
+}

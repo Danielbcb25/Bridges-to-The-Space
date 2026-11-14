@@ -47,7 +47,7 @@ function endEvent(ok, extra) {
   const res = { ok, text: '', points: 0 };
   if (ok) { res.points = def.points || 25; if (def.success) res.text = def.success(ev) || ''; }
   else {
-    res.points = 5;
+    res.points = 0; // falha não rende pontos
     if (def.failure) res.text = def.failure(ev) || '';
     const loss = has('voz') ? 1 : 2; moral(S.unity ? -loss + 1 : -loss); S.unity = false;
   }
@@ -136,7 +136,7 @@ TASK_DONE.evStep = (c, d) => {
     if (effIndex() < 50) mod--;
     const r = d20();
     if (r === 20 || (r !== 1 && r + mod >= (step.dc || 9))) { botSolves(ev, step, c); completeStep(ev, step, c); }
-    else { say(c, 'Não consegui de primeira, vou tentar de novo...'); step.claimed = c.id; c.task = { station: step.station, dur: step.dur, t: 0, label: step.label, key: 'evStep', data: d, ev: ev.id }; ev.t -= 6; }
+    else { say(c, F('crew.c2')); step.claimed = c.id; c.task = { station: step.station, dur: step.dur, t: 0, label: step.label, key: 'evStep', data: d, ev: ev.id }; ev.t -= 6; }
     return;
   }
   completeStep(ev, step, c);
@@ -227,7 +227,7 @@ ACTIONS.puzzle = (p, actor) => {
       ev.puzzle = null;
       completeStep(ev, stepById(ev, 'escolher'), actor);
       if (sub.owner && sub.owner !== 'bot') toast(`${sub.name}: vá até a Eclusa e pressione E para trocar de lugar.`, 'warn');
-      else { step.claimed = sub.id; assignTask(sub, { station: 'eclusa', dur: step.dur, label: step.label, key: 'evStep', data: { ev: ev.id, step: 'troca' }, ev: ev.id }); say(sub, 'Vou no lugar dele!'); }
+      else { step.claimed = sub.id; assignTask(sub, { station: 'eclusa', dur: step.dur, label: step.label, key: 'evStep', data: { ev: ev.id, step: 'troca' }, ev: ev.id }); say(sub, F('crew.c3')); }
       break;
     }
     case 'rota': {
@@ -291,7 +291,7 @@ EV.combFalta = {
       { id: 'painel', label: 'Conferir no painel se o nível subiu e a velocidade voltou', station: 'ponte', dur: 2, role: 'navegador' },
     ];
   },
-  start() { S.speedMod = 0.45; sayRole('navegador', 'A velocidade está caindo! O tanque principal não está alimentando o motor.'); },
+  start() { S.speedMod = 0.45; sayRole('navegador', F('crew.c4')); },
   success() { addRes('combustivel', 60, 'Reserva do tanque auxiliar'); return 'Combustível da reserva liberado. Velocidade normalizada.'; },
   failure() { addRes('combustivel', -40, 'Falha na alimentação'); damageSys('propulsao', 10); S.progress = Math.max(0, S.progress - 0.02); return 'O motor engasgou: perdemos combustível e tempo.'; },
 };
@@ -340,7 +340,7 @@ EV.painel = {
       { id: 'calibrar', label: backup ? 'Carregar o mapa de backup' : 'Recalibrar o mapa estelar', station: 'avionica', dur: backup ? 2 : 0.5, puzzle: backup ? null : 'mapa', role: 'engenheiro', dc: 9 },
     ];
   },
-  start() { S.speedMod = 0.5; sayRole('navegador', 'O painel enlouqueceu! O mapa mostra que estamos perto de Júpiter...'); },
+  start() { S.speedMod = 0.5; sayRole('navegador', F('crew.c5')); },
   success() { return 'Computador recalibrado. A nave sabe onde está de novo.'; },
   failure() { S.progress = Math.max(0, S.progress - 0.03); damageSys('avionica', 25); return 'A nave ficou perdida por tempo demais e desviou da rota.'; },
 };
@@ -362,7 +362,7 @@ EV.lixo = {
     }
     ev.data.collected = 0;
     addRes('lixo', 4, 'Lixo solto');
-    sayRole('engenheiro1', 'Tem lixo flutuando por toda a nave! E acho que algo entrou no motor.');
+    sayRole('engenheiro1', F('crew.c6'));
   },
   tick(ev, dt) {
     // bots ajudam a recolher
@@ -409,7 +409,7 @@ EV.radio = {
       { id: 'antena', label: 'Engenheiro: consertar a antena (reduz o chiado)', station: 'antena', dur: 6, role: 'engenheiro', optional: true },
     ];
   },
-  start() { S.commDown = 999; sayRole('engenheiro2', 'O rádio só chia... estamos recebendo pedaços de mensagem da Terra.'); },
+  start() { S.commDown = 999; sayRole('engenheiro2', F('crew.c7')); },
   onStep(ev, step) { if (step.id === 'antena') { ev.data.fixed = true; damageSys('comunicacao', -15); } },
   botSolve(ev) { ev.data.correct = Math.random() < 0.7; ev.data.msg = pick(RADIO_MESSAGES); },
   success(ev) {
@@ -456,7 +456,7 @@ EV.traje = {
   start(ev) {
     const v = byRole('engenheiro').find(c => c.alive && !c.hibernating) || byRole('engenheiro').find(c => c.alive);
     ev.data.victim = v.id; v.task = null; v.outfit = 'broken'; v.x = STATIONS.eclusa.x + 30; v.deck = 'L'; v.tx = v.x; v.tdeck = 'L'; v.eva = true;
-    say(v, 'Meu traje está vazando! Não vou aguentar muito tempo!', 8);
+    say(v, F('crew.c8'), 8);
   },
   botSolve(ev) { const sub = alive().find(c => c.id !== ev.data.victim && available(c) && c.id !== 'cmd'); ev.data.sub = sub ? sub.id : null; },
   success(ev) { const v = crewById(ev.data.victim); v.outfit = 'suit'; v.eva = false; moral(-2, v); damageSys('acoplamento', -10); return `${v.name} voltou para dentro a tempo. O substituto terminou o reparo.`; },
@@ -555,7 +555,7 @@ EV.termico = {
   start(ev) {
     const th = S.thermal;
     narrate('Atenção, tripulação. A nave está entrando em uma zona de calor extremo. No espaço não há ar para espalhar o calor. O lado voltado para a estrela esquenta sem parar, enquanto o outro lado congela. Mantenham a temperatura interna entre 18 e 26 graus.');
-    sayRole('navegador', 'Se a nave ficar parada, um lado cozinha e o outro vira gelo. Posso girá-la devagar, mas isso gasta combustível.', 9);
+    sayRole('navegador', F('crew.c9'), 9);
     thMsg('Cena 1 — Alerta de calor. Decisão: ligar a rotação agora ou esperar.');
   },
   tick(ev, dt) { thermalTick(ev, dt); },
@@ -571,9 +571,9 @@ function thermalTick(ev, dt) {
   // cenas
   if (th.scene < 2 && p >= 0.12) {
     th.scene = 2; thMsg('Cena 2 — A estrela se aproxima: o lado do Sol sobe para +' + peak + ' °C.');
-    sayRole('engenheiro1', 'Aqui o calor só sai por radiação. Se não abrirmos os radiadores, ele fica preso.', 8);
+    sayRole('engenheiro1', F('crew.c10'), 8);
     const need = thNeed('rot');
-    if (need >= 9 && roleAlive('navegador')) sayRole('navegador', 'Os propulsores estão fazendo um ruído estranho... não sei se aguentam girar a nave por muito tempo.');
+    if (need >= 9 && roleAlive('navegador')) sayRole('navegador', F('crew.c11'));
   }
   if (th.scene < 3 && p >= 0.32) {
     th.scene = 3;
@@ -585,11 +585,11 @@ function thermalTick(ev, dt) {
   }
   if (th.scene < 4 && p >= 0.48) {
     th.scene = 4; th.overload = true; thMsg('Cena 4 — Sobrecarga elétrica: os equipamentos geram calor interno.');
-    sayRole('pesquisador', 'Nossos instrumentos esquentam muito. Podemos desligar alguns, mas perdemos dados.', 8);
+    sayRole('pesquisador', F('crew.c12'), 8);
   }
   if (th.scene < 5 && p >= 0.66) {
     th.scene = 5; th.shadow = true; th.overload = false; thMsg('Cena 5 — Entrada na sombra: a temperatura cai rápido.');
-    sayRole('paramedico', 'A tripulação está sentindo frio. Se continuar assim, o corpo perde energia e o raciocínio piora.', 8);
+    sayRole('paramedico', F('crew.c13'), 8);
   }
   // temperaturas externas
   let sunT = th.shadow ? -60 : (th.scene >= 2 ? peak : 60);
@@ -727,10 +727,10 @@ function thRoll(k, isReroll) {
   th.maint[k] = false;
   th.last = k;
   if (ok) {
-    if (k === 'rot') { th.act.rot = 90 * th.D / 300; th.rotOk = true; thMsg('Rotação funcionando: o calor se distribui (técnica do “espetinho”).'); sayRole('navegador', 'Rotação estável.'); }
+    if (k === 'rot') { th.act.rot = 90 * th.D / 300; th.rotOk = true; thMsg('Rotação funcionando: o calor se distribui (técnica do “espetinho”).'); sayRole('navegador', F('crew.c14')); }
     if (k === 'rad') { th.act.rad = 60 * th.D / 300; thMsg('Radiadores abertos: o calor sai por radiação.'); }
     if (k === 'heat') { th.act.heat = 60 * th.D / 300; thMsg('Aquecedores ligados.'); }
-    if (k === 'rep') { th.repaired = true; thMsg('Isolamento reparado: o escudo para de perder espessura.'); sayRole('engenheiro2', 'Conserto feito, voltando!'); }
+    if (k === 'rep') { th.repaired = true; thMsg('Isolamento reparado: o escudo para de perder espessura.'); sayRole('engenheiro2', F('crew.c15')); }
     if (k === 'shut') { th.act.shut = 60 * th.D / 300; th.shutOk = true; thMsg(`Persianas ${th.shutMode === 'abrir' ? 'abertas: soltando calor' : 'fechadas: segurando calor'}.`); }
     if (k === 'equip') { th.equipOff = false; S.equipOff = false; thMsg('Equipamentos religados com sucesso.'); }
     S.v++; return;
@@ -750,7 +750,7 @@ function thFailure(k) {
   let txt = '';
   if (k === 'rot') {
     if (g === 'leve') { th.act.rot = 40 * th.D / 300; th.weak.rot = true; th.sunMult = 1.3; txt = 'Gira pouco: o lado do Sol esquenta mais rápido.'; }
-    if (g === 'média') { addRes('plantacao', -6, 'Propulsor travado'); th.plantsLost += 6; txt = 'Propulsor travado! Plantação −6 kg.'; sayRole('navegador', 'O propulsor travou! A nave parou de girar!'); }
+    if (g === 'média') { addRes('plantacao', -6, 'Propulsor travado'); th.plantsLost += 6; txt = 'Propulsor travado! Plantação −6 kg.'; sayRole('navegador', F('crew.c16')); }
     if (g === 'grave') { th.disabled.rot = true; th.act.rot = 0; addRes('combustivel', -50, 'Propulsor queimado'); th.fuel += 50; damageSys('propulsao', 15); txt = 'Propulsor queimou: sem controle de rotação e −50 kg de combustível.'; }
   }
   if (k === 'rad') {
@@ -792,7 +792,7 @@ function thermalEnd(ev) {
   const E = S.res.energia, sh = S.res.escudo;
   let grade, pts;
   if (E < 9 || sh < 25) {
-    grade = 'Crítico'; pts = 10;
+    grade = 'Crítico'; pts = 0; // falha não rende pontos
     const v = pick(alive().filter(c => c.id !== 'cmd')); if (v) { v.status = 'ferido'; v.statusT = 90; }
     S.fragile = true;
   } else if (th.outT < th.D * 0.15 && th.fails <= 1 && E > 24) { grade = 'Excelente'; pts = 40; moral(10); }

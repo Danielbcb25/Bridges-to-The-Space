@@ -9,14 +9,7 @@ const ASSETS = {
   heroic: ['.claude/InteriorFaseHeroicMusic1.mp3', '.claude/InteriorFaseHeroicMusic2.mp3'],
 };
 
-const NARRATION_INTRO = [
-  'Em razão do iminente colapso terrestre, há tempos, as principais lideranças do planeta se reuniam em prol da sobrevivência humana.',
-  'Em meio ao caos, observatórios do mundo todo se uniram com o objetivo de localizar o planeta habitável mais próximo da Terra. E assim o fizeram.',
-  'Nomeado de “Pontes-01b”, este passou a ser a única esperança de sobrevivência da Terra.',
-  'Você passará a gerenciar uma das centenas de estações e naves espaciais lançadas ao espaço: seus recursos, sua tripulação e a rota para Pontes-01b.',
-  'Durante a expedição, você enfrentará chuvas de asteroides, radiação, microgravidade, a escassez de recursos e o psicológico de todos a bordo.',
-  'Atenção! O jogo possui apenas um final. Caso este não seja alcançado, o jogador falha.',
-];
+const NARRATION_INTRO = []; // preenchido por data/falas.json (story)
 
 // ---------------- Tripulação ----------------
 const ROLES = [
@@ -31,6 +24,14 @@ const FEM_NAMES = ['Ana', 'Carla', 'Elisa', 'Gabi', 'Iara', 'Luana', 'Nina', 'Pa
 // concordância de gênero: cargos no feminino para nomes femininos
 const FEM_ROLE = { 'Paramédico': 'Paramédica', 'Navegador': 'Navegadora', 'Agricultor / Eng. Genético': 'Agricultora / Eng. Genética', 'Engenheiro 1': 'Engenheira 1', 'Engenheiro 2': 'Engenheira 2', 'Pesquisador Chefe': 'Pesquisadora Chefe' };
 const roleForName = (role, name) => (FEM_NAMES.includes(name) && FEM_ROLE[role]) || role;
+const ROLE_FN = {
+  paramedico: K('Cura feridos e doentes', 'Heals the hurt and sick', 'Cura heridos y enfermos'),
+  navegador: K('Rota e manobras', 'Route and maneuvers', 'Ruta y maniobras'),
+  agricultor: K('Horta e comida', 'Garden and food', 'Huerta y comida'),
+  engenheiro1: K('Motores e reparos', 'Engines and repairs', 'Motores y reparaciones'),
+  engenheiro2: K('Suporte à vida e trajes', 'Life support and suits', 'Soporte vital y trajes'),
+  pesquisador: K('Ciência e dados', 'Science and data', 'Ciencia y datos'),
+};
 const CREW_NAMES = ['Ana', 'Bruno', 'Carla', 'Davi', 'Elisa', 'Felipe', 'Gabi', 'Heitor', 'Iara', 'João', 'Kaique', 'Luana', 'Marcos', 'Nina', 'Otávio', 'Paula', 'Rafa', 'Sofia', 'Tiago', 'Yara'];
 const FOOD_TAGS = ['sopa', 'apimentado', 'salada', 'carne', 'batata', 'pao', 'doce', 'diferente', 'algas', 'soja'];
 

@@ -681,7 +681,7 @@ Object.assign(I18N_DICT.en, {
   "nav.multi": "Multiplayer",
   "start.click": "▶ CLICK TO START",
   "start.sound": "sound on · use headphones for the narration",
-  "under.keys": "⌨ ←→/A D walk · ↑↓/W S ladders · E interact · R report · T crew · F fund · J diary · Enter chat · Esc menu · click to walk",
+  "under.keys": "⌨ ←→ walk · Shift run · Space interact/jump · ↑↓ ladders · E interact · H help · Shift+S time 2x · Esc close · click to walk",
   "under.fs": "⛶ Fullscreen",
   "s9": "The Mission",
   "s10": "Because of Earth's imminent collapse, the planet's leaders joined together for human survival. Observatories around the world located the closest habitable planet: <b class=\"cyan\">Pontes-01b</b>, Earth's only hope.",

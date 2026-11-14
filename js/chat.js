@@ -8,16 +8,7 @@
 // ============================================================
 'use strict';
 
-const NASA_FACTS = [
-  K('Controle da Missão: a atmosfera da Terra tem hoje mais de 420 ppm de CO₂, contra ≈ 280 ppm antes da era industrial (NASA/NOAA).', 'Mission Control: Earth\'s atmosphere now holds over 420 ppm of CO₂, versus ≈ 280 ppm before the industrial era (NASA/NOAA).', 'Control de la Misión: la atmósfera terrestre tiene hoy más de 420 ppm de CO₂, frente a ≈ 280 ppm antes de la era industrial (NASA/NOAA).'),
-  K('Controle da Missão: a temperatura média da Terra já subiu ≈ 1,2 °C desde o fim do século XIX; os 10 anos mais quentes da história são os 10 últimos (NASA GISS).', 'Mission Control: Earth\'s average temperature has risen ≈ 1.2 °C since the late 1800s; the 10 warmest years on record are the last 10 (NASA GISS).', 'Control de la Misión: la temperatura media de la Tierra subió ≈ 1,2 °C desde fines del siglo XIX; los 10 años más cálidos registrados son los últimos 10 (NASA GISS).'),
-  K('Controle da Missão: satélites da NASA medem que o nível do mar subiu cerca de 10 cm desde 1993, e o ritmo está acelerando.', 'Mission Control: NASA satellites show sea level has risen about 10 cm since 1993, and the pace is accelerating.', 'Control de la Misión: los satélites de la NASA miden que el nivel del mar subió unos 10 cm desde 1993 y el ritmo se acelera.'),
-  K('Controle da Missão: a ISS dá uma volta na Terra a cada ~90 minutos, a 28.000 km/h. Os astronautas veem 16 nasceres do sol por dia!', 'Mission Control: the ISS circles Earth every ~90 minutes at 28,000 km/h. Astronauts see 16 sunrises a day!', 'Control de la Misión: la ISS da una vuelta a la Tierra cada ~90 minutos a 28.000 km/h. ¡Los astronautas ven 16 amaneceres al día!'),
-  K('Controle da Missão: um astronauta respira cerca de 0,84 kg de oxigênio por dia. Na ISS, o O₂ vem da eletrólise da água.', 'Mission Control: an astronaut breathes about 0.84 kg of oxygen a day. On the ISS, O₂ comes from splitting water by electrolysis.', 'Control de la Misión: un astronauta respira cerca de 0,84 kg de oxígeno por día. En la ISS el O₂ sale de la electrólisis del agua.'),
-  K('Controle da Missão: no espaço não há ar para espalhar o calor — a nave só se esfria irradiando. A diferença entre sol e sombra passa de 200 °C.', 'Mission Control: in space there is no air to spread heat — a ship cools only by radiating. The sun–shade difference can top 200 °C.', 'Control de la Misión: en el espacio no hay aire que reparta el calor: la nave solo se enfría irradiando. La diferencia entre sol y sombra supera los 200 °C.'),
-  K('Controle da Missão: o sinal de rádio de Marte leva de 3 a 22 minutos para chegar à Terra. Conversas ao vivo são impossíveis!', 'Mission Control: a radio signal from Mars takes 3 to 22 minutes to reach Earth. Live conversations are impossible!', 'Control de la Misión: la señal de radio desde Marte tarda de 3 a 22 minutos en llegar a la Tierra. ¡Las conversaciones en vivo son imposibles!'),
-  K('Controle da Missão: o telescópio Kepler (2009–2018) descobriu mais de 2.600 planetas observando pequenas quedas no brilho das estrelas (método do trânsito).', 'Mission Control: the Kepler telescope (2009–2018) found over 2,600 planets by watching tiny dips in starlight (the transit method).', 'Control de la Misión: el telescopio Kepler (2009–2018) descubrió más de 2.600 planetas observando pequeñas caídas en el brillo de las estrellas (método del tránsito).'),
-];
+const NASA_FACTS = []; // preenchido por data/falas.json
 
 const Chat = {
   log: [], open: false, unread: 0, nid: 1, factT: 70, lastSend: 0, dirty: true, els: null, peekUntil: 0,
@@ -164,14 +155,7 @@ const Chat = {
   crewAnswer(c, intent) {
     const role = c.role.startsWith('engenheiro') ? 'eng' : c.role;
     const r = S.res;
-    const flavor = {
-      paramedico: [K('Estou de olho na saúde de todos. Beba água e durma bem!', 'I\'m watching everyone\'s health. Drink water and sleep well!', 'Vigilo la salud de todos. ¡Beban agua y duerman bien!'), K('Na microgravidade os ossos perdem massa. Lembrem de se exercitar!', 'In microgravity bones lose mass. Remember to exercise!', 'En microgravedad los huesos pierden masa. ¡Recuerden hacer ejercicio!')],
-      navegador: [K('A rota está sob controle. Cada grau de desvio custa combustível.', 'The route is under control. Every degree of drift costs fuel.', 'La ruta está bajo control. Cada grado de desvío cuesta combustible.'), K('As estrelas não mentem: Pontes-01b está logo ali.', 'The stars don\'t lie: Pontes-01b is right there.', 'Las estrellas no mienten: Pontes-01b está justo ahí.')],
-      agricultor: [K('As plantas estão firmes! Alface em 4 dias, batata demora mais.', 'The plants are doing great! Lettuce in 4 days, potatoes take longer.', '¡Las plantas están firmes! Lechuga en 4 días, la papa tarda más.'), K('Na ISS já colheram até pimenta. Aqui vai ter tempero!', 'On the ISS they even harvested chile peppers. We\'ll have spice here!', 'En la ISS hasta cosecharon chile. ¡Aquí habrá sabor!')],
-      eng: [K('Posso consertar quase tudo com uma boa peça e um pouco de energia.', 'I can fix almost anything with a good part and a bit of power.', 'Puedo arreglar casi todo con una buena pieza y algo de energía.'), K('Os sistemas estão rodando. Se algo apitar, eu corro!', 'Systems are running. If anything beeps, I\'ll run!', 'Los sistemas funcionan. ¡Si algo suena, corro!')],
-      pesquisador: [K('Os dados que coletamos valem ouro para a Terra.', 'The data we collect is gold for Earth.', 'Los datos que recogemos valen oro para la Tierra.'), K('Sabia que já são mais de 6.000 exoplanetas confirmados?', 'Did you know there are over 6,000 confirmed exoplanets?', '¿Sabía que ya hay más de 6.000 exoplanetas confirmados?')],
-      comandante: [K('Aqui é o Comandante. Seguimos a missão.', 'Commander here. We continue the mission.', 'Aquí el Comandante. Seguimos con la misión.')],
-    }[role] || [K('Estou aqui para ajudar.', 'Here to help.', 'Estoy aquí para ayudar.')];
+    const flavor = (FALAS.crewChat || {})[role] || [K('Estou aqui para ajudar.', 'Here to help.', 'Estoy aquí para ayudar.')];
     const pre = `${c.name}: `;
     const resLine = (k, label) => pre + L(K('Temos ', 'We have ', 'Tenemos ')) + fmt(r[k], 0) + ' ' + label + '.';
     switch (intent) {

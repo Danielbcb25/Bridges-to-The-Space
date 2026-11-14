@@ -56,23 +56,18 @@ const CITY_BUILDINGS = [
     ] },
 ];
 
+// tom de voz de cada morador (síntese de voz)
+const NPC_VOICE = { lia: 1.15, teo: 0.85, mari: 1.45, ramos: 0.75, bia: 1.15, gui: 0.95, nina: 1.1, beto: 0.8 };
+// moradores: posição na cidade. Nome, função e falas ficam em data/falas.json
 const CITY_NPCS = [
-  { id: 'lia', x: 520, seed: 11, name: 'Ms. Lia', role: K('Vendedora de água', 'Water seller', 'Vendedora de agua'),
-    say: [K('Racionamento nível 4… Cada gota conta. Você viu como os astronautas reciclam até o suor?', 'Rationing level 4… every drop counts. Did you see how astronauts recycle even their sweat?', 'Racionamiento nivel 4… cada gota cuenta. ¿Vio cómo los astronautas reciclan hasta el sudor?'), K('A NASA diz: “o café de ontem é o café de amanhã”. Brincadeira de quem recicla a água da ISS!', 'NASA jokes: “yesterday\'s coffee is tomorrow\'s coffee”. A joke from people who recycle ISS water!', 'La NASA bromea: “el café de ayer es el café de mañana”. ¡Broma de quienes reciclan el agua de la ISS!'), K('Leve água no coração, Comandante.', 'Carry water in your heart, Commander.', 'Lleve agua en el corazón, Comandante.')] },
-  { id: 'teo', x: 940, seed: 23, name: 'Dr. Teo', role: K('Astrofísico', 'Astrophysicist', 'Astrofísico'),
-    say: [K('Quando eu era criança contava estrelas. Hoje contamos planetas: já passam de 6.000 os exoplanetas confirmados!', 'As a kid I counted stars. Today we count planets: over 6,000 exoplanets are confirmed!', 'De niño contaba estrellas. Hoy contamos planetas: ¡ya pasan de 6.000 los exoplanetas confirmados!'), K('Nem todo planeta “parecido com a Terra” é bom. Perto de anãs vermelhas, as erupções da estrela podem arrancar a atmosfera.', 'Not every “Earth-like” planet is good. Near red dwarfs, the star\'s flares can strip the atmosphere.', 'No todo planeta “parecido a la Tierra” es bueno. Cerca de enanas rojas las erupciones pueden arrancar la atmósfera.'), K('Se um dia na estação alguém lhe oferecer um planeta “perfeito”… confira os dados antes de acelerar!', 'If one day at the station someone offers you a “perfect” planet… check the data before you accelerate!', 'Si un día en la estación le ofrecen un planeta “perfecto”… ¡revise los datos antes de acelerar!')] },
-  { id: 'mari', x: 780, seed: 37, name: 'Mari', role: K('Estudante, 9 anos', 'Student, age 9', 'Estudiante, 9 años'),
-    say: [K('Meu professor disse que o astronauta Scott Kelly passou 340 dias na ISS e voltou ~5 cm mais alto!', 'My teacher said astronaut Scott Kelly spent 340 days on the ISS and came back ~5 cm taller!', '¡Mi profesor dijo que el astronauta Scott Kelly pasó 340 días en la ISS y volvió ~5 cm más alto!'), K('Sem gravidade a coluna se estica. Mas depois volta ao normal. Eu queria ver estrelas sem poluição…', 'Without gravity the spine stretches. But it goes back to normal. I wish I could see stars without pollution…', 'Sin gravedad la columna se estira. Pero luego vuelve a la normalidad. Quisiera ver estrellas sin contaminación…'), K('Promete que vai mandar uma foto de Pontes-01b?', 'Promise you\'ll send a photo of Pontes-01b?', '¿Promete que enviará una foto de Pontes-01b?')] },
-  { id: 'ramos', x: 1250, seed: 41, name: 'Mr. Ramos', role: K('Engenheiro aposentado', 'Retired engineer', 'Ingeniero jubilado'),
-    say: [K('Vi o pouso do Perseverance em Marte, em 2021, pela TV: os “7 minutos de terror” da descida, tudo sozinho, sem ninguém na Terra poder ajudar.', 'I watched the Perseverance Mars landing in 2021 on TV: the “7 minutes of terror” of the descent, all alone, with nobody on Earth able to help.', 'Vi el aterrizaje de Perseverance en Marte en 2021 por la tele: los “7 minutos de terror” del descenso, todo solo, sin nadie en la Tierra que pudiera ayudar.'), K('Depois disso o helicóptero Ingenuity voou 72 vezes em Marte, bem mais que as 5 previstas. Quem projeta bem, sobra margem.', 'After that the Ingenuity helicopter flew 72 times on Mars, far more than the 5 planned. Good design leaves margin.', 'Después el helicóptero Ingenuity voló 72 veces en Marte, bastante más que las 5 previstas. Quien diseña bien deja margen.'), K('Conselho de velho: leve peças sobressalentes!', 'An old-timer\'s advice: bring spare parts!', 'Consejo de viejo: ¡lleve piezas de repuesto!')] },
-  { id: 'bia', x: 1620, seed: 53, name: 'Bia', role: K('Enfermeira', 'Nurse', 'Enfermera'),
-    say: [K('No espaço os remédios também envelhecem mais rápido, por causa da radiação. A nave precisa renovar o estoque.', 'In space medicines also age faster because of radiation. The ship must renew its stock.', 'En el espacio los medicamentos también envejecen más rápido por la radiación. La nave debe renovar el stock.'), K('Se alguém ficar com enjoo, dor de cabeça ou febre: meça, compare os sintomas e só então escolha o remédio.', 'If someone gets nausea, headache or fever: measure, compare symptoms and only then pick the medicine.', 'Si alguien tiene náuseas, dolor de cabeza o fiebre: mida, compare los síntomas y solo entonces elija el medicamento.')] },
-  { id: 'gui', x: 2100, seed: 61, name: 'Gui', role: K('Programador', 'Programmer', 'Programador'),
-    say: [K('Eu escrevo software de navegação. Um grau de erro na partida vira milhões de km de erro na chegada.', 'I write navigation software. One degree of error at departure becomes millions of km at arrival.', 'Escribo software de navegación. Un grado de error en la partida son millones de km de error en la llegada.'), K('A sonda DSOC da NASA já mandou vídeo por laser de 31 milhões de km, a 267 Mbps. Rádio é o passado!', 'NASA\'s DSOC test sent laser video from 31 million km at 267 Mbps. Radio is the past!', '¡La prueba DSOC de la NASA mandó video por láser desde 31 millones de km a 267 Mbps. La radio es el pasado!')] },
-  { id: 'nina', x: 2480, seed: 71, name: 'Ms. Nina', role: K('Professora de ciências', 'Science teacher', 'Profesora de ciencias'),
-    say: [K('Na Terra, a atmosfera regula a temperatura de graça. Numa nave tudo tem custo: calor só sai por radiação.', 'On Earth the atmosphere regulates temperature for free. On a ship everything has a cost: heat only leaves by radiation.', 'En la Tierra la atmósfera regula la temperatura gratis. En una nave todo tiene un costo: el calor solo sale por radiación.'), K('Por isso é mais fácil manter a Terra habitável do que habitar outro planeta. Lembre disso lá longe.', 'That is why it is easier to keep Earth habitable than to inhabit another planet. Remember that out there.', 'Por eso es más fácil mantener habitable la Tierra que habitar otro planeta. Recuerde eso allá lejos.')] },
-  { id: 'beto', x: 2880, seed: 83, name: 'Tio Beto', role: K('Feirante de sementes', 'Seed vendor', 'Vendedor de semillas'),
-    say: [K('Batata, soja, alface, pimenta… Alface cresce em 4 dias, batata demora mais, mas rende mais. Planejar a horta é planejar a viagem.', 'Potato, soy, lettuce, chile… Lettuce grows in 4 days, potato takes longer but yields more. Planning the garden is planning the trip.', 'Papa, soja, lechuga, chile… La lechuga crece en 4 días, la papa tarda más pero rinde más. Planificar la huerta es planificar el viaje.'), K('Ah! E não esqueça das alergias da tripulação. Soja para quem é alérgico? Nem pensar.', 'Oh! And don\'t forget the crew\'s allergies. Soy for someone allergic? No way.', '¡Ah! Y no olvide las alergias de la tripulación. ¿Soja para un alérgico? Ni pensar.')] },
+  { id: 'lia', x: 200, seed: 11, name: '', role: '', say: [] },
+  { id: 'teo', x: 940, seed: 23, name: '', role: '', say: [] },
+  { id: 'mari', x: 780, seed: 37, name: '', role: '', say: [] },
+  { id: 'ramos', x: 1250, seed: 41, name: '', role: '', say: [] },
+  { id: 'bia', x: 1620, seed: 53, name: '', role: '', say: [] },
+  { id: 'gui', x: 2100, seed: 61, name: '', role: '', say: [] },
+  { id: 'nina', x: 2480, seed: 71, name: '', role: '', say: [] },
+  { id: 'beto', x: 2880, seed: 83, name: '', role: '', say: [] },
 ];
 
 const CITY_TOTAL = CITY_BUILDINGS.reduce((s, b) => s + b.tabs.length, 0) + CITY_NPCS.length;
@@ -93,16 +88,22 @@ function cityNear() {
 function cityBusy() { const E = U.earth; return !!(E && (E.panel || E.dialog || E.diary)); }
 function tickCity(dt) {
   const E = U.earth; if (!E || U.comms) return;
+  jumpTick(E.p, dt);
+  // a primeira moradora puxa conversa logo no começo
+  if (!E.greeted && E.t > 1.2 && !cityBusy()) { E.greeted = true; E.dialog = { id: CITY_NPCS[0].id, i: 0 }; E.read['npc:' + CITY_NPCS[0].id] = 1; E.target = CITY_NPCS[0].x - 26; }
   if (!cityBusy()) {
     E.t += dt;
-    const p = E.p; const dx = ((keys.ArrowRight || keys.KeyD) ? 1 : 0) - ((keys.ArrowLeft || keys.KeyA) ? 1 : 0);
-    if (dx) { p.x = clamp(p.x + dx * 62 * dt, 20, EARTH_W - 20); p.face = dx; p.moving = true; p.walkT += dt; } else p.moving = false;
+    const p = E.p; let dx = ((keys.ArrowRight || keys.KeyD) ? 1 : 0) - ((keys.ArrowLeft || keys.KeyA) ? 1 : 0);
+    if (dx) E.target = null; // teclado tem prioridade sobre o mouse
+    else if (E.target != null) { const d = E.target - p.x; if (Math.abs(d) < 3) E.target = null; else dx = Math.sign(d); }
+    const sp = 62 * (keys.ShiftLeft || keys.ShiftRight ? RUN_MULT : 1);
+    if (dx) { p.x = clamp(p.x + dx * sp * dt, 20, EARTH_W - 20); p.face = dx; p.moving = true; p.walkT += dt * (sp / 62); } else p.moving = false;
     if (E.t >= E.limit) cityComms();
-  } else E.p.moving = false;
+  } else { E.p.moving = false; if (E.target != null && E.dialog) { const d = E.target - E.p.x; if (Math.abs(d) > 3) { E.p.x += Math.sign(d) * 62 * dt; E.p.face = Math.sign(d); E.p.moving = true; E.p.walkT += dt; } else E.target = null; } }
 }
 function cityComms() {
   U.comms = 1; U.earth.panel = null; U.earth.dialog = null; U.earth.diary = false; Sfx.alarm();
-  Narrator.say('Você foi selecionado para uma missão espacial para salvar o futuro da humanidade.');
+  Narrator.say(F('comms.selected'));
 }
 function cityInteract() {
   const E = U.earth; if (!E || U.comms) return;
@@ -188,8 +189,11 @@ function cityPanel() {
     <div class="row">${last ? `<button class="btn primary" data-ui="cityAccept">🚀 ${esc(L(K('Estou pronto: aceitar a missão', 'I\'m ready: accept the mission', 'Estoy listo: aceptar la misión')))}</button>` : ''}<button class="btn" data-ui="cityClose">${esc(L(K('Sair', 'Leave', 'Salir')))}</button></div></div></div>`;
 }
 function cityDialog() {
-  const E = U.earth; const n = CITY_NPCS.find(x => x.id === E.dialog.id); if (!n) return '';
+  const E = U.earth; const n = CITY_NPCS.find(x => x.id === E.dialog.id); if (!n || !n.av) return '';
   const line = n.say[E.dialog.i];
+  // os moradores falam em voz alta (cada um com seu tom)
+  const dk = n.id + ':' + E.dialog.i;
+  if (U.lastDlg !== dk) { U.lastDlg = dk; Narrator.say(line, { pitch: NPC_VOICE[n.id] || 1 }); }
   return `<div class="dialog"><img src="${spriteURL(n.av, 'civil', 'happy', 3)}" alt=""><div><b>${esc(n.name)}</b> <small>${esc(L(n.role))}</small><p>${esc(L(line))}</p>
     <div class="row"><button class="btn primary" data-ui="cityNext">${E.dialog.i < n.say.length - 1 ? esc(L(K('Próximo ▶', 'Next ▶', 'Siguiente ▶'))) : esc(L(K('Tchau ✔', 'Bye ✔', 'Chao ✔')))}</button></div></div></div>`;
 }

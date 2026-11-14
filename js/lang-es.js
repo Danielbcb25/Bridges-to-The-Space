@@ -681,7 +681,7 @@ Object.assign(I18N_DICT.es, {
   "nav.multi": "Multijugador",
   "start.click": "▶ HAGA CLIC PARA EMPEZAR",
   "start.sound": "sonido activado · use auriculares para la narración",
-  "under.keys": "⌨ ←→/A D caminar · ↑↓/W S escaleras · E interactuar · R informe · T tripulación · F fondo · J diario · Enter chat · Esc menú · clic para caminar",
+  "under.keys": "⌨ ←→ caminar · Shift correr · Espacio interactuar/saltar · ↑↓ escaleras · E interactuar · H ayuda · Shift+S tiempo 2x · Esc cerrar · clic para caminar",
   "under.fs": "⛶ Pantalla completa",
   "s9": "La Misión",
   "s10": "A causa del inminente colapso terrestre, los líderes del planeta se unieron por la supervivencia humana. Los observatorios de todo el mundo localizaron el planeta habitable más cercano: <b class=\"cyan\">Pontes-01b</b>, la única esperanza de la Tierra.",

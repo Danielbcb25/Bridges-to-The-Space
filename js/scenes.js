@@ -126,10 +126,17 @@ function buildEarth() {
   // placas nos vãos entre os prédios da cidade (longe das portas e das pessoas)
   const signX = [110, 440, 870, 1170, 1720, 2010, 2400, 2790, 2980];
   signs.forEach((t, i) => props.push({ type: 'sign', x: signX[i] != null ? signX[i] : 120 + i * 372, t }));
-  for (let i = 0; i < 18; i++) props.push({ type: 'trash', x: 80 + rnd() * (EARTH_W - 160) });
+  for (let i = 0; i < 60; i++) props.push({ type: 'trash', x: 40 + rnd() * (EARTH_W - 80) });
+  // cidade mais impactante: montes de lixo, sacos, tambores pegando fogo e carros abandonados
+  for (let i = 0; i < 22; i++) props.push({ type: 'pile', x: 60 + rnd() * (EARTH_W - 120), w: 22 + rnd() * 30, h: 8 + rnd() * 12, s: rnd() });
+  for (let i = 0; i < 40; i++) props.push({ type: 'bag', x: 30 + rnd() * (EARTH_W - 60), c: pick(['#1c1c1c', '#2a3a2a', '#3a3a46', '#4a3a1c']) });
+  for (let i = 0; i < 9; i++) props.push({ type: 'barrel', x: 150 + rnd() * (EARTH_W - 300) });
+  for (let i = 0; i < 7; i++) props.push({ type: 'car', x: 120 + rnd() * (EARTH_W - 240), c: pick(['#6a3a2a', '#3a4a5a', '#5a5a3a', '#4a2a3a']) });
   for (let i = 0; i < 10; i++) props.push({ type: 'tree', x: 120 + rnd() * (EARTH_W - 240) });
   for (let i = 0; i < 10; i++) npcs.push({ x: 100 + rnd() * (EARTH_W - 200), dir: rnd() < 0.5 ? -1 : 1, av: randomAvatar(rnd), t: rnd() * 5 });
-  earthLayout = { far, near, props, npcs, smoke: [] };
+  props.sort((a, b) => ['car', 'pile', 'barrel', 'tree', 'bag', 'trash', 'sign'].indexOf(a.type) - ['car', 'pile', 'barrel', 'tree', 'bag', 'trash', 'sign'].indexOf(b.type));
+  const dust = []; for (let i = 0; i < 60; i++) dust.push({ x: rnd() * VW, y: rnd() * VH, v: 6 + rnd() * 18 });
+  earthLayout = { far, near, props, npcs, smoke: [], dust };
 }
 function drawEarth(dt, player) {
   if (!earthLayout) buildEarth();
@@ -174,11 +181,28 @@ function drawEarth(dt, player) {
   for (const p of L.props) {
     const x = Math.round(p.x - cam); if (x < -80 || x > VW + 80) continue;
     if (p.type === 'trash') { cx.drawImage(getItemSprite('lata'), x, GROUND - 6); cx.drawImage(getItemSprite('garrafa'), x + 8, GROUND - 8); cx.drawImage(getItemSprite('papel'), x + 16, GROUND - 5); }
+    if (p.type === 'pile') {
+      const w = Math.round(p.w), h = Math.round(p.h);
+      cx.fillStyle = '#2a241c'; cx.beginPath(); cx.moveTo(x - w / 2, GROUND); cx.lineTo(x - w / 4, GROUND - h); cx.lineTo(x + w / 5, GROUND - h - 3); cx.lineTo(x + w / 2, GROUND); cx.fill();
+      for (let k = 0; k < 7; k++) { cx.fillStyle = ['#8a8a8a', '#c43a2a', '#2f78c8', '#d8c86a', '#3a6a3a', '#e8e8e8', '#6a4a2a'][(k + Math.floor(p.s * 7)) % 7]; cx.fillRect(Math.round(x - w / 2 + 3 + (k * 37 % (w - 6))), Math.round(GROUND - 2 - (k * 13 % h)), 3, 2); }
+      if (Math.random() < dt * 0.6) L.smoke.push({ x: p.x, y: GROUND - h, r: 2, a: 0.35, par: 1 });
+    }
+    if (p.type === 'bag') { cx.fillStyle = p.c; cx.beginPath(); cx.arc(x, GROUND - 4, 4, 0, 7); cx.fill(); cx.fillRect(x - 1, GROUND - 9, 2, 2); }
+    if (p.type === 'barrel') {
+      cx.fillStyle = '#5a3a24'; cx.fillRect(x - 5, GROUND - 14, 10, 14); cx.fillStyle = '#3a2416'; cx.fillRect(x - 5, GROUND - 10, 10, 1); cx.fillRect(x - 5, GROUND - 5, 10, 1);
+      for (let k = 0; k < 4; k++) { const fl = Math.sin(R.t * 12 + k * 2) * 2; cx.fillStyle = k % 2 ? '#ffd23f' : '#ff6a1a'; cx.fillRect(x - 4 + k * 2, GROUND - 18 - Math.abs(fl) - k % 3, 2, 5 + Math.abs(fl)); }
+      cx.fillStyle = 'rgba(255,140,40,0.12)'; cx.beginPath(); cx.arc(x, GROUND - 16, 18, 0, 7); cx.fill();
+      if (Math.random() < dt * 3) L.smoke.push({ x: p.x, y: GROUND - 22, r: 2, a: 0.5, par: 1 });
+    }
+    if (p.type === 'car') { cx.fillStyle = p.c; cx.fillRect(x - 16, GROUND - 10, 32, 7); cx.fillRect(x - 9, GROUND - 16, 18, 6); cx.fillStyle = '#1a1a22'; cx.fillRect(x - 7, GROUND - 15, 6, 4); cx.fillRect(x + 1, GROUND - 15, 6, 4); cx.fillStyle = '#111'; cx.fillRect(x - 12, GROUND - 4, 6, 4); cx.fillRect(x + 6, GROUND - 4, 6, 4); cx.fillStyle = '#7a4a2a'; cx.fillRect(x + 4, GROUND - 9, 6, 3); }
     if (p.type === 'tree') { cx.fillStyle = '#2a1e14'; cx.fillRect(x, GROUND - 30, 3, 30); cx.fillRect(x - 6, GROUND - 26, 6, 2); cx.fillRect(x + 3, GROUND - 22, 7, 2); cx.fillRect(x - 3, GROUND - 32, 2, 4); }
   }
   drawCity(dt, cam);
   // placas na frente dos prédios (desenhadas depois deles)
   for (const p of L.props) if (p.type === 'sign') drawStreetSign(p, Math.round(p.x - cam));
+  // poeira e fuligem no ar + neblina tóxica
+  for (const d of L.dust) { d.x -= d.v * dt; d.y += Math.sin(R.t + d.v) * dt * 4; if (d.x < -2) { d.x = VW + 2; } cx.fillStyle = 'rgba(70,58,40,0.55)'; cx.fillRect(Math.round(d.x), Math.round(d.y), 1, 1); }
+  const haze = cx.createLinearGradient(0, 120, 0, VH); haze.addColorStop(0, 'rgba(140,110,60,0)'); haze.addColorStop(1, 'rgba(120,96,56,0.28)'); cx.fillStyle = haze; cx.fillRect(0, 120, VW, VH - 120);
   if (R.cityBubble) { const b = R.cityBubble; R.cityBubble = null; bubble(b.text, b.x, b.y, 170, 9); }
   // NPCs com máscara
   for (const n of L.npcs) {
@@ -285,7 +309,7 @@ function drawShipInterior(dt, me) {
     const outfit = S.cylinders ? 'helmet' : c.outfit;
     const mood = c.sickness ? 'sick' : (c.humor < 40 || c.status !== 'ok') ? 'sad' : 'happy';
     if (c.hibernating) { cx.globalAlpha = 0.5; }
-    drawChar(c.avatar, outfit, c.x, floor, c.face, c.moving ? Math.floor(c.walkT * 8) : 0, mood);
+    drawChar(c.avatar, outfit, c.x, floor - (c.jy || 0), c.face, c.moving ? Math.floor(c.walkT * 8) : 0, mood);
     cx.globalAlpha = 1;
     if (c.status !== 'ok') { cx.fillStyle = c.status === 'ferido' ? '#ff8a3a' : '#ff3a3a'; cx.fillRect(Math.round(c.x) - 2, floor - 36, 5, 2); cx.fillRect(Math.round(c.x), floor - 38, 1, 6); }
     if (c.task) { const p = clamp(c.task.t / c.task.dur, 0, 1); cx.fillStyle = '#000'; cx.fillRect(Math.round(c.x) - 11, floor - 40, 22, 4); cx.fillStyle = '#38e07b'; cx.fillRect(Math.round(c.x) - 10, floor - 39, Math.round(20 * p), 2); }

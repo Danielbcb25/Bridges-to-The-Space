@@ -24,7 +24,7 @@ function moveHuman(c, dt) {
   const pilot = S.event && S.event.puzzle && S.event.puzzle.kind === 'pilot';
   if (pilot) return;
   if (c.climb > 0) { stepMove(c, dt); return; }
-  if (L || Rr || up || down) U.autopilot = null;
+  if (L || Rr || up || down) { U.autopilot = null; U.clickTarget = null; } // teclado tem prioridade sobre o mouse
   if (U.autopilot) {
     const st = STATIONS[U.autopilot];
     c.tx = st.x; c.tdeck = st.deck; stepMove(c, dt);
@@ -32,7 +32,7 @@ function moveHuman(c, dt) {
     return;
   }
   if (U.clickTarget) { c.tx = U.clickTarget.x; c.tdeck = U.clickTarget.deck; stepMove(c, dt); if (!c.moving) U.clickTarget = null; return; }
-  const sp = (c.status === 'ferido' ? 40 : 70) * (c.sickness ? 0.6 : 1);
+  const sp = (c.status === 'ferido' ? 40 : 70) * (c.sickness ? 0.6 : 1) * (keys.ShiftLeft || keys.ShiftRight ? RUN_MULT : 1);
   let dx = (Rr ? 1 : 0) - (L ? 1 : 0);
   if (dx) { c.x = clamp(c.x + dx * sp * dt, 64, WORLD_W - 70); c.face = dx; c.moving = true; c.walkT += dt; if (Math.floor(c.walkT * 8) % 4 === 0 && Math.random() < 0.05) Sfx.step(); }
   else c.moving = false;
@@ -61,13 +61,15 @@ function interact() {
 function update(dt) {
   R.t += dt;
   Net.tick(dt);
+  if (U.screen === 'story') storyTick(dt);
   if (!S || U.screen !== 'game') return;
   const host = Net.role !== 'client';
-  if (S.scene === 'intro') U.introT += dt;
+  const k = timeScale();
+  if (S.crew) jumpTick(me(), dt); // só o próprio jogador pula; os outros chegam pela rede
   if (S.scene === 'earth' && host) tickCity(dt);
   if (S.scene === 'colony') {
     const c = me(); if (c) moveColonyHuman(c, dt);
-    if (host && !(U.panel === 'menu' && !Net.role)) tickColony(dt); // no solo, o menu pausa a colônia
+    if (host && !(U.panel === 'menu' && !Net.role) && !U.help) tickColony(dt * k); // no solo, o menu e a ajuda pausam a colônia
   }
   if (S.scene === 'launch' && host) {
     U.launchT += dt;
@@ -79,7 +81,8 @@ function update(dt) {
   if (S.scene === 'ship') {
     const c = me();
     if (c) moveHuman(c, dt);
-    if (host && !(Net.role !== 'host' && U.panel === 'menu')) tickGame(dt);
+    if (host && !(Net.role !== 'host' && U.panel === 'menu')) tickGame(dt * k);
+    if (S.event && S.event.phase !== 'result') S.fast = 0; // o ⏩ vale até o próximo evento
     // som de alerta em novos eventos
     if (S.event && S.event.id !== lastEventId) { lastEventId = S.event.id; Sfx.alarm(); }
   } else if (host && ['station', 'detour', 'planet', 'migration'].includes(S.scene)) {
@@ -95,14 +98,15 @@ function update(dt) {
 function draw(dt) {
   cx.imageSmoothingEnabled = false;
   cv.style.filter = '';
+  if (U.screen === 'story') { drawStory(dt); return; }
   if (!S || U.screen !== 'game') { drawTitleBg(dt); if (U.screen === 'avatar') { cx.fillStyle = 'rgba(5,6,26,0.6)'; cx.fillRect(0, 0, VW, VH); } return; }
   switch (S.scene) {
-    case 'intro': drawIntroBg(dt); break;
+    case 'intro': drawModeIntro(dt); break;
     case 'earth': {
       if (Net.role === 'client') { drawIntroBg(dt); break; }
       const p = U.earth.p;
       drawEarth(dt, p);
-      drawChar(Object.assign({}, crewById('cmd').avatar), 'civil', p.x - R.earthCam, GROUND, p.face, p.moving ? Math.floor(p.walkT * 8) : 0, 'happy');
+      drawChar(Object.assign({}, crewById('cmd').avatar), 'civil', p.x - R.earthCam, GROUND - (p.jy || 0), p.face, p.moving ? Math.floor(p.walkT * 8) : 0, 'happy');
       break;
     }
     case 'setup': drawSetupBg(dt); break;
@@ -132,32 +136,64 @@ function frame(now) {
 }
 
 // ---------- entrada ----------
+const shiftOn = () => keys.ShiftLeft || keys.ShiftRight;
+// Esc: fecha o que estiver aberto, desmarca seleções e volta
+function escAll() {
+  if (U.help) { U.help = false; return true; }
+  if (Chat.open) { Chat.toggle(false); return true; }
+  if (U.screen === 'story') { UIH.storySkip(); return true; }
+  if (!S || U.screen !== 'game') { if (U.screen !== 'title') { UIH.title(); return true; } return false; }
+  if (S.scene === 'intro') { UIH.introSkip(); return true; }
+  if (S.scene === 'earth') { const E = U.earth; if (E && (E.dialog || E.panel || E.diary)) { cityEsc(); return true; } if (E && E.target != null) { E.target = null; return true; } return false; }
+  if (U.cook && U.cook.length) { U.cook = []; return true; }
+  if (U.farmSel != null && U.panel === 'estufa') { U.farmSel = null; return true; }
+  if (U.panel) { UIH.closePanel(); return true; }
+  if (U.autopilot || U.clickTarget) { U.autopilot = null; U.clickTarget = null; return true; }
+  if (U.hudFull) { U.hudFull = false; return true; }
+  return false;
+}
+// Espaço: interage se houver algo perto; senão, pula
+function spaceAction() {
+  if (!S) return;
+  if (S.scene === 'earth') { const E = U.earth; if (U.comms) return; if (E.dialog || cityNear()) return cityInteract(); if (!cityBusy()) jumpStart(E.p, 'earth'); return; }
+  const c = me(); if (!c || !c.alive || U.panel) return;
+  if (S.scene === 'colony') { if (S.colony.tut === 0 || nearBuilding(c)) return interact(); jumpStart(c, 'colony'); return; }
+  if (S.scene === 'ship') {
+    const trash = S.event && S.event.type === 'lixo' && S.event.phase === 'run' && S.trash.some(t => t.deck === c.deck && Math.abs(t.x - c.x) < 16);
+    if (trash || stationNear(c)) return interact();
+    if (!c.climb) jumpStart(c, 'ship');
+  }
+}
 window.addEventListener('keydown', e => {
-  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) return;
   Music.unlock(); Sfx.ensure();
   keys[e.code] = true;
   const inGame = S && U.screen === 'game';
-  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && inGame) e.preventDefault();
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (inGame || U.screen === 'story')) e.preventDefault();
+  if (e.code === 'Escape') { escAll() || (inGame && ['ship', 'colony'].includes(S.scene) && UIH.panel('menu')); return; }
+  if (U.screen === 'story') { if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) UIH.storyNext(); return; }
   if (!inGame) return;
+  if (e.repeat && e.code === 'Space') return;
+  if (e.code === 'KeyH' && S.scene !== 'intro') { UIH.help(); return; }
+  if (e.code === 'KeyS' && e.shiftKey) { keys.KeyS = false; UIH.fast(); return; }
   if (e.code === 'Enter' && Net.role && S.scene !== 'intro' && !U.comms) { e.preventDefault(); Chat.focus(); return; }
+  if (U.help) { if (e.code === 'Space' || e.code === 'Enter') UIH.helpGo(); return; }
+  if (S.scene === 'intro') { if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) UIH.mNext(); if (e.code === 'ArrowLeft') UIH.mPrev(); return; }
   if (S.scene === 'earth') {
-    if (e.code === 'Escape') cityEsc();
-    if (e.code === 'KeyE' || e.code === 'Space') cityInteract();
+    if (e.code === 'Space') spaceAction();
+    if (e.code === 'KeyE') cityInteract();
     if (e.code === 'KeyJ' && !U.comms) UIH.cityDiary();
     return;
   }
   if (S.scene === 'colony') {
-    if (e.code === 'Escape') { if (U.panel) UIH.closePanel(); else UIH.panel('menu'); }
-    if (e.code === 'KeyE' || e.code === 'Space') { if (U.panel && U.panel.startsWith('c:')) UIH.closePanel(); else interact(); }
+    if (e.code === 'Space') { if (U.panel && U.panel.startsWith('c:')) UIH.closePanel(); else spaceAction(); }
+    if (e.code === 'KeyE') { if (U.panel && U.panel.startsWith('c:')) UIH.closePanel(); else interact(); }
     if (e.code === 'KeyT') { U.panel === 'crew' ? UIH.closePanel() : UIH.panel('crew'); }
     return;
   }
-  if (e.code === 'Escape') { if (U.panel) UIH.closePanel(); else if (S.scene === 'ship') UIH.panel('menu'); }
-  if (S.scene !== 'ship') {
-    if (S.scene === 'intro' && (e.code === 'Enter' || e.code === 'Space')) UIH.introNext();
-    return;
-  }
-  if (e.code === 'KeyE' || e.code === 'Space') interact();
+  if (S.scene !== 'ship') return;
+  if (e.code === 'Space') spaceAction();
+  if (e.code === 'KeyE') interact();
   if (e.code === 'KeyR') { U.panel === 'report' ? UIH.closePanel() : UIH.panel('report'); }
   if (e.code === 'KeyT') { U.panel === 'crew' ? UIH.closePanel() : UIH.panel('crew'); }
   if (e.code === 'KeyF') { U.panel === 'fund' ? UIH.closePanel() : UIH.panel('fund'); }
@@ -168,6 +204,11 @@ window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; }
 function bindCanvas() {
   cv.addEventListener('pointerdown', e => {
     Music.unlock(); Sfx.ensure();
+    if (S && S.scene === 'earth' && U.earth && !U.comms && !cityBusy() && Net.role !== 'client') {
+      const r0 = cv.getBoundingClientRect();
+      U.earth.target = clamp((e.clientX - r0.left) / r0.width * VW + R.earthCam, 20, EARTH_W - 20);
+      return;
+    }
     if (S && S.scene === 'colony' && !U.panel && S.colony && S.colony.tut) {
       const r0 = cv.getBoundingClientRect();
       U.clickTarget = { x: clamp((e.clientX - r0.left) / r0.width * VW + R.colCam, 24, COLONY_W - 24) };
@@ -184,13 +225,14 @@ function bindCanvas() {
   // controles de toque
   document.querySelectorAll('#touch [data-key]').forEach(b => {
     const k = b.dataset.key;
-    const on = e => { e.preventDefault(); Music.unlock(); if (k === 'KeyE') interact(); else keys[k] = true; };
+    const on = e => { e.preventDefault(); Music.unlock(); if (k === 'KeyE') (S && S.scene === 'earth' ? cityInteract() : interact()); else keys[k] = true; };
     const off = e => { e.preventDefault(); keys[k] = false; };
     b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off); b.addEventListener('pointercancel', off);
   });
 }
 
-function boot() {
+async function boot() {
+  await loadFalas();
   I18n.init();
   const sel = document.getElementById('lang');
   if (sel) { sel.innerHTML = LANGS.map(l => `<option value="${l.id}">${l.flag} ${l.label}</option>`).join(''); sel.value = I18n.lang; sel.addEventListener('change', () => I18n.set(sel.value)); }
@@ -204,7 +246,7 @@ function boot() {
     if (document.fullscreenElement) document.exitFullscreen(); else if (g.requestFullscreen) g.requestFullscreen();
   });
   const start = document.getElementById('start');
-  const go = () => { start.classList.add('hide'); Music.unlock(); Sfx.ensure(); };
+  const go = () => { if (start.classList.contains('hide')) return; start.classList.add('hide'); Music.unlock(); Sfx.ensure(); if (!S) storyStart(); };
   start.addEventListener('pointerdown', go); start.addEventListener('keydown', go);
   document.querySelectorAll('[data-crew-sprite]').forEach(img => { const r = ROLES[+img.dataset.crewSprite]; img.src = spriteURL(Object.assign(randomAvatar(() => ((+img.dataset.crewSprite + 1) * 0.137) % 1), { suit: 0 }), 'suit', 'happy', 3); img.alt = r ? r.name : ''; });
   document.querySelectorAll('[data-sprite]').forEach(img => { img.src = spriteURL(DEFAULT_AVATAR, img.dataset.sprite, 'happy', 4); });

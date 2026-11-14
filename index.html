@@ -39,7 +39,7 @@
 <button class="start" id="start"><span class="logo-s">PONTES<b>01</b></span><span class="blink" data-i18n="start.click">▶ CLIQUE PARA INICIAR</span><small data-i18n="start.sound">som ligado · use fones para a narração</small></button>
 </div>
 <div class="under">
-<span data-i18n="under.keys">⌨ ←→/A D andar · ↑↓/W S escadas · E interagir · R relatório · T tripulação · F fundo · J diário · Enter chat · Esc menu · clique para andar</span>
+<span data-i18n="under.keys">⌨ ←→ andar · Shift correr · Espaço interagir/pular · ↑↓ escadas · E interagir · H ajuda · Shift+S tempo 2x · Esc fechar · clique para andar</span>
 <button class="btn small" data-i18n="under.fs" id="fs">⛶ Tela cheia</button>
 </div>
 </section>
@@ -81,7 +81,8 @@
 <div class="wrap">
 <h2 data-i18n="s44">Tripulação</h2>
 <p class="muted" data-i18n="s45">Seis tripulantes fixos + o Comandante (você). Tripulantes podem morrer: cada morte tira uma função e derruba a moral. Se o Comandante morrer, a missão falha.</p>
-<div class="crewgrid">
+<div id="crew-live" class="crewgrid live"></div>
+      <div class="crewgrid">
 <div><img alt="" data-crew-sprite="0"/><b data-i18n="s46">Paramédico</b><span data-i18n="s47">Trata feridos e doentes, monitora o estresse.</span></div>
 <div><img alt="" data-crew-sprite="1"/><b data-i18n="s48">Navegador</b><span data-i18n="s49">Rotação da nave e recálculo de rota.</span></div>
 <div><img alt="" data-crew-sprite="2"/><b data-i18n="s50">Agricultor / Eng. Genético</b><span data-i18n="s51">Cuida da horta e da comida.</span></div>
@@ -142,6 +143,9 @@
 <script src="js/ui.js"></script>
 <script src="js/city.js"></script>
 <script src="js/chat.js"></script>
+<script src="js/assist.js"></script>
+<script src="js/story.js"></script>
+<script src="js/falas.js"></script>
 <script src="js/vendor/peerjs.min.js"></script>
 <script src="js/net.js"></script>
 <script src="js/main.js"></script>

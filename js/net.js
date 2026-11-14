@@ -138,7 +138,7 @@ const Net = {
       case 'pos': {
         const p = this.players[m.pid]; if (!p || !S) return;
         const c = crewById(p.role); if (!c || !c.alive) return;
-        Object.assign(c, { x: clamp(+m.x || 0, 20, (S.scene === 'colony' ? COLONY_W : WORLD_W) - 20), deck: m.deck === 'L' ? 'L' : 'U', face: m.face > 0 ? 1 : -1, moving: !!m.moving, walkT: +m.walkT || 0, climb: +m.climb || 0, climbTo: m.climbTo === 'L' ? 'L' : 'U' });
+        Object.assign(c, { x: clamp(+m.x || 0, 20, (S.scene === 'colony' ? COLONY_W : WORLD_W) - 20), deck: m.deck === 'L' ? 'L' : 'U', face: m.face > 0 ? 1 : -1, moving: !!m.moving, walkT: +m.walkT || 0, climb: +m.climb || 0, climbTo: m.climbTo === 'L' ? 'L' : 'U', jy: clamp(+m.jy || 0, 0, 40) });
         c.tx = c.x; c.tdeck = c.deck;
         break;
       }
@@ -156,7 +156,7 @@ const Net = {
       case 'state': {
         if (this.role !== 'client') return;
         const keep = S && crewById(U.me);
-        const local = keep ? { x: keep.x, deck: keep.deck, face: keep.face, moving: keep.moving, walkT: keep.walkT, climb: keep.climb, climbTo: keep.climbTo, tx: keep.tx, tdeck: keep.tdeck } : null;
+        const local = keep ? { x: keep.x, deck: keep.deck, face: keep.face, moving: keep.moving, walkT: keep.walkT, climb: keep.climb, climbTo: keep.climbTo, tx: keep.tx, tdeck: keep.tdeck, jy: keep.jy, jv: keep.jv, jg: keep.jg } : null;
         const prevScene = S && S.scene;
         S = m.S;
         const mine = crewById(U.me);
@@ -183,7 +183,7 @@ const Net = {
     if (this.role === 'client' && S && (S.scene === 'ship' || S.scene === 'colony')) {
       this.posT -= dt;
       const c = crewById(U.me);
-      if (this.posT <= 0 && c) { this.posT = 0.1; this.send({ t: 'pos', x: c.x, deck: c.deck, face: c.face, moving: c.moving, walkT: c.walkT, climb: c.climb, climbTo: c.climbTo }); }
+      if (this.posT <= 0 && c) { this.posT = 0.1; this.send({ t: 'pos', x: c.x, deck: c.deck, face: c.face, moving: c.moving, walkT: c.walkT, climb: c.climb, climbTo: c.climbTo, jy: Math.round((c.jy || 0) * 10) / 10 }); }
     }
   },
 };

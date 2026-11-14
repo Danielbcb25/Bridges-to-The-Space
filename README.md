@@ -18,6 +18,14 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - **Chat**: só no multiplayer (Enter). No modo solo a tripulação e as pessoas da cidade falam em balões de fala.
 - **Idiomas**: inglês (padrão), português e espanhol.
 
+## Controles e ajuda
+
+- **← →** andar (ou clique para andar — o teclado tem prioridade) · **Shift** correr · **Espaço** interagir; longe de tudo, **pula** (na nave o pulo é lento, de gravidade zero) · **E** interagir · **Esc** fecha/desmarca/volta.
+- **H** abre o **computador de bordo**: próximo passo, lista de tarefas e controles. A barra 💻 no topo mostra sempre o próximo passo.
+- **Shift+S** ou o botão ⏩: tempo 2x até o próximo evento.
+- HUD enxuto com 4 barras (oxigênio, fome, humor, armazenamento); ▾ mostra todos os recursos.
+- Falas do jogo (narração, moradores, tripulação, Controle da Missão e introduções de cada modo) ficam em `data/falas.json` — o jogo precisa ser aberto por um servidor (GitHub Pages, Vercel ou `node server/server.js`) para carregá-las.
+
 ## O que tem
 
 - Narração da introdução, caminhada pela Terra poluída e comunicados.

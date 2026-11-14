@@ -294,7 +294,7 @@ function shade(hex, f) {
 function avatarPalette(a) {
   const skin = SKIN_TONES[a.skin] || SKIN_TONES[1];
   const eye = EYE_COLORS[a.eyes] || EYE_COLORS[1];
-  const vis = VISOR_COLORS[a.visor] || VISOR_COLORS[0];
+  const vis = VISOR_COLORS[0]; // capacete padrão para todos
   const hair = HAIR_COLORS[a.hairColor] || HAIR_COLORS[2];
   const shirt = CLOTH_COLORS[a.shirt] || CLOTH_COLORS[0];
   const pants = CLOTH_COLORS[a.pants] || CLOTH_COLORS[5];
@@ -373,7 +373,7 @@ function getSprite(a, outfit = 'suit', mood = 'happy', walk = 0) {
     ctx.fillStyle = col; ctx.fillRect(x, y, 1, 1);
   }
   // pintura livre do criador
-  if (a.paint) for (const k in a.paint) {
+  if (false && a.paint) for (const k in a.paint) { // pintura livre removida do criador
     const [x, y] = k.split(',').map(Number);
     if (outfit !== 'civil' && y >= 3 && y < 12 && (outfit === 'helmet' || outfit === 'broken')) continue;
     if (a.paint[k] === 'erase') ctx.clearRect(x, y, 1, 1);
