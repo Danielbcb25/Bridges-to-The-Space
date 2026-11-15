@@ -186,7 +186,7 @@ function applySetup() {
 function buildSchedule() {
   const route = ROUTES.find(r => r.id === S.setup.route);
   const n = S.journey === 'curta' ? 4 : 9;
-  const pool = ['termico', 'asteroides', 'combFalta', 'combVaz', 'oxigenio', 'painel', 'lixo', 'radio', 'contaminacao', 'traje', 'doenca', 'tempestade'];
+  const pool = ['termico', 'asteroides', 'combFalta', 'combVaz', 'oxigenio', 'painel', 'lixo', 'radio', 'contaminacao', 'traje', 'doenca', 'tempestade', 'prateleira', 'destrocos'];
   const weight = { asteroides: route.risk, tempestade: route.risk, termico: 1.2 };
   const chosen = [];
   const bag = pool.slice();
@@ -566,10 +566,6 @@ function checkStuck(dt) {
       if (S.stuckFood >= 2) return fail('A comida acabou e não há como produzir mais: a tripulação não chegaria viva a Pontes-01b.');
     } else { S.stuckFood = 0; S.stuckFoodWarned = false; }
     if (sc === 'station' && S.res.combustivel < 1) return fail('Sem combustível na Estação Ponte-Alfa: a nave não consegue mais partir.');
-  }
-  if (sc === 'migration') {
-    const need = landingFuel();
-    if (S.res.combustivel < need) return planetEnding('Sem combustível para pousar, a tripulação ficou em órbita de Pontes-01b enviando dados e preparando o caminho para as próximas naves.');
   }
   if (sc === 'colony' && S.colony) {
     const C = S.colony, solarCost = (typeof CCOST !== 'undefined' && CCOST.solar[1]) ? CCOST.solar[1].kwh : 8;
