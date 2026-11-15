@@ -1833,7 +1833,15 @@
   "Andar": "Caminar",
   "Correr": "Correr",
   "Usar estações e conversar": "Usar estaciones y hablar",
-  "Computador de bordo: peça ajuda": "Computadora de a bordo: pide ayuda"
+  "Computador de bordo: peça ajuda": "Computadora de a bordo: pide ayuda",
+  "Comer na Cozinha": "Comer en la Cocina",
+  "Você está com fome. Na Cozinha, aperte E e clique em \"Comer agora\".": "Tienes hambre. En la Cocina, pulsa E y haz clic en \"Comer ahora\".",
+  "Média": "Media",
+  "tripulação mais feliz": "tripulación más feliz",
+  "equilibrada": "equilibrada",
+  "chega a Pontes-01b": "llega a Pontes-01b",
+  "acaba antes de chegar": "se acaba antes de llegar",
+  "A tripulação come sozinha; você come quando tiver fome.": "La tripulación come sola; tú comes cuando tienes hambre."
  },
  "patterns": [
   [

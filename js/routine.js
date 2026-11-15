@@ -40,30 +40,17 @@ function routinePenalty() {
 const ROUTINE_DAY1 = ['suporte', 'horta', 'lixo', 'radio'];
 const ROUTINE_SIZE = 3;
 
-// ---------- almoço: todo dia, entre 11h e 15h, cada jogador vai à Cozinha comer ----------
-const LUNCH = [11, 15];
-const dayHour = () => S.dayT / S.dayLen * 24;
-function lunchOpen() { return S && S.scene === 'ship' && dayHour() >= LUNCH[0] && dayHour() < LUNCH[1]; }
-function lunchDone(c) { return !!(S.lunch && c && S.lunch[c.id] === S.day); }
-function lunchTick() {
+// ---------- comer: quando o jogador fica com fome, aparece a tarefa de ir à Cozinha ----------
+const HUNGRY = 40;
+function hungerTick() {
   if (!S || S.scene !== 'ship' || Net.role === 'client') return;
-  S.lunchT = S.lunchT || {};
-  const h = dayHour();
-  if (h >= LUNCH[0] && h < LUNCH[1] && S.lunchT.open !== S.day) { S.lunchT.open = S.day; if (S.fast) S.fast = 0; if (!evActive()) toast('🍽 Hora do almoço! Vá à Cozinha e clique em Comer agora.', 'info'); }
-  if (h >= LUNCH[1] && S.lunchT.close !== S.day) {
-    S.lunchT.close = S.day;
-    if (S.lunchT.ev === S.day) return; // missão na hora do almoço: sem punição
-    alive().filter(c => isHumanCrew(c) && !c.hibernating && !lunchDone(c)).forEach(c => {
-      c.humor = clamp(c.humor - 6, 0, 100); c.saciedade = clamp(c.saciedade - 10, 0, 100);
-      toast(`🍽 ${c.name} pulou o almoço: fome e humor −6.`, 'warn');
-    });
+  for (const c of alive().filter(x => isHumanCrew(x) && !x.hibernating)) {
+    if (c.saciedade < HUNGRY && !c.hungryWarned) { c.hungryWarned = true; if (S.fast) S.fast = 0; toast(`🍴 ${c.name} está com fome: vá à Cozinha e clique em Comer agora.`, 'info'); }
   }
-  if (evActive() && h >= LUNCH[0] && h < LUNCH[1]) S.lunchT.ev = S.day;
 }
-function lunchItem() {
-  const m = me(); if (!m || !m.alive || m.hibernating) return null;
-  const h = dayHour(), done = lunchDone(m);
-  return { t: 'Almoçar na Cozinha', icon: '🍽', how: 'Na Cozinha, aperte E e clique em "Comer agora" (entre 11h e 15h).', done, open: h >= LUNCH[0] && h < LUNCH[1], late: h >= LUNCH[1] };
+function hungerItem() {
+  const m = me(); if (!m || !m.alive || m.hibernating || m.saciedade >= HUNGRY) return null;
+  return { t: 'Comer na Cozinha', icon: '🍴', how: 'Você está com fome. Na Cozinha, aperte E e clique em "Comer agora".' };
 }
 
 // missão (desafio) em andamento: a rotina fica pausada
@@ -99,7 +86,7 @@ function routineGet() {
   if (!S || S.scene !== 'ship') return null;
   if ((!S.routine || S.routine.day !== S.day) && Net.role !== 'client') routineNew();
   if (S.routine && evActive() && Net.role !== 'client') S.routine.hadEvent = true;
-  lunchTick();
+  hungerTick();
   return S.routine;
 }
 // chamado pelo host depois de cada ação (e quando alguém abre o painel de uma estação)
@@ -129,7 +116,7 @@ ACTIONS.inspect = (p, actor) => routineHook('inspect', p, actor);
 }
 function routineNext() {
   const r = routineGet(); if (!r) return null;
-  const lu = lunchItem(); if (lu && lu.open && !lu.done && !evActive()) return { t: lu.t, how: lu.how, icon: lu.icon, go: { st: 'cozinha' }, routine: true };
+  const hu = hungerItem(); if (hu && !evActive()) return { t: hu.t, how: hu.how, icon: hu.icon, go: { st: 'cozinha' }, routine: true };
   const it = r.items.find(x => !x.done); if (!it) return null;
   const ch = CHORES[it.id];
   return { t: ch.t, how: ch.how, icon: ch.icon, go: { st: ch.st }, routine: true };
@@ -142,14 +129,14 @@ function routineBox() {
   const ev = S.event && S.event.phase !== 'result' ? S.event : null;
   const rows = [];
   if (S.tutorial < 4) assistSteps().filter(x => x.go && x.go.st).forEach(x => rows.push({ t: x.t, icon: x.icon, done: x.done, how: TUT_HOW[x.go.st] }));
-  const lu = lunchItem();
+  const hu = hungerItem();
   r.items.forEach(it => { const ch = CHORES[it.id]; rows.push({ t: ch.t, icon: ch.icon, done: it.done, how: ch.how }); });
-  if (lu) rows.splice(lu.open && !lu.done ? 0 : rows.length, 0, { t: lu.t + ' · 11h–15h', icon: lu.icon, done: lu.done, how: lu.how, lunch: lu });
-  const cur = ev ? null : rows.find(x => !x.done && (!x.lunch || x.lunch.open));
+  if (hu) rows.unshift({ t: hu.t, icon: hu.icon, done: false, how: hu.how });
+  const cur = ev ? null : rows.find(x => !x.done);
   const done = r.items.filter(x => x.done).length;
   return `<div class="goals routine ${ev ? 'paused' : ''}"><b>${ev ? '⚠ ' + esc(L('EMERGÊNCIA')) : esc(L('ROTINA')) + ' · ' + esc(L('DIA')) + ' ' + S.day} <small>${done}/${r.items.length}</small></b>
     ${ev ? `<div class="evline">${esc(T((EVENT_INFO[ev.type] || {}).title || ''))}</div><div class="muted small">${esc(L('Rotina pausada: resolva o desafio primeiro.'))}</div>` : ''}
-    ${rows.map(x => `<div class="${x.done ? 'done' : x === cur ? 'cur' : x.lunch && x.lunch.late ? 'missed' : ''}">${x.done ? '☑' : x === cur ? '▶' : x.lunch && x.lunch.late ? '✖' : '☐'} ${x.icon} ${esc(L(x.t))}${x === cur && x.how ? `<div class="how">${esc(L(x.how))}</div>` : ''}</div>`).join('')}
+    ${rows.map(x => `<div class="${x.done ? 'done' : x === cur ? 'cur' : ''}">${x.done ? '☑' : x === cur ? '▶' : '☐'} ${x.icon} ${esc(L(x.t))}${x === cur && x.how ? `<div class="how">${esc(L(x.how))}</div>` : ''}</div>`).join('')}
     ${!ev && r.hadEvent && !r.bonus && r.items.length ? `<div class="muted small">⏸ ${esc(L('Hoje teve missão: o que faltar passa para amanhã.'))}</div>` : ''}
     ${!ev && !r.bonus && !r.hadEvent && S.tutorial >= 4 ? `<div class="muted small">⏳ ${Math.max(0, Math.floor(24 - S.dayT / S.dayLen * 24))}h · ${esc(L('o que não for feito hoje tem consequência'))}</div>` : ''}
     ${!ev && !r.items.length ? `<div class="muted small">☕ ${esc(L('Nenhuma tarefa hoje. Acelere o tempo (Shift+S) se quiser.'))}</div>` : ''}

@@ -1832,7 +1832,15 @@
   "Andar": "Walk",
   "Correr": "Run",
   "Usar estações e conversar": "Use stations and talk",
-  "Computador de bordo: peça ajuda": "Onboard computer: ask for help"
+  "Computador de bordo: peça ajuda": "Onboard computer: ask for help",
+  "Comer na Cozinha": "Eat in the Kitchen",
+  "Você está com fome. Na Cozinha, aperte E e clique em \"Comer agora\".": "You are hungry. In the Kitchen, press E and click \"Eat now\".",
+  "Média": "Medium",
+  "tripulação mais feliz": "happier crew",
+  "equilibrada": "balanced",
+  "chega a Pontes-01b": "reaches Pontes-01b",
+  "acaba antes de chegar": "runs out before arrival",
+  "A tripulação come sozinha; você come quando tiver fome.": "The crew eats on its own; you eat when you're hungry."
  },
  "patterns": [
   [

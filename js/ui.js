@@ -289,7 +289,7 @@ function readinessAlerts() {
   const st = S.setup; const h = id => st.modules.includes(id) || st.upgrades.includes(id) || st.reserves.includes(id) || st.skills.includes(id) || st.pantry.includes(id) || st.gadgets.includes(id) || st.training.includes(id);
   const a = [];
   const days = Math.round((S.journey === 'curta' ? 12 : 30) * ROUTES.find(r => r.id === st.route).days);
-  const food = (S.journey === 'curta' ? 70 : 140) + (h('racaoExtra') ? 30 : 0);
+  const food = Math.ceil(0.4 * 7 * days * 1.08) + (h('racaoExtra') ? 30 : 0);
   if (!h('filtroReserva')) a.push(['bad', 'Sem filtro de ar reserva: risco alto em falhas do Suporte à Vida.']);
   if (!h('enfermaria')) a.push(['bad', 'Sem enfermaria: feridos graves podem morrer.']);
   if (st.route === 'rapida' && !h('tanqueExtra')) a.push(['warn', 'Combustível justo para a rota rápida.']);
@@ -592,8 +592,8 @@ function kitchenPanel() {
     const fo = foodOutlook(); const mm = me();
     const status = `<div class="foodstat ${fo.days < 2 ? 'bad' : fo.days < fo.left ? 'warn' : 'ok'}"><div>🍱 <b>${fmt(S.res.comida, 0)} kg</b> ${esc(L('de ração'))} · ${esc(L('dura'))} ≈ <b>${fmt(fo.days, 0)}</b> ${esc(L('dias'))} <small class="muted">(${fmt(fo.perDay, 1)} kg/${esc(L('dia'))}, ${fo.n} ${esc(L('pessoas'))})</small>${S.stage === 1 ? ` · ${esc(L('viagem restante'))} ≈ <b>${fo.left}</b> ${esc(L('dias'))}` : ''}</div>
       ${mm && mm.alive ? `<div class="sysline"><span>${esc(L('Sua fome'))}</span>${bar(mm.saciedade, 100)}<b>${fmt(mm.saciedade, 0)}%</b><button class="btn tiny primary" data-act="eat">🍴 ${esc(L('Comer agora'))}</button></div>` : ''}
-      <small class="muted">${esc(L('A tripulação come sozinha 3 vezes por dia.'))}</small></div>`;
-    return tabs + status + `<h4>${esc(L('Tamanho das porções'))}</h4><div class="opts portions">${[['pleno', 'Normal', 1, 'tripulação satisfeita'], ['reduzido', 'Menor', 1.5, 'humor cai um pouco'], ['minimo', 'Mínima', 3, 'humor cai muito · risco de desmaio']].map(([k, n, mult, d]) => { const days = S.res.comida / (0.6 * (foodOutlook().n)) * mult; return `<button class="opt ${fd.racionamento === k ? 'on' : ''}" data-act="ration" data-p='${J({ level: k })}'><b>${esc(L(n))}</b><span class="big">${esc(L('comida dura'))} ≈ ${fmt(days, 0)} ${esc(L('dias'))}</span><span>${esc(L(d))}</span></button>`; }).join('')}</div>
+      <small class="muted">${esc(L('A tripulação come sozinha; você come quando tiver fome.'))}</small></div>`;
+    return tabs + status + `<h4>${esc(L('Tamanho das porções'))}</h4><div class="opts portions">${[['pleno', 'Normal', 1, 'tripulação mais feliz'], ['reduzido', 'Média', 1.5, 'equilibrada'], ['minimo', 'Mínima', 3, 'humor cai muito · risco de desmaio']].map(([k, n, mult, d]) => { const fo2 = foodOutlook(); const days = S.res.comida / (0.6 * fo2.n) * mult; const ok = days >= fo2.left; return `<button class="opt ${fd.racionamento === k ? 'on' : ''}" data-act="ration" data-p='${J({ level: k })}'><b>${esc(L(n))}</b><span class="big">${esc(L('comida dura'))} ≈ ${fmt(days, 0)} ${esc(L('dias'))}</span>${S.stage === 1 ? `<span class="${ok ? 'green' : 'red'}">${ok ? '✔ ' + esc(L('chega a Pontes-01b')) : '✖ ' + esc(L('acaba antes de chegar'))}</span>` : ''}<span>${esc(L(d))}</span></button>`; }).join('')}</div>
       <h4>${esc(L('O que servir'))}</h4><div class="mchips">${okF.map(f => `<button class="chip ${fd.menu.every(x => x === f.k) ? 'on' : ''}" data-act="menuAll" data-p='${J({ item: f.k })}'>${f.ic} ${esc(T(f.n))} <small>${f.q}</small></button>`).join('')}</div>${okF.length <= 1 ? `<p class="small muted">${esc(L('Só ração por enquanto.'))} ${esc(L(has('estufa') ? 'Plante e colha na Estufa para ter comida fresca.' : 'Sem Estufa, a nave depende da ração.'))}</p>` : ''}
       ${warn.length && roleAlive('paramedico') ? `<div class="alert bad">Paramédico: ${esc([...new Set(warn)].join(' '))}</div>` : ''}
       <details class="evinfo"><summary>${esc(L('Mais opções da cozinha'))}</summary>

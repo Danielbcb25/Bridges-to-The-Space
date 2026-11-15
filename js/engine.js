@@ -146,8 +146,10 @@ function applySetup() {
   const st = S.setup;
   const route = ROUTES.find(r => r.id === st.route);
   S.totalDays = Math.round((S.journey === 'curta' ? 12 : 30) * route.days);
-  S.res = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: S.journey === 'curta' ? 70 : 140, plantacao: 40, dados: 200, medicos: 10, lixo: 0 };
-  S.cap = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: S.journey === 'curta' ? 70 : 140, plantacao: 40, dados: 400, medicos: 10, lixo: 40 };
+  // a ração dá certinho para a viagem com a porção MÉDIA (0,4 kg/pessoa/dia): normal falta, mínima sobra
+  const foodKg = Math.ceil(0.4 * 7 * S.totalDays * 1.08);
+  S.res = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: foodKg, plantacao: 40, dados: 200, medicos: 10, lixo: 0 };
+  S.cap = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: foodKg, plantacao: 40, dados: 400, medicos: 10, lixo: 40 };
   const addR = (k, v) => { S.res[k] += v; S.cap[k] = Math.max(S.cap[k], S.res[k]); };
   if (has('tanqueExtra')) { addR('combustivel', 100); }
   if (has('baterias')) { S.cap.energia += 20; S.res.energia += 20; }
@@ -267,7 +269,7 @@ function effIndex() {
   }
   const m = moralIndex(); if (m < 40) e -= 10; else if (m < 60) e -= 4;
   e -= (6 - (a.length - 1)) * 3;
-  if (S.food.racionamento === 'reduzido') e -= 4; if (S.food.racionamento === 'minimo') e -= 9;
+  if (S.food.racionamento === 'minimo') e -= 9;
   return clamp(e, 5, 100);
 }
 function sysHp(k) { return S.systems[k] ? S.systems[k].hp : 100; }
@@ -485,7 +487,8 @@ function simulate(dt) {
     if (has('jogos')) decay -= 0.3;
     if (has('cupula')) decay -= 0.3;
     if (S.res.lixo > 15) decay += 1;
-    if (S.food.racionamento === 'reduzido') decay += 2;
+    if (S.food.racionamento === 'pleno') decay -= 0.5; // porção cheia: tripulação mais feliz
+    if (S.food.racionamento === 'reduzido') decay += 0.3;
     if (S.food.racionamento === 'minimo') decay += 5;
     if (c.sickness) decay += 4;
     c.humor = clamp(c.humor - decay * f, 0, 100);
@@ -587,9 +590,10 @@ function fail(reason) {
 function serveMeal(slot) {
   const fd = S.food;
   const per = { pleno: 0.2, reduzido: 0.133, minimo: 0.067 }[fd.racionamento];
-  const full = { pleno: 34, reduzido: 22, minimo: 11 }[fd.racionamento];
+  const full = { pleno: 34, reduzido: 23, minimo: 21 }[fd.racionamento];
   // no almoço (refeição do meio-dia) os jogadores precisam ir à Cozinha comer; os bots comem sozinhos
-  const eaters = alive().filter(c => !c.hibernating && !(slot === 1 && S.scene === 'ship' && isHumanCrew(c)));
+  // jogadores comem quando têm fome (Cozinha → Comer agora); os bots comem nas refeições
+  const eaters = alive().filter(c => !c.hibernating && !(S.scene === 'ship' && isHumanCrew(c)));
   const n = eaters.length;
   let item = fd.menu[slot] || 'racao';
   let tags = [], humor = 0, label = 'ração';
@@ -918,22 +922,21 @@ ACTIONS.hibernate = p => {
 // comer fora de hora: prato pronto > comida fresca > ração
 ACTIONS.eat = (p, actor) => {
   const c = actor; if (!c || !c.alive) return;
-  const lunch = typeof lunchOpen === 'function' && lunchOpen() && !lunchDone(c);
-  if (c.saciedade >= 85 && !lunch) return toast('Você ainda está satisfeito.', 'info');
+  if (c.saciedade >= 85) return toast('Você ainda está satisfeito.', 'info');
+  const lv = S.food.racionamento; const portion = { pleno: 0.6, reduzido: 0.4, minimo: 0.2 }[lv] || 0.4; const fill = { pleno: 75, reduzido: 60, minimo: 40 }[lv] || 60;
   const fd = S.food; let item = null;
   const dish = Object.keys(fd.dishes).find(k => fd.dishes[k] >= 1);
   const crop = Object.keys(fd.fresh).find(k => fd.fresh[k] >= 0.3);
   if (dish) { fd.dishes[dish] -= 1; item = dish; }
   else if (crop) { fd.fresh[crop] -= 0.3; item = crop; }
-  else if (S.res.comida >= 0.2) { addRes('comida', -0.2, 'Lanche'); item = 'racao'; }
+  else if (S.res.comida >= portion) { addRes('comida', -portion, 'Refeições'); item = 'racao'; }
   else return toast('Não há nada para comer!', 'bad');
-  c.saciedade = clamp(c.saciedade + 40, 0, 100); c.noFoodDays = 0;
+  c.saciedade = clamp(c.saciedade + fill, 0, 100); c.noFoodDays = 0; c.hungryWarned = false;
   const n = foodNutr(item); if (!c.nut) c.nut = [80, 80, 80];
   for (let k = 0; k < 3; k++) c.nut[k] = clamp(c.nut[k] + n[k] * 0.5, 0, 100);
   c.nutricao = (c.nut[0] + c.nut[1] + c.nut[2]) / 3;
   addRes('lixo', 0.05, 'Restos de comida');
-  if (lunch) { S.lunch = S.lunch || {}; S.lunch[c.id] = S.day; c.humor = clamp(c.humor + 3, 0, 100); toast('🍽 ' + c.name + ' almoçou.', 'good'); }
-  else toast('🍴 ' + c.name + ' comeu.', 'good');
+  toast('🍴 ' + c.name + ' comeu.', 'good');
 };
 ACTIONS.sleep = (p, actor) => {
   const c = crewById(p.id || actor.id); if (!available(c)) return;
