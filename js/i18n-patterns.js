@@ -41,6 +41,13 @@ function registerFnPatterns() {
   P(/^🍱 (.+) está passando fome! Sirva comida ou coma na Cozinha\.$/, '🍱 $1 is starving! Serve food or eat in the Kitchen.', '🍱 ¡$1 está pasando hambre! Sirve comida o come en la Cocina.');
   P(/^🍴 (.+) comeu\.$/, '🍴 $1 ate.', '🍴 $1 comió.');
   P(/^🍴 (.+) está com fome: vá à Cozinha e clique em Comer agora\.$/, '🍴 $1 is hungry: go to the Kitchen and click Eat now.', '🍴 $1 tiene hambre: ve a la Cocina y haz clic en Comer ahora.');
+  P(/^Etapa fora de ordem \((.+)\)\. O ciclo reiniciou\.$/, (m, a) => `Step out of order (${t(a)}). The cycle restarted.`, (m, a) => `Etapa fuera de orden (${t(a)}). El ciclo se reinició.`);
+  P(/^(\d+(?:[.,]\d+)?) kg de lixo viraram (\d+(?:[.,]\d+)?) kg de adubo para a horta\.$/, (m, a, b) => `${a.replace(',', '.')} kg of trash became ${b.replace(',', '.')} kg of compost for the garden.`, '$1 kg de basura se convirtieron en $2 kg de abono para el huerto.');
+  P(/^A tempestade atingiu a nave\. (\d+) tripulante\(s\) fora do abrigo\.$/, 'The storm hit the ship. $1 crew member(s) outside the shelter.', 'La tormenta golpeó la nave. $1 tripulante(s) fuera del refugio.');
+  P(/^Você partiu para (.+?) sem combustível suficiente \((\d+) kg\)\. A nave ficou à deriva\.\s*(.*)$/, (m, a, b, c) => `You left for ${a} without enough fuel (${b} kg). The ship drifted away.${c ? ' ' + t(c) : ''}`, (m, a, b, c) => `Partiste hacia ${a} sin combustible suficiente (${b} kg). La nave quedó a la deriva.${c ? ' ' + t(c) : ''}`);
+  P(/^O oxigênio acabou durante a viagem até (.+)\.$/, 'Oxygen ran out on the trip to $1.', 'El oxígeno se acabó durante el viaje a $1.');
+  P(/^Chegamos a (.+)\. Atenção: este não é o destino planejado\.$/, 'We have arrived at $1. Warning: this is not the planned destination.', 'Llegamos a $1. Atención: este no es el destino planeado.');
+  P(/^Sem combustível para voltar de (.+) \(precisava de (\d+) kg\)\. A nave ficou presa lá, longe de Pontes-01b\.$/, 'No fuel to return from $1 (needed $2 kg). The ship got stuck there, far from Pontes-01b.', 'Sin combustible para volver de $1 (hacían falta $2 kg). La nave quedó atrapada allí, lejos de Pontes-01b.');
   P(/^✔ Rotina: (.+)$/, (m, a) => `✔ Routine: ${t(a)}`, (m, a) => `✔ Rutina: ${t(a)}`);
   P(/^Troca feita: (.+)$/, (m, a) => `Trade done: ${t(a)}`, (m, a) => `Intercambio hecho: ${t(a)}`);
   P(/^Análise de (.+) concluída\.\s*(.*)$/, (m, a, r) => `${t(a)} analysis complete.${r ? ' ' + t(r) : ''}`, (m, a, r) => `Análisis de ${low(t(a))} completado.${r ? ' ' + t(r) : ''}`);

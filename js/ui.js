@@ -411,7 +411,7 @@ function puzzleHTML(ev) {
   if (pz.kind === 'filtros') {
     return `<div class="puzzle"><h4>Filtros de ar (CDRA)</h4><p class="small">Inspecione os filtros (custa tempo) e troque o entupido pelo reserva.</p><div class="filters">${Array.from({ length: pz.n }, (_, i) => {
       const seen = pz.seen.includes(i); const bad = seen && i === pz.bad;
-      return `<div class="filter ${seen ? (bad ? 'bad' : 'ok') : ''}"><span>F${i + 1}</span><em>${seen ? (bad ? 'ENTUPIDO' : 'limpo') : '?'}</em><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'inspect', i })}' ${seen ? 'disabled' : ''}>Inspecionar</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'swap', i })}'>Trocar</button></div>`;
+      return `<div class="filter ${seen ? (bad ? 'bad' : 'ok') : ''}"><span>F${i + 1}</span><em>${seen ? esc(L(bad ? 'ENTUPIDO' : 'limpo')) : '?'}</em><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'inspect', i })}' ${seen ? 'disabled' : ''}>Inspecionar</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'swap', i })}'>Trocar</button></div>`;
     }).join('')}</div></div>`;
   }
   if (pz.kind === 'mapa') {
@@ -430,11 +430,11 @@ function puzzleHTML(ev) {
       ${q < 0.5 ? '<p class="small muted">Sintonize melhor para entender a mensagem.</p>' : `<p class="small">O que a base está tentando avisar?</p><div class="opts1">${shuffleStable(msg.options, pz.seed).map(o => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'answer', answer: o })}'>${esc(o)}</button>`).join('')}</div>`}</div>`;
   }
   if (pz.kind === 'agua') {
-    return `<div class="puzzle"><h4>Ciclo fechado de descontaminação</h4><p class="small">Clique nas etapas na ordem correta.</p><div class="row">${pz.options.map(o => `<button class="btn tiny ${pz.order.includes(o) ? 'on' : ''}" data-act="puzzle" data-p='${J({ stage: o })}' ${pz.order.includes(o) ? 'disabled' : ''}>${o}</button>`).join('')}</div><p>Sequência: ${pz.order.map((o, i) => `${i + 1}. ${o}`).join(' → ') || '—'}</p></div>`;
+    return `<div class="puzzle"><h4>Ciclo fechado de descontaminação</h4><p class="small">Clique nas etapas na ordem correta.</p><div class="row">${pz.options.map(o => `<button class="btn tiny ${pz.order.includes(o) ? 'on' : ''}" data-act="puzzle" data-p='${J({ stage: o })}' ${pz.order.includes(o) ? 'disabled' : ''}>${o}</button>`).join('')}</div><p>${esc(L('Sequência'))}: ${pz.order.map((o, i) => `${i + 1}. ${esc(T(o))}`).join(' → ') || '—'}</p></div>`;
   }
   if (pz.kind === 'remedio') {
     const expired = S.day > S.meds.validUntil;
-    return `<div class="puzzle"><h4>Aparelhos médicos</h4><div class="devs">${MED_DEVICES.map(d => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'device', dev: d.id })}'>${d.name}</button>${pz.seen[d.id] ? `<span class="reading">${esc(pz.seen[d.id])}</span>` : ''}`).join('')}</div>
+    return `<div class="puzzle"><h4>Aparelhos médicos</h4><div class="devs">${MED_DEVICES.map(d => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'device', dev: d.id })}'>${d.name}</button>${pz.seen[d.id] ? `<span class="reading">${esc(I18n.lang === 'en' ? T(pz.seen[d.id]).replace(/(\d),(\d)/g, '$1.$2') : T(pz.seen[d.id]))}</span>` : ''}`).join('')}</div>
       ${expired ? `<p class="red small">Estoque vencido! <button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'replace' })}'>Trocar lote (2 recursos)</button></p>` : ''}
       <h4>Kit de remédios</h4><div class="row">${MEDICINES.map(m => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'give', med: m.id })}'>${m.name}</button>`).join('')}</div>
       <p class="small muted">Referência: febre e ruído no pulmão → infecção; SpO₂ baixo → hipóxia; pressão alta e dor de cabeça → fluidos na cabeça; náusea → enjoo espacial; coceira e chiado → alergia.</p></div>`;

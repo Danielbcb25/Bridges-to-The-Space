@@ -564,7 +564,7 @@ const TH_ACTIONS = {
   rot: { name: 'Girar a nave', short: 'Rotação', need: 5, role: 'navegador', station: 'ponte', cost: () => `−${has('motorEf') ? 15 : 20} kg comb.`, sys: 'propulsao' },
   rad: { name: 'Radiadores', short: 'Radiadores', need: 4, role: 'engenheiro', station: 'termico', cost: () => '−6 kWh', sys: 'termico' },
   heat: { name: 'Aquecedores', short: 'Aquecedores', need: 4, role: 'engenheiro', station: 'termico', cost: () => `−${thHeatCost()} kWh`, sys: 'suporte' },
-  rep: { name: 'Reparar o isolamento', short: 'Reparo', need: 3, role: 'engenheiro', station: 'eclusa', cost: () => '−4,8 kWh e engenheiro 1 min', sys: 'termico' },
+  rep: { name: 'Reparar o isolamento', short: 'Reparo', need: 3, role: 'engenheiro', station: 'eclusa', cost: () => L(K('−4,8 kWh e engenheiro 1 min', '−4.8 kWh and engineer 1 min', '−4,8 kWh e ingeniero 1 min')), sys: 'termico' },
   shut: { name: 'Persianas térmicas', short: 'Persianas', need: 6, role: 'engenheiro', station: 'termico', cost: () => '−3 kWh', sys: 'termico' },
   equip: { name: 'Desligar equipamentos', short: 'Equipamentos', need: 5, role: 'pesquisador', station: 'lab', cost: () => (S.thermal && S.thermal.equipOff ? 'religar (sem custo)' : '+6 kWh e −3 moral'), sys: 'avionica' },
 };

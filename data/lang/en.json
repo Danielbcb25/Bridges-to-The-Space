@@ -1875,7 +1875,11 @@
   "Persianas travadas (água congelou)": "Blinds jammed (water froze)",
   "Análise planetária": "Planetary analysis",
   "Cultivo falhou": "Farming failed",
-  "Casco": "Hull"
+  "Casco": "Hull",
+  "ENTUPIDO": "CLOGGED",
+  "limpo": "clean",
+  "Sequência": "Sequence",
+  "Esse filtro estava bom. Tempo perdido!": "That filter was fine. Time lost!"
  },
  "patterns": [
   [

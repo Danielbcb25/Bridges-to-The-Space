@@ -198,7 +198,9 @@ function buildSchedule() {
   }
   // espalha os eventos pela viagem (evita o 1º dia e a parada na estação)
   const days = S.totalDays;
-  S.schedule = chosen.map((type, i) => ({ type, day: 1.6 + (i + 0.3 + Math.random() * 0.5) * (days - 2) / n }));
+  // o 1º dia (e o 2º na jornada longa) é só para aprender: o primeiro desafio vem depois
+  const start = S.journey === 'curta' ? 2.5 : 3.2;
+  S.schedule = chosen.map((type, i) => ({ type, day: start + (i + 0.3 + Math.random() * 0.5) * (days - start - 0.5) / n }));
   S.schedule.sort((a, b) => a.day - b.day);
 }
 
@@ -492,7 +494,7 @@ function simulate(dt) {
     if (S.food.racionamento === 'minimo') decay += 5;
     if (c.sickness) decay += 4;
     c.humor = clamp(c.humor - decay * f, 0, 100);
-    c.saciedade = clamp(c.saciedade - 35 * f, 0, 100); // fome desce devagar (~1 refeição a cada 1–2 dias)
+    c.saciedade = clamp(c.saciedade - 20 * f, 0, 100); // fome desce devagar (~1 refeição a cada 2–3 dias)
     // o humor também é o sono: acordado ele cai um pouco mais; dormir (Dormitórios) recupera
     if (!(c.task && c.task.key === 'sleep')) c.humor = clamp(c.humor - 4 * f, 0, 100);
     else c.humor = clamp(c.humor + 60 * f, 0, 100); // dormindo: recupera aos poucos, além do bônus ao acordar

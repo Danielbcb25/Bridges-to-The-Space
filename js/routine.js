@@ -77,7 +77,7 @@ function routineNew() {
   }
   while (ids.length < ROUTINE_SIZE) { const extra = ['rota', 'cardapio', 'tanques', 'motor', 'saude'].find(x => !ids.includes(x)); if (!extra) break; ids.push(extra); }
   // jornada curta: 1 tarefa por dia; longa: de 0 a 2 (no 1º dia, 2 para ensinar)
-  const size = S.journey === 'curta' ? 1 : S.day <= 1 ? 2 : Math.floor(Math.random() * 3);
+  const size = S.day <= 1 ? 0 : S.journey === 'curta' ? 1 : Math.floor(Math.random() * 3); // dia 1: só o tutorial
   S.routine = { day: S.day, items: ids.slice(0, size).map(id => ({ id, done: false })), bonus: false };
   // o ⏩ para quando chega tarefa nova, como nos desafios
   if (size && S.fast) { S.fast = 0; toast('⏸ Nova tarefa da rotina: tempo normal.', 'info'); }
