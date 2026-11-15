@@ -54,3 +54,8 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - Alimentação: horta 4×3, cozinha e livro de receitas, cardápio com gostos/alergias, mesa, racionamento, desperdício.
 - Etapas: estação orbital (escambo + exoplanetas reais da NASA), órbita de Pontes-01b (análises e adaptação), migração e final único.
 - Jornada Completa e Curta; loja com itens de lazer (moral) e produtividade (eficiência) comprados com pontos.
+
+## Quiz NASA e fundo de contingência na colônia
+- **QUIZ NASA** (menu inicial): 8 perguntas por rodada com dados da NASA (fonte citada em cada resposta). Acerto = +5 ✦ (1ª vez) ou +1 ✦ (repetida); +2 ✦ se o tema foi lido na cidade; rodada perfeita +5 ✦. Os créditos vão para a Loja.
+- **Centro de Design de Missões NASA** (cidade): ciclo de vida de missões (fases A–F), revisões (PDR/CDR) e da ciência à nave. Texto escrito a partir de conhecimento público da NASA (não extraído do PDF indicado, que não pôde ser lido).
+- **Fundo de contingência** na colônia: tecla **F** ou botão no HUD (peça, tratamento médico, energia, água, ração); qualquer jogador (inclusive comandantes de outras Arcas) pode usar.

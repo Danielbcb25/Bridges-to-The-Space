@@ -906,12 +906,14 @@ ACTIONS.banquete = () => {
 };
 ACTIONS.research = p => { S.researchOn = !!p.on; };
 ACTIONS.fund = p => {
-  const costs = { peca: 2, medico: 3, energia: 2, oxigenio: 2 };
+  const costs = { peca: 2, medico: 3, energia: 2, oxigenio: 2, agua: 2, comida: 2 };
   const c = costs[p.kind]; if (S.fund < c) return toast('Fundo de contingência insuficiente.', 'warn');
   S.fund -= c;
   if (p.kind === 'peca') { S.peças++; toast('Fundo: +1 peça de reposição.'); }
   if (p.kind === 'medico') { alive().forEach(x => { if (x.status !== 'ok') x.statusT = 0.1; if (x.sickness) { x.sickness = null; } }); toast('Fundo: tratamento médico urgente para todos.'); }
   if (p.kind === 'energia') { addRes('energia', 20, 'Fundo de contingência'); toast('Fundo: +20 kWh de baterias de emergência.'); }
+  if (p.kind === 'agua') { addRes('agua', 100, 'Fundo de contingência'); toast('Fundo: +100 L de água.'); }
+  if (p.kind === 'comida') { addRes('comida', 20, 'Fundo de contingência'); toast('Fundo: +20 kg de ração.'); }
   if (p.kind === 'oxigenio') { addRes('oxigenio', 15, 'Fundo de contingência'); toast('Fundo: +15 kg de oxigênio.'); }
 };
 ACTIONS.hibernate = p => {

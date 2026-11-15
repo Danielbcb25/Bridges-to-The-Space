@@ -12,6 +12,12 @@ const CITY_BUILDINGS = [
       { t: 'Janela', b: 'Da janela, a névoa cobre os prédios. Desde o fim do século XIX a temperatura média global subiu ≈ 1,2 °C (NASA GISS), e o nível do mar sobe cerca de 3,4 mm por ano em média desde 1993 — hoje mais rápido. O gelo do Ártico no fim do verão diminui ≈ 12% por década.' },
       { t: 'Mochila', b: 'Você separa o que levar: uma foto, uma semente, o rádio antigo. Colocar 1 kg em órbita custa milhares de dólares — por isso, numa nave, tudo precisa ter função. Quanto mais leve a carga, mais longe a nave chega.' },
     ] },
+  { id: 'missao', x: 262, w: 92, h: 70, col: '#2f4a5e', roof: '#1c3040', icon: '🛰', name: K('Centro de Design de Missões NASA', 'NASA Mission Design Center', 'Centro de Diseño de Misiones NASA'),
+    tabs: [
+      { t: K('Fases da missão', 'Mission phases', 'Fases de la misión'), b: K('Uma missão da NASA segue um ciclo de vida: Pré-Fase A (estudos de conceito), Fase A (conceito e desenvolvimento de tecnologia), Fase B (projeto preliminar), Fase C (projeto final e construção), Fase D (integração, testes e lançamento), Fase E (operações) e Fase F (encerramento).', 'A NASA mission follows a lifecycle: Pre-Phase A (concept studies), Phase A (concept and technology development), Phase B (preliminary design), Phase C (final design and build), Phase D (integration, test and launch), Phase E (operations) and Phase F (closeout).', 'Una misión de la NASA sigue un ciclo de vida: Pre-Fase A (estudios de concepto), Fase A (concepto y desarrollo tecnológico), Fase B (diseño preliminar), Fase C (diseño final y construcción), Fase D (integración, pruebas y lanzamiento), Fase E (operaciones) y Fase F (cierre).') },
+      { t: K('Revisões', 'Reviews', 'Revisiones'), b: K('Entre as fases existem revisões, como a PDR (Revisão Preliminar de Projeto) e a CDR (Revisão Crítica de Projeto). Elas funcionam como portões: se o projeto não está maduro, a missão não avança. Errar no papel é barato; errar no espaço, não.', 'Between phases there are reviews, like the PDR (Preliminary Design Review) and CDR (Critical Design Review). They work as gates: if the design is not mature, the mission does not move on. Mistakes on paper are cheap; in space they are not.', 'Entre fases hay revisiones, como la PDR (Revisión Preliminar de Diseño) y la CDR (Revisión Crítica de Diseño). Son puertas: si el diseño no está maduro, la misión no avanza. Errar en papel es barato; en el espacio, no.') },
+      { t: K('Da ciência à nave', 'From science to spacecraft', 'De la ciencia a la nave'), b: K('Tudo começa com perguntas científicas. Delas saem os objetivos, os requisitos e, só então, os instrumentos e a nave. Os engenheiros mantêm margens de massa, energia e orçamento — porque imprevistos acontecem. É a mesma lógica do seu fundo de contingência!', 'It all starts with science questions. From them come objectives, requirements and only then the instruments and spacecraft. Engineers keep margins of mass, power and budget — because surprises happen. It is the same logic as your contingency fund!', 'Todo empieza con preguntas científicas. De ellas salen los objetivos, los requisitos y solo después los instrumentos y la nave. Los ingenieros mantienen márgenes de masa, energía y presupuesto — porque ocurren imprevistos. ¡Es la misma lógica de su fondo de contingencia!') },
+    ] },
   { id: 'mercado', x: 383, w: 100, h: 58, col: '#4a5a6a', roof: '#2a3a52', icon: '💧', name: 'Mercado da Água',
     tabs: [
       { t: 'A fila', b: 'Racionamento nível 4: 20 litros por pessoa por dia, para beber, cozinhar e se lavar. Na ISS a água também é contada gota a gota — mas lá ela é reciclada: em 2023 o sistema alcançou 98% de recuperação, transformando até suor e urina em água potável (NASA).' },
@@ -119,7 +125,7 @@ function cityInteract() {
   const n = cityNear(); if (!n) return;
   Sfx.click();
   if (n.type === 'r') return cityComms();
-  if (n.type === 'b') { E.panel = n.o.id; E.tab = 0; E.read[n.o.id + ':0'] = 1; }
+  if (n.type === 'b') { E.panel = n.o.id; E.tab = 0; E.read[n.o.id + ':0'] = 1; learnMark(n.o.id + ':0'); }
   else { E.dialog = { id: n.o.id, i: 0 }; E.read['npc:' + n.o.id] = 1; }
 }
 function cityEsc() { const E = U.earth; if (!E) return; if (E.dialog) E.dialog = null; else if (E.panel) { E.autoClosed = E.panel; E.panel = null; } else if (E.diary) E.diary = false; }
@@ -204,7 +210,7 @@ function cityDialog() {
   return `<div class="dialog"><img src="${spriteURL(n.av, 'civil', 'happy', 3)}" alt=""><div><b>${esc(n.name)}</b> <small>${esc(L(n.role))}</small><p>${esc(L(line))}</p>
     <div class="row"><button class="btn primary" data-ui="cityNext">${E.dialog.i < n.say.length - 1 ? esc(L('Próximo ▶')) : esc(L('Tchau ✔'))}</button></div></div></div>`;
 }
-UIH.cityTab = i => { const E = U.earth; E.tab = +i; E.read[E.panel + ':' + i] = 1; };
+UIH.cityTab = i => { const E = U.earth; E.tab = +i; E.read[E.panel + ':' + i] = 1; learnMark(E.panel + ':' + i); };
 UIH.cityEnter = () => { const E = U.earth; if (E && !E.panel) cityInteract(); };
 UIH.cityClose = () => { const E = U.earth; if (E.panel) E.autoClosed = E.panel; E.panel = null; E.dialog = null; E.diary = false; };
 UIH.cityNext = () => { const E = U.earth; if (!E.dialog) return; const n = CITY_NPCS.find(x => x.id === E.dialog.id); if (E.dialog.i < n.say.length - 1) E.dialog.i++; else E.dialog = null; };

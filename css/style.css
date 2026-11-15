@@ -574,3 +574,6 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
   .objgrid { grid-template-columns: 1fr 1fr; }
   #game .btn.big { font-size: 1.1em; padding: 0.25em 0.9em; }
 }
+.opt.good{border-color:#5fe08a;background:rgba(60,160,90,.25)}
+.opt.bad{border-color:#ff6a6a;background:rgba(180,50,50,.25)}
+.quizfb{margin:8px 0;text-align:left}

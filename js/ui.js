@@ -96,6 +96,7 @@ function titleScreen() {
       <button class="mbtn" data-ui="playMenu">◀ ${esc(L('VOLTAR'))}</button>` : `<button class="mbtn primary" data-ui="playMenu">▶ ${esc(L('JOGAR'))}</button>
       <button class="mbtn" data-ui="lobby">👥 MULTIPLAYER</button>
       <button class="mbtn" data-ui="avatar">🧑‍🚀 CRIAR AVATAR</button>
+      <button class="mbtn" data-ui="quiz">🛰 ${esc(L(K('QUIZ NASA', 'NASA QUIZ', 'QUIZ NASA')))}</button>
       <button class="mbtn" data-ui="shop">✦ LOJA <small>${cr} créditos</small></button>
       <button class="mbtn" data-ui="settings">⚙ CONFIGURAÇÕES</button>`}
     </div>
@@ -634,7 +635,9 @@ function crewList() {
     ${c.alive ? `<div class="meters"><span>${esc(L('Humor e sono'))}</span>${bar(c.humor, 100)}<span>Saciedade</span>${bar(c.saciedade, 100)}<span>Nutrição</span>${bar(c.nutricao, 100)}<span class="nutr" title="${esc(L(NUTR_NAMES[0]))} / ${esc(L(NUTR_NAMES[1]))} / ${esc(L(NUTR_NAMES[2]))}">${(c.nut || [80, 80, 80]).map((v, i) => `<i class="n${i} ${v < 25 ? 'low' : ''}" style="height:${Math.round(v)}%"></i>`).join('')}</span></div>${c.nut && c.nut[2] < 25 ? `<small class="orange">${esc(L('Faltam vitaminas: sirva comida fresca.'))}</small><br>` : ''}<small><span>${c.hibernating ? '💤 ' + esc(L('hibernando')) : c.sickness ? '🤒 ' + esc(L('doente')) : c.status === 'ok' ? '✔ ok' : '✚ ' + esc(T(c.status))}</span>${c.task ? ' · <span>' + esc(T(c.task.label)) + '</span>' : ''} · ❤ ${esc(tagNames(c.likes))}${c.allergy.length ? ' · ' + esc(L('alergia')) + ': ' + esc(tagNames(c.allergy)) : ''}</small>` : '☠ morto'}</div></div>`).join('')}</div>`;
 }
 function fundPanel() {
-  const o = [['peca', 'Peça de reposição', 2], ['medico', 'Tratamento médico urgente (todos)', 3], ['energia', 'Baterias de emergência (+20 kWh)', 2], ['oxigenio', 'Oxigênio de emergência (+15 kg)', 2]];
+  const o = S.scene === 'colony'
+    ? [['peca', 'Peça de reposição', 2], ['medico', 'Tratamento médico urgente (todos)', 3], ['energia', 'Baterias de emergência (+20 kWh)', 2], ['agua', 'Água de emergência (+100 L)', 2], ['comida', 'Ração de emergência (+20 kg)', 2]]
+    : [['peca', 'Peça de reposição', 2], ['medico', 'Tratamento médico urgente (todos)', 3], ['energia', 'Baterias de emergência (+20 kWh)', 2], ['oxigenio', 'Oxigênio de emergência (+15 kg)', 2]];
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel station" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Fundo de contingência: ${S.fund} pts</h2><div class="opts">${o.map(([k, n, c]) => `<button class="opt ${S.fund < c ? 'cant' : ''}" data-act="fund" data-p='${J({ kind: k })}'><b>${n}</b><em>${c} pts</em></button>`).join('')}</div></div></div>`;
 }
 function menuPanel() {
@@ -766,7 +769,7 @@ function endScreen() {
 function renderUI() {
   let scr = '', hud = '', side = '', modal = '';
   if (!S || U.screen !== 'game') {
-    const map = { saves: savesScreen, story: storyScreen, title: titleScreen, journey: journeyScreen, history: historyScreen, settings: () => settingsScreen(false), shop: shopScreen, avatar: () => U.avatarDirty ? avatarScreen() : U.cache.scr, lobby: lobbyScreen };
+    const map = { saves: savesScreen, story: storyScreen, title: titleScreen, journey: journeyScreen, history: historyScreen, settings: () => settingsScreen(false), shop: shopScreen, quiz: quizScreen, avatar: () => U.avatarDirty ? avatarScreen() : U.cache.scr, lobby: lobbyScreen };
     scr = (map[U.screen] || titleScreen)();
     U.avatarDirty = false;
   } else if (Net.role === 'client' && !['ship', 'station', 'detour', 'planet', 'migration', 'colony', 'end'].includes(S.scene)) {
@@ -792,6 +795,7 @@ function renderUI() {
       case 'colony':
         hud = colonyHud() + assistMini() + nasaCard();
         if (S.colony.tut === 0) modal = colonyIntro();
+        else if (U.panel === 'fund') modal = fundPanel();
         else if (U.panel === 'menu') modal = menuPanel();
         else if (U.panel === 'settings') modal = `<div class="modal-bg">${settingsScreen(true)}</div>`;
         else if (U.panel === 'crew') modal = `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Tripulação</h2>${crewList()}</div></div>`;

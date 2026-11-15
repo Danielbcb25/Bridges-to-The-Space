@@ -175,7 +175,7 @@ const Net = {
         if (this.forwardToCmd(m)) return;
         const p = this.players[m.pid]; if (!p || !S) return;
         if (typeof m.type !== 'string' || !ACTIONS[m.type]) return;
-        const blocked = ['cruise', 'fund', 'trade', 'ration', 'hibernate']; // decisões de gestão do Comandante; avançar de etapa (destino, pouso, migração) qualquer jogador pode
+        const blocked = S.scene === 'colony' ? [] : ['cruise', 'fund', 'trade', 'ration', 'hibernate']; // decisões de gestão do Comandante; avançar de etapa (destino, pouso, migração) qualquer jogador pode
         if (blocked.includes(m.type)) return; // decisões do Comandante
         applyAction(m.type, m.p, p.role);
         break;
@@ -210,7 +210,7 @@ const Net = {
   // sala só repassa as mensagens. Os demais jogadores da Arca viram tripulantes.
   rosterName(pid) { const r = this.roster[pid]; return r ? r : null; },
   sendTo(pid, msg) {
-    if (this.mode === 'ws') { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify({ t: 'to', pid, msg })); return; }
+    if (this.mode === 'ws') { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify({ t: 'to', pid: (typeof pid === 'string' && /^\d+$/.test(pid)) ? +pid : pid, msg })); return; }
     const c = this.conns[pid]; if (c && c.open) try { c.send(JSON.stringify(msg)); } catch (e) { /* */ }
   },
   sendMembers(pids, msg) {

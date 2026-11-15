@@ -503,7 +503,7 @@ function colonyHud() {
   return `<div class="hud-top"><div class="bars">${items.join('')}</div><div class="clock"><b>${esc(L('COLÔNIA · DIA'))} ${C.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}<br><small>${esc(C.site)}${C.storm > 0 ? ' · 🌪' : ''}</small></div></div>
     <div class="objbox"><b>${esc(L('MISSÃO PONTES-01b'))} ${doneN}/${obj.length}</b>${obj.map(o => `<div class="${o.done ? 'done' : ''}">${o.done ? '✔' : '▫'} ${esc(L(o.t))}</div>`).join('')}</div>
     ${call}<div class="hud-bottom"><div class="prompt">${prompt}</div>
-    <div class="btns"><button class="btn small" data-ui="panel" data-arg="c:nave">${esc(L('Controle'))}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div></div>`;
+    <div class="btns"><button class="btn small" data-ui="panel" data-arg="fund">[F] ${esc(L('Fundo'))} ${S.fund|0}</button><button class="btn small" data-ui="panel" data-arg="c:nave">${esc(L('Controle'))}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div></div>`;
 }
 function ctaskBar(bid) {
   const ws = S.crew.filter(c => c.alive && c.ctask && c.ctask.bid === bid);
