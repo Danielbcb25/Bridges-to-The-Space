@@ -554,7 +554,7 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .howcap { font-family: var(--sk); font-size: 1.5em; color: var(--cyan); text-shadow: 3px 3px 0 #000; }
 .howto .dots i { display: inline-block; width: 10px; height: 10px; margin: 0 3px; background: #2a3a7a; } .howto .dots i.on { background: var(--yellow); } .howto .dots i.done { background: var(--cyan); }
 /* lições do computador de bordo */
-.lesson-card { position: absolute; right: 0.6em; bottom: 3.2em; width: 34%; background: rgba(4, 12, 30, 0.95); border: 2px solid #3d7dff; padding: 0.45em 0.7em; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); animation: pcin 0.4s steps(4); }
+.lesson-card { position: absolute; right: 0.6em; bottom: 3.2em; width: 34%; background: rgba(4, 12, 30, 0.95); border: 2px solid #3d7dff; padding: 0.45em 0.7em; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); }
 .lesson-card b { color: #7ab8ff; font-family: var(--sk); } .lesson-card p { margin: 0.3em 0; } .lesson-card small { color: var(--muted); } .lesson-card .x { position: absolute; right: 0.3em; top: 0.1em; }
 .lesson-report { margin: 0.8em 0; border: 2px solid #3d7dff; padding: 0.5em 0.8em; background: rgba(4, 12, 30, 0.7); }
 .lesson-report h4 { color: #7ab8ff; margin: 0 0 0.3em; } .lesson-report .nf { border-left: 3px solid #3d7dff; padding: 0.15em 0.5em; margin: 0.35em 0; } .lesson-report .nf p { margin: 0; } .lesson-report small { color: var(--muted); }
