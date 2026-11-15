@@ -90,13 +90,14 @@ function titleScreen() {
     <div class="tbox tr"><div class="lbl cyan">▣ MISSÃO ATUAL</div><div class="small">Explorar o planeta</div><div class="cyan">Pontes01</div></div>
     <div class="logo"><h1>PONTES<span>01</span></h1><div class="sub">— EXPLORAÇÃO ESPACIAL —</div></div>
     <div class="menu">
-      ${(() => { const sv = GameSave.summary(); return sv ? `<button class="mbtn primary" data-ui="continueGame">▶ ${esc(L('CONTINUAR'))} <small>${esc(sv.scene)} · ${esc(L('dia'))} ${sv.day}</small></button>` : ''; })()}
-      <button class="mbtn ${GameSave.summary() ? '' : 'primary'}" data-ui="journey">▶ NOVA JORNADA</button>
+      ${U.playMenu ? `${(() => { const sv = GameSave.summary(); return sv ? `<button class="mbtn primary" data-ui="continueGame">▶ ${esc(L('CONTINUAR'))} <small>${esc(sv.scene)} · ${esc(L('dia'))} ${sv.day}</small></button>` : ''; })()}
+      <button class="mbtn ${GameSave.summary() ? '' : 'primary'}" data-ui="journey">✦ NOVA JORNADA</button>
       ${GameSave.list().length ? `<button class="mbtn" data-ui="saves">📂 ${esc(L(K('JOGOS SALVOS', 'SAVED GAMES', 'PARTIDAS GUARDADAS')))} <small>${GameSave.list().length}</small></button>` : ''}
+      <button class="mbtn" data-ui="playMenu">◀ ${esc(L('VOLTAR'))}</button>` : `<button class="mbtn primary" data-ui="playMenu">▶ ${esc(L('JOGAR'))}</button>
       <button class="mbtn" data-ui="lobby">👥 MULTIPLAYER</button>
       <button class="mbtn" data-ui="avatar">🧑‍🚀 CRIAR AVATAR</button>
       <button class="mbtn" data-ui="shop">✦ LOJA <small>${cr} créditos</small></button>
-      <button class="mbtn" data-ui="settings">⚙ CONFIGURAÇÕES</button>
+      <button class="mbtn" data-ui="settings">⚙ CONFIGURAÇÕES</button>`}
     </div>
     <div class="tfoot">UM NOVO MUNDO NOS ESPERA...<b>PONTES01</b></div>
   </div>`;
@@ -725,7 +726,7 @@ function renderUI() {
       case 'setup': scr = U.setupDirty ? setupScreen() : U.cache.scr; U.setupDirty = false; break;
       case 'launch': scr = ''; break;
       case 'ship':
-        hud = hudTop() + assistMini() + hudBottom();
+        hud = hudTop() + assistMini() + goalsBox() + hudBottom();
         side = eventPanel();
         if (U.panel === 'report') modal = reportPanel();
         else if (U.panel === 'crew') modal = `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Tripulação</h2>${crewList()}</div></div>`;
@@ -750,6 +751,7 @@ function renderUI() {
     }
   }
   if (S && U.screen === 'game' && !hud && !['intro', 'launch', 'end'].includes(S.scene) && !(S.scene === 'earth' && U.comms)) hud = assistMini();
+  if (S && U.screen === 'game') { welcomeCheck(); if (U.welcome) modal = welcomeCard(); }
   if (U.help && S && U.screen === 'game') modal = helpPanel();
   sitePlayMode();
   const gameEl = document.getElementById('game'); const sc = S && U.screen === 'game' ? S.scene : 'menu'; if (gameEl.dataset.scene !== sc) gameEl.dataset.scene = sc;
@@ -768,7 +770,8 @@ function renderUI() {
 const UIH = {};
 UIH.voiceTest = () => { Narrator.voice = null; Narrator.say('Olá, Comandante. Esta é a voz da missão Pontes-01b.'); };
 UIH.hudFull = () => { U.hudFull = !U.hudFull; };
-UIH.title = () => { U.screen = 'title'; Music.play('intro'); };
+UIH.playMenu = () => { U.playMenu = !U.playMenu; };
+UIH.title = () => { U.playMenu = false; U.screen = 'title'; Music.play('intro'); };
 UIH.journey = () => { U.screen = 'journey'; S = null; };
 UIH.history = () => { U.screen = 'history'; };
 UIH.settings = () => { U.screen = 'settings'; };

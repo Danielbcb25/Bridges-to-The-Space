@@ -61,7 +61,7 @@ function interact() {
   if (near === 'termico' && ev && ev.type === 'termico') return;
   U.panel = near; U.tab = null;
   if (near === 'ponte' && S.tutorial === 0) act('tut', { n: 1 });
-  if (near === 'cozinha' && S.tutorial === 3) act('tut', { n: 4 });
+  if (near === 'cozinha' && S.tutorial >= 2 && S.tutorial < 4) act('tut', { n: 4 });
 }
 
 function update(dt) {
@@ -115,6 +115,7 @@ function draw(dt) {
       const p = U.earth.p;
       drawEarth(dt, p);
       drawChar(Object.assign({}, crewById('cmd').avatar), 'civil', p.x - R.earthCam, GROUND - (p.jy || 0), p.face, p.moving ? Math.floor(p.walkT * 8) : 0, 'happy');
+      drawGuide();
       break;
     }
     case 'setup': drawSetupBg(dt); break;
@@ -122,13 +123,13 @@ function draw(dt) {
     case 'ship': {
       const ev = S.event;
       if (ev && ev.puzzle && ev.puzzle.kind === 'pilot') drawPilot(ev.puzzle);
-      else drawShipInterior(dt, me() || S.crew[0]);
+      else { drawShipInterior(dt, me() || S.crew[0]); drawGuide(); }
       const m = me(); if (m && m.sickness) cv.style.filter = 'blur(0.6px)';
       break;
     }
     case 'station': drawStationBg(dt); break;
     case 'detour': drawDetourBg(dt); break;
-    case 'colony': drawColony(dt); break;
+    case 'colony': drawColony(dt); drawGuide(); break;
     case 'planet': drawPlanetBg(dt); break;
     case 'migration': drawSurface(dt, false); break;
     case 'end': if (S.ending && S.ending.ok) drawSurface(dt, true); else { spaceBg(); drawStars(1, dt); drawShipExterior(220 + Math.sin(R.t * 0.2) * 20, 140, 1.2, false); } break;

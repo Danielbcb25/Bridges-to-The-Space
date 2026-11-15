@@ -93,6 +93,9 @@ function cityBusy() { const E = U.earth; return !!(E && (E.dialog || E.diary)); 
 function tickCity(dt) {
   const E = U.earth; if (!E || U.comms) return;
   if (E.panel) { const b = CITY_BUILDINGS.find(x => x.id === E.panel); if (!b || Math.abs(E.p.x - b.x) > 80) E.panel = null; }
+  // ao passar por um prédio, o conteúdo abre sozinho no canto (se fechar, só reabre depois de se afastar)
+  if (E.autoClosed) { const b = CITY_BUILDINGS.find(x => x.id === E.autoClosed); if (!b || Math.abs(E.p.x - b.x) > 80) E.autoClosed = null; }
+  if (!E.panel && !E.dialog && !U.comms) { const n = cityNear(); if (n && n.type === 'b' && E.autoClosed !== n.o.id) { E.panel = n.o.id; E.tab = 0; E.read[n.o.id + ':0'] = 1; } }
   jumpTick(E.p, dt);
   // a primeira moradora puxa conversa logo no começo
   if (!E.greeted && E.t > 1.2 && !cityBusy()) { E.greeted = true; E.dialog = { id: CITY_NPCS[0].id, i: 0 }; E.read['npc:' + CITY_NPCS[0].id] = 1; E.target = CITY_NPCS[0].x - 26; }
@@ -119,7 +122,7 @@ function cityInteract() {
   if (n.type === 'b') { E.panel = n.o.id; E.tab = 0; E.read[n.o.id + ':0'] = 1; }
   else { E.dialog = { id: n.o.id, i: 0 }; E.read['npc:' + n.o.id] = 1; }
 }
-function cityEsc() { const E = U.earth; if (!E) return; if (E.dialog) E.dialog = null; else if (E.panel) E.panel = null; else if (E.diary) E.diary = false; }
+function cityEsc() { const E = U.earth; if (!E) return; if (E.dialog) E.dialog = null; else if (E.panel) { E.autoClosed = E.panel; E.panel = null; } else if (E.diary) E.diary = false; }
 
 // ---------- desenho ----------
 function drawCity(dt, cam) {
@@ -179,7 +182,7 @@ function cityScreen() {
   const prompt = E.dialog ? `<b>E</b> — ${esc(L('Próxima fala ▶'))} · <b>Esc</b> — ${esc(L('sair'))}` : nearForHint ? `<b>E</b> — ${nearForHint.type === 'b' ? esc(L('Entrar: ')) + esc(L(near.o.name)) : esc(L('Conversar com ')) + esc(near.o.name)}` : esc(L('← → / A D para andar · explore os prédios e converse com as pessoas'));
   return `<div class="earth-hud">
     <div class="tbox tl small"><b>TERRA · 2091</b><br>Qualidade do ar: <span class="red">péssima (IQA 312)</span><br>Temperatura: <span class="orange">46 °C</span><br>Água: racionamento nível 4</div>
-    <div class="tbox tr small">${esc(L('Explore a cidade.'))}<br>🚀 ${esc(L('O foguete da missão fica no fim da rua, à direita.'))}</div>
+    <div class="tbox tr small">${esc(L('Explore a cidade.'))}<br>🚀 ${esc(L('O foguete da missão fica no fim da rua, à direita.'))}<br><button class="btn tiny" data-ui="earthSkip">⏭ ${esc(L('Pular para o foguete'))}</button></div>
     <div class="hint">${prompt}</div></div>${houseCard}${ov}`;
 }
 function cityPanel() {
@@ -203,6 +206,8 @@ function cityDialog() {
 }
 UIH.cityTab = i => { const E = U.earth; E.tab = +i; E.read[E.panel + ':' + i] = 1; };
 UIH.cityEnter = () => { const E = U.earth; if (E && !E.panel) cityInteract(); };
-UIH.cityClose = () => { const E = U.earth; E.panel = null; E.dialog = null; E.diary = false; };
+UIH.cityClose = () => { const E = U.earth; if (E.panel) E.autoClosed = E.panel; E.panel = null; E.dialog = null; E.diary = false; };
 UIH.cityNext = () => { const E = U.earth; if (!E.dialog) return; const n = CITY_NPCS.find(x => x.id === E.dialog.id); if (E.dialog.i < n.say.length - 1) E.dialog.i++; else E.dialog = null; };
 UIH.cityAccept = () => { cityComms(); };
+
+UIH.earthSkip = () => { const E = U.earth; if (!E) return; E.panel = null; E.dialog = null; E.target = null; E.p.x = rocketX() - 28; E.p.face = 1; };

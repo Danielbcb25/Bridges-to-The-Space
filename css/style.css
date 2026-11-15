@@ -493,3 +493,11 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
   body.playing::before { content: '📱↻  Gire o celular para jogar na horizontal'; position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2em; background: rgba(5, 6, 26, 0.96); color: var(--yellow); font-family: var(--sk); font-size: 18px; }
 }
 .earth-hud .tbox.tr { max-width: 26%; }
+
+/* tutorial */
+.welcome { max-width: 30em; text-align: center; }
+.welcome .wl { list-style: none; padding: 0; margin: 0.4em 0 0.8em; text-align: left; display: inline-block; }
+.welcome .wl li { padding: 0.15em 0; } .welcome .wl li::before { content: '▸ '; color: var(--yellow); }
+.goals { position: absolute; left: 0.6em; top: 6.6em; max-width: 34%; background: rgba(8, 14, 44, 0.92); border: 2px solid var(--yellow); padding: 0.3em 0.6em; font-size: 0.9em; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); }
+.goals b { font-family: var(--sk); color: var(--yellow); display: block; margin-bottom: 0.15em; }
+.goals .done { color: var(--muted); text-decoration: line-through; } .goals .cur { color: #fff; }

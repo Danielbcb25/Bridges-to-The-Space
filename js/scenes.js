@@ -513,3 +513,45 @@ function drawSurface(dt, colony) {
     const a = alive(); a.forEach((c, i) => drawChar(c.avatar, 'helmet', 150 + i * 22, 240, 1, Math.floor(R.t * 4) + i, 'happy'));
   }
 }
+
+// ---------- seta-guia: aponta o próximo objetivo, mesmo fora da tela ----------
+function guideTarget() {
+  if (!S) return null;
+  const next = typeof assistNext === 'function' ? assistNext() : null;
+  if (S.scene === 'earth' && U.earth && !U.comms) {
+    const x = next && next.go && next.go.earth != null ? next.go.earth : rocketX();
+    return { x, y: GROUND - 64, cam: R.earthCam };
+  }
+  if (S.scene === 'ship') {
+    const ev = S.event; let st = null, drawn = false;
+    if (ev && ev.phase === 'run') {
+      const cs = curStep(ev) || ev.steps.find(s => !s.done && s.station && s.optional);
+      if (cs && cs.station) { st = cs.station; drawn = true; }
+    } else if (next && next.go && next.go.st) st = next.go.st;
+    if (!st || !STATIONS[st]) return null;
+    const P = STATIONS[st];
+    return { x: P.x, y: DECKS[P.deck].floor - 62, cam: R.camX, drawn };
+  }
+  if (S.scene === 'colony' && typeof CBUILD !== 'undefined' && next && next.go && next.go.b && CBUILD[next.go.b]) return { x: CBUILD[next.go.b].x, y: CGROUND - 80, cam: R.colCam || 0 };
+  return null;
+}
+function drawGuide() {
+  const g = guideTarget(); if (!g) return;
+  const sx = Math.round(g.x - g.cam), bob = Math.round(Math.sin(R.t * 6) * 2);
+  const tri = (x, y, dir, col) => { // triângulo de pixels: dir 1 = direita, -1 = esquerda, 0 = para baixo
+    cx.fillStyle = col;
+    for (let i = 0; i < 5; i++) {
+      const h = 2 * (4 - i) + 1;
+      if (dir === 0) cx.fillRect(x - (4 - i), y + i, h, 1);
+      else cx.fillRect(dir > 0 ? x - 4 + i : x + 4 - i, y - (4 - i), 1, h);
+    }
+  };
+  if (sx < 12 || sx > VW - 12) {
+    const right = sx > VW - 12, ex = right ? VW - 6 + bob : 6 - bob, ey = clamp(g.y + 30, 30, VH - 30);
+    tri(ex + (right ? 1 : -1), ey + 1, right ? 1 : -1, '#000');
+    tri(ex, ey, right ? 1 : -1, '#ffd23f');
+  } else if (!g.drawn) {
+    tri(sx + 1, g.y + bob + 1, 0, '#000');
+    tri(sx, g.y + bob, 0, '#ffd23f');
+  }
+}

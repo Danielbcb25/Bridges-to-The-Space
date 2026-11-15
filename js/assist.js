@@ -70,12 +70,11 @@ function assistSteps() {
     case 'ship': {
       // só a progressão principal: desafios aleatórios têm o próprio painel
       const tut = [
-        ['Vá à Ponte de comando (andar de cima, à direita).', 'ponte', '🧭'],
-        ['Escolha o modo de cruzeiro no painel de pilotagem.', 'ponte', '🚀'],
-        ['Abra o relatório de recursos (R).', null, '📊'],
-        ['Defina o cardápio na Cozinha (andar de baixo).', 'cozinha', '🍳'],
+        ['Vá à Ponte de comando (andar de cima, à direita).', 'ponte', '🧭', 1],
+        ['Escolha o modo de cruzeiro no painel de pilotagem.', 'ponte', '🚀', 2],
+        ['Defina o cardápio na Cozinha (andar de baixo).', 'cozinha', '🍳', 4],
       ];
-      tut.forEach(([t, st, ic], i) => add(t, S.tutorial > i, st ? { st } : null, ic, i === 2 ? 'report' : null));
+      tut.forEach(([t, st, ic, n]) => add(t, S.tutorial >= n, st ? { st } : null, ic));
       add(KS(`Leve a nave até Pontes-01b (${Math.round(S.progress * 100)}%). Use ⏩ (Shift+S) para acelerar.`, `Take the ship to Pontes-01b (${Math.round(S.progress * 100)}%). Use ⏩ (Shift+S) to speed up.`, `Lleve la nave a Pontes-01b (${Math.round(S.progress * 100)}%). Use ⏩ (Shift+S) para acelerar.`), false, null, '🪐');
       break;
     }
@@ -145,4 +144,27 @@ function sitePlayMode() {
     const st = !c.alive ? '💀' : c.hibernating ? '💤' : c.sickness ? '🤒' : c.status !== 'ok' ? '✚' : '✔';
     return `<div class="${c.alive ? '' : 'dead'}"><img src="${spriteURL(c.avatar, 'suit', c.alive && c.humor >= 40 ? 'happy' : 'sad', 3)}" alt=""><b>${esc(c.name)}</b><span>${esc(c.roleName)}</span><em>${st} ☺ ${Math.round(c.humor)}</em></div>`;
   }).join(''));
+}
+
+// ---------- tutorial: boas-vindas e lista de objetivos sempre visível ----------
+const WELCOME = {
+  earth: { t: 'Terra, 2091', lines: ['← → andar · Shift correr', 'Passe pelos prédios: as informações abrem sozinhas', 'E conversar com as pessoas', 'Siga a seta amarela ▶', 'Objetivo: embarcar no foguete no fim da rua'] },
+  ship: { t: 'A bordo da nave', lines: ['← → andar · ↑ ↓ escadas', 'E usar a estação da sala onde você está', 'Siga a seta amarela até cada objetivo', 'Desafios aparecem com aviso e passos numerados', 'H abre o computador de bordo'] },
+};
+function welcomeCheck() {
+  if (!S || U.screen !== 'game' || Net.role === 'client') return;
+  S.seen = S.seen || {};
+  if (WELCOME[S.scene] && !S.seen[S.scene] && !(S.scene === 'earth' && U.comms)) { S.seen[S.scene] = true; U.welcome = S.scene; }
+}
+function welcomeCard() {
+  const w = WELCOME[U.welcome]; if (!w || !S || S.scene !== U.welcome) { U.welcome = null; return ''; }
+  return `<div class="modal-bg"><div class="panel center welcome"><h2>${esc(L(w.t))}</h2><ul class="wl">${w.lines.map(x => `<li>${esc(L(x))}</li>`).join('')}</ul>
+    <div class="row" style="justify-content:center"><button class="btn primary big" data-ui="welcomeOk">${esc(L('Entendi ▶'))}</button></div></div></div>`;
+}
+UIH.welcomeOk = () => { U.welcome = null; };
+// lista curta de objetivos enquanto o tutorial da nave não termina
+function goalsBox() {
+  if (!S || S.scene !== 'ship' || S.tutorial >= 4 || (S.event && S.event.phase !== 'result') || U.help) return '';
+  const all = assistSteps().filter(x => x.go && x.go.st || x.done).slice(0, 3); const n = all.find(x => !x.done);
+  return `<div class="goals"><b>${esc(L('OBJETIVOS'))}</b>${all.map(x => `<div class="${x.done ? 'done' : x === n ? 'cur' : ''}">${x.done ? '☑' : x === n ? '▶' : '☐'} ${esc(L(x.t))}</div>`).join('')}</div>`;
 }

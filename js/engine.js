@@ -811,7 +811,7 @@ ACTIONS.processTrash = () => {
   if (rec && has('impressora')) { S.recycled = (S.recycled || 0) + kg; if (S.recycled >= 6) { S.recycled -= 6; S.peças += 1; toast('Oficina 3D: lixo reciclado virou 1 peça de reparo.', 'good'); } }
   toast(`${fmt(kg)} kg de lixo viraram ${fmt(kg * (rec ? 1 : 0.5))} kg de adubo para a horta.`, 'good');
 };
-ACTIONS.cruise = p => { S.cruise = p.mode; logMsg('Modo de cruzeiro: ' + p.mode); if (S.tutorial === 1) S.tutorial = 2; };
+ACTIONS.cruise = p => { S.cruise = p.mode; logMsg('Modo de cruzeiro: ' + p.mode); if (S.tutorial === 1) S.tutorial = 3; };
 ACTIONS.repair = (p, actor) => {
   const sys = p.sys; if (!S.systems[sys] || S.systems[sys].hp >= 100) return;
   const st = Object.keys(STATIONS).find(k => STATIONS[k].sys === sys) || 'avionica';
