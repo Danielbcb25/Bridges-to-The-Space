@@ -111,7 +111,7 @@ function journeyScreen() {
     <p class="muted">Escolha o tamanho da expedição. Os 6 tripulantes que não forem jogadores são controlados por bots.</p>
     <div class="cards two">
       <button class="card big" data-ui="startGame" data-arg="completa"><h3>🚀 Jornada Completa</h3><p>≈ 30 dias de viagem · 9 desafios · as 5 etapas da campanha.</p><p class="muted">Cada dia dura 30 s. Recomendado para a experiência completa.</p></button>
-      <button class="card big" data-ui="startGame" data-arg="curta"><h3>⚡ Jornada Curta</h3><p>≈ 12 dias · 4 desafios · regulação térmica de 3 min.</p><p class="muted">Ideal para aulas e partidas rápidas.</p></button>
+      <button class="card big" data-ui="startGame" data-arg="curta"><h3>⚡ Jornada Curta</h3><p>≈ 12 dias · 4 desafios · regulação térmica de 3 min.</p><p class="small yellow">${esc(L('Termina ao chegar a Pontes-01b (sem colônia).'))}</p><p class="muted">Ideal para aulas e partidas rápidas.</p></button>
     </div>
     <div class="row"><button class="btn" data-ui="title">◀ Voltar</button></div>
   </div>`;

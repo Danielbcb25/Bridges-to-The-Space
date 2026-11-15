@@ -1894,7 +1894,8 @@
   "O que você aprendeu": "Lo que aprendiste",
   "Me conte uma curiosidade": "Cuéntame una curiosidad",
   "Tema aprendido: vale bônus no Quiz da tela inicial.": "Tema aprendido: vale bonificación en el Quiz de la pantalla inicial.",
-  "Curiosidades do computador de bordo (texto e voz)": "Curiosidades de la computadora de a bordo (texto y voz)"
+  "Curiosidades do computador de bordo (texto e voz)": "Curiosidades de la computadora de a bordo (texto y voz)",
+  "Termina ao chegar a Pontes-01b (sem colônia).": "Termina al llegar a Pontes-01b (sin colonia)."
  },
  "patterns": [
   [
@@ -2902,7 +2903,7 @@
     },
     {
      "node": "colonia",
-     "t": "Llegue a Pontes-01b y levante la colonia. Pulse H siempre que tenga dudas."
+     "t": "Llegue a Pontes-01b: en la jornada corta, la misión termina al llegar. Pulse H siempre que tenga dudas."
     }
    ],
    "multi": [

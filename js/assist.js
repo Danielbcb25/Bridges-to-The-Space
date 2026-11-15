@@ -156,7 +156,7 @@ const PC_QA = [
   { id: 'curio', q: 'Me conte uma curiosidade', a: () => { const ll = lessonList(); const t = ll.length ? pick(ll) : END_LESSONS[0](); return { a: [t] }; } },
   { id: 'keys', q: 'Quais são os controles?', a: () => ({ a: [PC_KEYS[S.scene] || PC_KEYS.ship] }) },
 ];
-function pcQuestions() { return PC_QA.filter(x => !x.sc || x.sc.includes(S.scene)); }
+function pcQuestions() { return PC_QA.filter(x => (!x.sc || x.sc.includes(S.scene)) && (x.id !== 'curio' || typeof curiosOn !== 'function' || curiosOn())); }
 // frases que começam com @ são textos já traduzíveis vindos de assistSteps
 const pcLine = k => typeof k === 'string' ? k.split('@').map(x => esc(L(x))).join('') : esc(L(k));
 UIH.help = () => { U.help = !U.help; if (U.help && !(U.pcLog && U.pcLog.scene === S.scene)) U.pcLog = { scene: S.scene, items: [] }; Sfx.click(); };
@@ -201,7 +201,7 @@ function helpPanel() {
       ${(() => { const rn = typeof routineNext === 'function' ? routineNext() : null; return rn ? `<div class="ln mis">📋 <small>${esc(L('Rotina'))}:</small> ${esc(L(rn.t))} <small class="muted">— ${esc(L(rn.how))}</small> ${goBtn(rn.go)}</div>` : ''; })()}
       ${n ? `<div class="ln mis">🎯 <small>${esc(L('Missão'))} ${done}/${all.length}:</small> ${esc(L(n.t))} ${goBtn(n.go, n.act)}</div>` : ''}
       ${log.map(e => `<div class="ln q">&gt; ${esc(L(e.q))}</div><div class="ln a">${e.a.map(pcLine).join(' ')} ${goBtn(e.go, e.act)}</div>`).join('')}
-      ${(() => { const nl = typeof lessonList === 'function' ? lessonList() : []; return nl.length ? `<div class="ln sys">📚 ${esc(L('O que você aprendeu'))} (${nl.length})</div>` + nl.map(t => `<div class="ln a">${esc(L(t))}</div>`).join('') : ''; })()}
+      ${(() => { const nl = typeof lessonList === 'function' && curiosOn() ? lessonList() : []; return nl.length ? `<div class="ln sys">📚 ${esc(L('O que você aprendeu'))} (${nl.length})</div>` + nl.map(t => `<div class="ln a">${esc(L(t))}</div>`).join('') : ''; })()}
       <div class="ln cur">_</div>
     </div>
     <div class="qs">${pcQuestions().map((x, i) => `<button class="btn tiny" data-ui="pcAsk" data-arg="${x.id}">${i + 1}. ${esc(L(x.q))}</button>`).join('')}</div>

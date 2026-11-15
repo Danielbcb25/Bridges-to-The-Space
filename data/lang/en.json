@@ -1893,7 +1893,8 @@
   "O que você aprendeu": "What you learned",
   "Me conte uma curiosidade": "Tell me something interesting",
   "Tema aprendido: vale bônus no Quiz da tela inicial.": "Topic learned: worth a bonus in the Quiz on the title screen.",
-  "Curiosidades do computador de bordo (texto e voz)": "Onboard computer fun facts (text and voice)"
+  "Curiosidades do computador de bordo (texto e voz)": "Onboard computer fun facts (text and voice)",
+  "Termina ao chegar a Pontes-01b (sem colônia).": "Ends on arrival at Pontes-01b (no colony)."
  },
  "patterns": [
   [
@@ -2901,7 +2902,7 @@
     },
     {
      "node": "colonia",
-     "t": "Reach Pontes-01b and raise the colony. Press H whenever you are unsure."
+     "t": "Reach Pontes-01b: in the short journey, the mission ends on arrival. Press H whenever you are unsure."
     }
    ],
    "multi": [

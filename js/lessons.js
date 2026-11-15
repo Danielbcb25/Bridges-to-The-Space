@@ -158,6 +158,7 @@ const CHORE_LESSON = { suporte: 'oxigenio', horta: 'horta', lixo: 'lixo', radio:
 function teach(key, force) {
   if (!S || !ALL_LESSONS[key] || (typeof Net !== 'undefined' && Net.role === 'client')) return;
   if (Save.data.settings.curios === false && !(typeof Net !== 'undefined' && Net.role)) return; // desligadas no solo
+  if (S.scene === 'end') return; // jogo acabou: nada novo para contar
   S.lessons = S.lessons || [];
   if (S.lessons.some(x => x.ev === key)) return;
   const now = Date.now(); // relógio de parede: vale na nave, na estação, no planeta e na colônia
@@ -181,7 +182,9 @@ function lessonCard() {
 UIH.lessonClose = () => { if (S && S.lessonLast) U.lessonHide = S.lessonLast.at; };
 // o que já foi aprendido nesta jornada (painel do computador e relatório final)
 function lessonList() { return ((S && S.lessons) || []).map(lessonOf).filter(Boolean).map(ls => ls.fact); }
+const curiosOn = () => !(Save.data.settings && Save.data.settings.curios === false);
 function lessonReport() {
+  if (!curiosOn()) return '';
   const list = lessonList().concat(END_LESSONS.map(f => f()));
   return `<div class="lesson-report"><h4>💻 ${esc(L('O que você aprendeu nesta jornada'))}</h4>${list.map(t => `<div class="nf"><p>${esc(L(t))}</p></div>`).join('')}</div>`;
 }

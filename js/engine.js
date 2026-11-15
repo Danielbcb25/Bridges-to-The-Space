@@ -790,6 +790,8 @@ function leaveStation() {
   narrate('Partindo da Estação Ponte-Alfa. Próximo destino: Pontes-01b.');
 }
 function enterPlanet() {
+  // jornada curta: chegou a Pontes-01b, a jornada termina aqui (sem órbita nem colônia)
+  if (S.journey === 'curta') { S.planet = S.planet || {}; return planetEnding(null); }
   S.stage = 3; S.scene = 'planet';
   addPoints(80, 'Chegada a Pontes-01b');
   narrate('O novo mundo. A nave entrou em órbita de Pontes-01b. Investigue o planeta, faça análises e enfrente os desafios de adaptação.');
