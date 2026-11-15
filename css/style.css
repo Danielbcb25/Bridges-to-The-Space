@@ -553,11 +553,11 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .howkeys kbd.on { background: var(--yellow); color: #111; border-color: #fff; transform: translateY(4px); box-shadow: 0 1px 0 #1a2350; }
 .howcap { font-family: var(--sk); font-size: 1.5em; color: var(--cyan); text-shadow: 3px 3px 0 #000; }
 .howto .dots i { display: inline-block; width: 10px; height: 10px; margin: 0 3px; background: #2a3a7a; } .howto .dots i.on { background: var(--yellow); } .howto .dots i.done { background: var(--cyan); }
-/* banco de dados da NASA */
-.nasa-card { position: absolute; right: 0.6em; bottom: 3.2em; width: 34%; background: rgba(4, 12, 30, 0.95); border: 2px solid #3d7dff; padding: 0.45em 0.7em; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); animation: pcin 0.4s steps(4); }
-.nasa-card b { color: #7ab8ff; font-family: var(--sk); } .nasa-card p { margin: 0.3em 0; } .nasa-card small { color: var(--muted); } .nasa-card .x { position: absolute; right: 0.3em; top: 0.1em; }
-.nasa-report { margin: 0.8em 0; border: 2px solid #3d7dff; padding: 0.5em 0.8em; background: rgba(4, 12, 30, 0.7); }
-.nasa-report h4 { color: #7ab8ff; margin: 0 0 0.3em; } .nasa-report .nf { border-left: 3px solid #3d7dff; padding: 0.15em 0.5em; margin: 0.35em 0; } .nasa-report .nf p { margin: 0; } .nasa-report small { color: var(--muted); }
+/* lições do computador de bordo */
+.lesson-card { position: absolute; right: 0.6em; bottom: 3.2em; width: 34%; background: rgba(4, 12, 30, 0.95); border: 2px solid #3d7dff; padding: 0.45em 0.7em; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); animation: pcin 0.4s steps(4); }
+.lesson-card b { color: #7ab8ff; font-family: var(--sk); } .lesson-card p { margin: 0.3em 0; } .lesson-card small { color: var(--muted); } .lesson-card .x { position: absolute; right: 0.3em; top: 0.1em; }
+.lesson-report { margin: 0.8em 0; border: 2px solid #3d7dff; padding: 0.5em 0.8em; background: rgba(4, 12, 30, 0.7); }
+.lesson-report h4 { color: #7ab8ff; margin: 0 0 0.3em; } .lesson-report .nf { border-left: 3px solid #3d7dff; padding: 0.15em 0.5em; margin: 0.35em 0; } .lesson-report .nf p { margin: 0; } .lesson-report small { color: var(--muted); }
 
 /* ---------- introdução da colônia e painéis em telas pequenas (celular) ---------- */
 .introhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.6em; }
@@ -577,3 +577,4 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .opt.good{border-color:#5fe08a;background:rgba(60,160,90,.25)}
 .opt.bad{border-color:#ff6a6a;background:rgba(180,50,50,.25)}
 .quizfb{margin:8px 0;text-align:left}
+

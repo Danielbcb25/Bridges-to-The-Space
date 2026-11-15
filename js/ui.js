@@ -96,7 +96,7 @@ function titleScreen() {
       <button class="mbtn" data-ui="playMenu">◀ ${esc(L('VOLTAR'))}</button>` : `<button class="mbtn primary" data-ui="playMenu">▶ ${esc(L('JOGAR'))}</button>
       <button class="mbtn" data-ui="lobby">👥 MULTIPLAYER</button>
       <button class="mbtn" data-ui="avatar">🧑‍🚀 CRIAR AVATAR</button>
-      <button class="mbtn" data-ui="quiz">🛰 ${esc(L(K('QUIZ NASA', 'NASA QUIZ', 'QUIZ NASA')))}</button>
+      <button class="mbtn" data-ui="quiz">🛰 ${esc(L(K('QUIZ', 'QUIZ', 'QUIZ')))}</button>
       <button class="mbtn" data-ui="shop">✦ LOJA <small>${cr} créditos</small></button>
       <button class="mbtn" data-ui="settings">⚙ CONFIGURAÇÕES</button>`}
     </div>
@@ -527,7 +527,7 @@ function stationPanel(id) {
     case 'tanqueAux': case 'bomba': body = repairRow('tanques') + `<div class="kv"><span>Combustível</span><b>${fmt(S.res.combustivel, 0)} / ${S.cap.combustivel} kg</b></div>` + peç; break;
     case 'suporte': {
       const n = alive().length;
-      body = repairRow('suporte') + `<h4>Dados do suporte à vida (referência NASA/ISS)</h4><div class="kv">
+      body = repairRow('suporte') + `<h4>Dados do suporte à vida (referência ISS)</h4><div class="kv">
         <span>Consumo de O₂</span><b>${fmt(NASA.o2PorPessoaDia * n, 2)} kg/dia (0,84 kg/pessoa)</b><span>Eletrólise (OGS)</span><b>+${fmt(NASA.ogsO2Dia * sysHp('suporte') / 100, 1)} kg/dia de O₂</b>
         <span>Reciclagem de água</span><b>${has('reciclaAgua') ? '98% (ciclo fechado)' : '70% (básico)'}</b><span>Uso de água</span><b>${fmt(NASA.aguaPorPessoaDia * n, 1)} L/dia</b>
         <span>CO₂ produzido</span><b>${fmt(NASA.co2PorPessoaDia * n, 1)} kg/dia</b></div>` + peç;
@@ -680,7 +680,7 @@ function stationScreen() {
   let body = '';
   const dest = S.explore.dest; const dexo = EXOPLANETS.find(e => e.id === dest);
   if (tab === 'exo') {
-    body = `<p class="small">${esc(L(K('Dados reais do NASA Exoplanet Archive (aproximados): já são mais de 6.000 exoplanetas confirmados. Critérios de habitabilidade: raio parecido com o da Terra (0,8–1,5 R⊕), temperatura de equilíbrio entre 200 e 300 K, estrela calma e distância alcançável. Cada análise custa ' + (has('lab') ? 5 : 10) + ' GB. Você pode escolher QUALQUER destino — até os errados — mas cada viagem gasta combustível, oxigênio, comida e dias.', 'Real data from the NASA Exoplanet Archive (approximate): over 6,000 confirmed exoplanets so far. Habitability criteria: radius close to Earth\'s (0.8–1.5 R⊕), equilibrium temperature between 200 and 300 K, a calm star and a reachable distance. Each analysis costs ' + (has('lab') ? 5 : 10) + ' GB. You can pick ANY destination — even wrong ones — but every trip burns fuel, oxygen, food and days.', 'Datos reales del NASA Exoplanet Archive (aproximados): ya hay más de 6.000 exoplanetas confirmados. Criterios de habitabilidad: radio parecido al de la Tierra (0,8–1,5 R⊕), temperatura de equilibrio entre 200 y 300 K, estrella tranquila y distancia alcanzable. Cada análisis cuesta ' + (has('lab') ? 5 : 10) + ' GB. Puede elegir CUALQUIER destino, incluso los equivocados, pero cada viaje gasta combustible, oxígeno, comida y días.')))}</p>
+    body = `<p class="small">${esc(L(K('Dados reais Exoplanet Archive (aproximados): já são mais de 6.000 exoplanetas confirmados. Critérios de habitabilidade: raio parecido com o da Terra (0,8–1,5 R⊕), temperatura de equilíbrio entre 200 e 300 K, estrela calma e distância alcançável. Cada análise custa ' + (has('lab') ? 5 : 10) + ' GB. Você pode escolher QUALQUER destino — até os errados — mas cada viagem gasta combustível, oxigênio, comida e dias.', 'Real data from the Exoplanet Archive (approximate): over 6,000 confirmed exoplanets so far. Habitability criteria: radius close to Earth\'s (0.8–1.5 R⊕), equilibrium temperature between 200 and 300 K, a calm star and a reachable distance. Each analysis costs ' + (has('lab') ? 5 : 10) + ' GB. You can pick ANY destination — even wrong ones — but every trip burns fuel, oxygen, food and days.', 'Datos reales del Exoplanet Archive (aproximados): ya hay más de 6.000 exoplanetas confirmados. Criterios de habitabilidad: radio parecido al de la Tierra (0,8–1,5 R⊕), temperatura de equilibrio entre 200 y 300 K, estrella tranquila y distancia alcanzable. Cada análisis cuesta ' + (has('lab') ? 5 : 10) + ' GB. Puede elegir CUALQUIER destino, incluso los equivocados, pero cada viaje gasta combustible, oxígeno, comida y días.')))}</p>
       <div class="exos">${EXOPLANETS.map(e => {
         const an = S.explore.analyzed.includes(e.id); const vis = S.explore.visited && S.explore.visited[e.id];
         const dist = typeof e.dist === 'number' ? fmt(e.dist, 1) + ' ' + L('anos-luz') : L('na rota');
@@ -705,7 +705,7 @@ function detourScreen() {
   return `<div class="stage-panel"><h2>${esc(L('DESVIO DE ROTA: '))}${exo.name}</h2>${miniRes()}<div class="scroll">
     <div class="alert bad">⚠ ${esc(L('Este não é Pontes-01b. A viagem custou combustível, oxigênio, comida e dias — e a moral caiu.'))}</div>
     <h4>${esc(L('O que a tripulação encontrou'))}</h4><p>${esc(L(exo.trip.outcome))}</p>
-    <h4>${esc(L('Dados (NASA Exoplanet Archive, aproximados)'))}</h4>
+    <h4>${esc(L('Dados'))}</h4>
     <div class="kv small">${kv('Distância', typeof exo.dist === 'number' ? fmt(exo.dist, 1) + ' ' + L('anos-luz') : '—')}${kv('Raio/massa', exo.radius)}${kv('Temp. de equilíbrio', exo.teq + ' K')}${kv('Ano', exo.period + ' ' + L('dias'))}${kv('Estrela', esc(T(exo.star)))}${kv('Descoberta', esc(T(exo.disc)))}${kv('ESI', exo.esi)}</div>
     <p class="green">+${d.dados} GB ${esc(L('de dados científicos coletados.'))}</p>
     </div><div class="alert ${short ? 'bad' : 'warn'}">${esc(L('Voltar à Estação Ponte-Alfa custa'))}: ⛽ ${c.fuel} kg · O₂ ${c.o2} kg · 🍱 ${c.food} kg · ${c.days} ${esc(L('dias'))}${short ? ' — ' + esc(L('combustível insuficiente!')) : ''}</div>
@@ -754,7 +754,7 @@ function endScreen() {
     ${e.ok && e.note ? `<div class="alert good">${esc(L('A jornada terminou em Pontes-01b:'))} ${esc(T(e.note))}</div>` : ''}
     <p class="big">${e.ok ? (e.colony && !e.note ? esc(L(K('Em ' + e.site + ', a base cresceu, a Terra recebeu os dados e três naves trouxeram os primeiros colonos. A humanidade tem um novo começo — que custou caro.', 'At ' + e.site + ' the base grew, Earth received the data and three ships brought the first colonists. Humanity has a new beginning — and it came at a high cost.', 'En ' + e.site + ' la base creció, la Tierra recibió los datos y tres naves trajeron a los primeros colonos. La humanidad tiene un nuevo comienzo, que costó caro.'))) : `A expedição pousou no ${esc(e.site)}. A humanidade tem um novo começo — que custou caro.`) : esc(e.reason)}</p>
     ${endImpact(e.ok)}
-    ${nasaReport()}
+    ${lessonReport()}
     ${retryBlock()}
     ${e.ok && e.colony && S.colony ? `<div class="kv"><span>${esc(L('População final'))}</span><b>${colonyPop()}</b><span>${esc(L('Dias na colônia'))}</span><b>${S.colony.day}</b><span>${esc(L('Construções'))}</span><b>${S.colony.built}</b><span>${esc(L('Pacotes de dados enviados à Terra'))}</span><b>${S.colony.txCount}</b><span>${esc(L('Exoplanetas visitados por engano'))}</span><b>${(S.explore && S.explore.wrong) || 0}</b></div>` : ''}
     <div class="kv"><span>Dias de viagem</span><b>${S.day}</b><span>Tripulantes vivos</span><b>${alive().length}/7</b><span>Pontos</span><b>${S.points}</b><span>Energia gasta</span><b>${fmt(spent('energia'), 0)} kWh</b><span>Combustível gasto</span><b>${fmt(spent('combustivel'), 0)} kg</b><span>Água consumida</span><b>${fmt(spent('agua'), 0)} L</b><span>Oxigênio respirado</span><b>${fmt(spent('oxigenio'), 0)} kg</b>
@@ -781,7 +781,7 @@ function renderUI() {
       case 'setup': scr = U.setupDirty ? setupScreen() : U.cache.scr; U.setupDirty = false; break;
       case 'launch': scr = ''; break;
       case 'ship':
-        hud = hudTop() + assistMini() + routineBox() + nasaCard() + hudBottom();
+        hud = hudTop() + assistMini() + routineBox() + lessonCard() + hudBottom();
         side = eventPanel();
         if (U.panel === 'report') modal = reportPanel();
         else if (U.panel === 'crew') modal = `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Tripulação</h2>${crewList()}</div></div>`;
@@ -793,7 +793,7 @@ function renderUI() {
       case 'station': scr = stationScreen(); break;
       case 'detour': scr = S.detour ? detourScreen() : ''; break;
       case 'colony':
-        hud = colonyHud() + assistMini() + nasaCard();
+        hud = colonyHud() + assistMini() + lessonCard();
         if (S.colony.tut === 0) modal = colonyIntro();
         else if (U.panel === 'fund') modal = fundPanel();
         else if (U.panel === 'menu') modal = menuPanel();

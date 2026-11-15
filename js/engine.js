@@ -420,7 +420,7 @@ function simulate(dt) {
   const n = people.reduce((s, c) => s + (c.hibernating ? 0.1 : 1), 0);
   const econ = has('economia') ? 0.95 : 1;
   const sup = sysHp('suporte') / 100;
-  // Oxigênio (NASA: 0,84 kg/pessoa/dia)
+  // Oxigênio
   let o2use = NASA.o2PorPessoaDia * n * econ * (S.cylinders ? 1.6 : 1);
   if (S.res.energia < 12) o2use *= 1.25; // suporte em alerta
   addRes('oxigenio', -o2use * f, 'Respiração da tripulação');

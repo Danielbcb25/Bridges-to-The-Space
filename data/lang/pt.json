@@ -16,12 +16,12 @@
   "s11": "Você gerencia uma das centenas de naves lançadas ao espaço: seus <b>recursos</b>, sua <b>tripulação</b> e a <b>rota</b>. No caminho: chuvas de meteoros, radiação, microgravidade, escassez e o psicológico de todos a bordo.",
   "s13": "<b>Preparação</b> — 30 pontos de verba, 5 slots de módulo. Cada escolha é um sacrifício.",
   "s14": "<b>Partida e viagem</b> — controle a nave e enfrente os primeiros problemas espaciais.",
-  "s15": "<b>Exploração científica</b> — compare dados reais de exoplanetas da NASA.",
+  "s15": "<b>Exploração científica</b> — compare dados reais de exoplanetas.",
   "s16": "<b>O novo mundo</b> — investigue Pontes-01b e enfrente a adaptação.",
   "s17": "<b>Migração</b> — decida onde a humanidade vai recomeçar.",
   "n1": "<b>Colônia em Pontes-01b</b> — o jogo continua: construa a base, transmita dados à Terra e receba as naves de tripulação.",
   "s18": "Sistemas da nave",
-  "s19": "Antes de cada desafio aparece um aviso com o tipo de problema, as partes envolvidas e o seu nível de dano. Os números do suporte à vida usam referências públicas da NASA (ISS): 0,84 kg de O₂ por pessoa/dia, reciclagem de água de até 98% e eletrólise de oxigênio. O nível de dano mostra a porcentagem de integridade descontada a cada ocorrência no item: Baixo −10%, Médio −20%, Alto −30%.",
+  "s19": "Antes de cada desafio aparece um aviso com o tipo de problema, as partes envolvidas e o seu nível de dano. Os números do suporte à vida usam referências públicas (ISS): 0,84 kg de O₂ por pessoa/dia, reciclagem de água de até 98% e eletrólise de oxigênio. O nível de dano mostra a porcentagem de integridade descontada a cada ocorrência no item: Baixo −10%, Médio −20%, Alto −30%.",
   "s20": "Casco e Blindagem",
   "s21": "Proteção contra impactos e radiação cósmica",
   "s22": "Dano Baixo (−10%)",
@@ -67,10 +67,10 @@
   "s62": "Os sorteios ocultos usam <b>d20</b> e <b>d10</b>. Você recebe pistas (fala confiante, luz amarela, luz vermelha), não números.",
   "s63": "<b>Alimentação</b>: horta 4×3, cozinha com receitas, cardápio, mesa, racionamento e desperdício.",
   "s64": "<b>Pontos</b> de cada fase compram itens de lazer (moral) e produtividade (eficiência) na Loja.",
-  "n2": "<b>Explore a Terra</b>: entre nos 8 edifícios da cidade, leia os painéis com dados da NASA e converse com os moradores. O Diário do Explorador (J) rende verba extra para montar a nave.",
+  "n2": "<b>Explore a Terra</b>: entre nos 8 edifícios da cidade, leia os painéis com dados reais e converse com os moradores. O Diário do Explorador (J) rende verba extra para montar a nave.",
   "n3": "<b>Escolha qualquer planeta</b> na Estação Ponte-Alfa — até os errados. Cada viagem gasta combustível, oxigênio, comida e dias, e ensina por que Pontes-01b é a melhor aposta.",
   "n4": "<b>Depois do pouso o jogo continua</b>: instale painéis solares, água e estufa, erga a torre, transmita dados à Terra e acenda o farol para as naves de tripulação pousarem.",
-  "n5": "<b>Chat</b> (Enter): no multiplayer, converse com os outros jogadores; no solo, fale com a tripulação e com o Controle da Missão (curiosidades da NASA).",
+  "n5": "<b>Chat</b> (Enter): no multiplayer, converse com os outros jogadores; no solo, fale com a tripulação e com o Controle da Missão (curiosidades).",
   "s65": "Sprites baseados em AstronautaComCapacete.png e variantes — personalize no Criador de Avatar.",
   "s66": "Multiplayer (até 6 jogadores + Comandante)",
   "s67b": "Funciona direto pelo navegador, inclusive hospedado na Vercel ou no GitHub Pages: o Comandante clica em <b>Multiplayer → Criar sala</b> e passa o código de 5 letras; os amigos entram com o código pela internet, sem servidor e sem VPN (conexão P2P via WebRTC).",
@@ -97,7 +97,7 @@
      "Ei, você! Isso, você mesmo! Chegue mais perto, não tenha medo.",
      "Olha esta cidade: lixo por todo lado, ar que arde, 46 °C… Dizem que estão alistando gente para Pontes-01b.",
      "Racionamento nível 4… Cada gota conta. Você viu como os astronautas reciclam até o suor?",
-     "A NASA diz: “o café de ontem é o café de amanhã”. Brincadeira de quem recicla a água da ISS!",
+     "Astronautas dizem: “o café de ontem é o café de amanhã”. Brincadeira de quem recicla a água da ISS!",
      "Leve água no coração, Comandante."
     ]
    },
@@ -141,7 +141,7 @@
     "role": "Programador",
     "say": [
      "Eu escrevo software de navegação. Um grau de erro na partida vira milhões de km de erro na chegada.",
-     "A sonda DSOC da NASA já mandou vídeo por laser de 31 milhões de km, a 267 Mbps. Rádio é o passado!"
+     "A sonda DSOC já mandou vídeo por laser de 31 milhões de km, a 267 Mbps. Rádio é o passado!"
     ]
    },
    "nina": {
@@ -185,9 +185,9 @@
    "c22": "Bem melhor depois de uma pausa."
   },
   "nasa": [
-   "Controle da Missão: a atmosfera da Terra tem hoje mais de 420 ppm de CO₂, contra ≈ 280 ppm antes da era industrial (NASA/NOAA).",
-   "Controle da Missão: a temperatura média da Terra já subiu ≈ 1,2 °C desde o fim do século XIX; os 10 anos mais quentes da história são os 10 últimos (NASA GISS).",
-   "Controle da Missão: satélites da NASA medem que o nível do mar subiu cerca de 10 cm desde 1993, e o ritmo está acelerando.",
+   "Controle da Missão: a atmosfera da Terra tem hoje mais de 420 ppm de CO₂, contra ≈ 280 ppm antes da era industrial.",
+   "Controle da Missão: a temperatura média da Terra já subiu ≈ 1,2 °C desde o fim do século XIX; os 10 anos mais quentes da história são os 10 últimos.",
+   "Controle da Missão: satélites medem que o nível do mar subiu cerca de 10 cm desde 1993, e o ritmo está acelerando.",
    "Controle da Missão: a ISS dá uma volta na Terra a cada ~90 minutos, a 28.000 km/h. Os astronautas veem 16 nasceres do sol por dia!",
    "Controle da Missão: um astronauta respira cerca de 0,84 kg de oxigênio por dia. Na ISS, o O₂ vem da eletrólise da água.",
    "Controle da Missão: no espaço não há ar para espalhar o calor — a nave só se esfria irradiando. A diferença entre sol e sombra passa de 200 °C.",
@@ -195,10 +195,10 @@
    "Controle da Missão: o telescópio Kepler (2009–2018) descobriu mais de 2.600 planetas observando pequenas quedas no brilho das estrelas (método do trânsito)."
   ],
   "colonyFacts": [
-   "Controle da Missão: na ISS, os astronautas perdem 1% a 1,5% da massa óssea por mês sem gravidade e treinam cerca de 2 horas por dia para reduzir isso (NASA).",
-   "Controle da Missão: um astronauta na ISS recebe cerca de 80 mSv de radiação em 6 meses; na Terra, a média natural é ≈ 3 mSv por ano (NASA).",
+   "Controle da Missão: na ISS, os astronautas perdem 1% a 1,5% da massa óssea por mês sem gravidade e treinam cerca de 2 horas por dia para reduzir isso.",
+   "Controle da Missão: um astronauta na ISS recebe cerca de 80 mSv de radiação em 6 meses; na Terra, a média natural é ≈ 3 mSv por ano.",
    "Controle da Missão: a Voyager 1, lançada em 1977, viaja a 17 km/s e já está a cerca de um dia-luz de nós. Mesmo assim, levaria ~75 mil anos para chegar à estrela mais próxima.",
-   "Controle da Missão: já são mais de 6.000 exoplanetas confirmados no NASA Exoplanet Archive. Poucos estão na zona habitável da estrela.",
+   "Controle da Missão: já são mais de 6.000 exoplanetas confirmados no Exoplanet Archive. Poucos estão na zona habitável da estrela.",
    "Controle da Missão: o telescópio James Webb observa a luz das estrelas atravessando atmosferas de exoplanetas para descobrir de que gases elas são feitas.",
    "Controle da Missão: recicle tudo! Na ISS, o lixo vai embora em cargueiros que queimam na reentrada; numa colônia, o lixo é matéria-prima."
   ],
@@ -222,7 +222,7 @@
     },
     {
      "node": "estacao",
-     "t": "Na metade do caminho fica a Estação Ponte-Alfa: analise exoplanetas reais da NASA e escolha o destino — até os errados."
+     "t": "Na metade do caminho fica a Estação Ponte-Alfa: analise exoplanetas reais e escolha o destino — até os errados."
     },
     {
      "node": "orbita",

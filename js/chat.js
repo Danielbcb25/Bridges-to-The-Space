@@ -2,7 +2,7 @@
 //  CHAT — multiplayer (jogadores reais) e jornada solo
 //  • Multiplayer: o host retransmite as mensagens a todos.
 //  • Solo: converse com a tripulação (bots) e com o Controle da
-//    Missão (curiosidades da NASA e status da nave/colônia).
+//    Missão (curiosidades e status da nave/colônia).
 //  Mensagens do sistema são enviadas em PT/EN/ES e traduzidas
 //  no navegador de cada jogador.
 // ============================================================
@@ -105,9 +105,9 @@ const Chat = {
     setTimeout(() => {
       if (!S) return;
       const intent = this.intent(low);
-      if (mc && !target) return this.reply({ name: 'Controle da Missão', role: 'NASA', mc: true }, this.allLangs(() => this.mcAnswer(low, intent)));
+      if (mc && !target) return this.reply({ name: 'Controle da Missão', role: 'Terra', mc: true }, this.allLangs(() => this.mcAnswer(low, intent)));
       if (!target) target = crew.length ? pick(crew) : null;
-      if (!target) return this.reply({ name: 'Controle da Missão', role: 'NASA', mc: true }, this.allLangs(() => this.mcAnswer(low, intent)));
+      if (!target) return this.reply({ name: 'Controle da Missão', role: 'Terra', mc: true }, this.allLangs(() => this.mcAnswer(low, intent)));
       this.reply({ name: target.name, role: target.roleName, rid: target.id }, this.allLangs(() => this.crewAnswer(target, intent)));
     }, delay);
   },
@@ -176,7 +176,7 @@ const Chat = {
       case 'fuel': return resLine('combustivel', L('kg de combustível'));
       case 'moral': return pre + L('A moral da equipe está em ') + fmt(moralIndex(), 0) + '. ' + (c.humor < 40 ? L('Eu mesmo ando meio pra baixo…') : L('Eu estou bem!'));
       case 'goal': return pre + this.goalLine();
-      case 'help': return pre + L('Pergunte “status”, “água”, “comida”, “moral”, “objetivo” ou fale com a “NASA” para curiosidades.');
+      case 'help': return pre + L('Pergunte “status”, “água”, “comida”, “moral”, “objetivo” ou fale com a “Controle” para curiosidades.');
       case 'joke': return pre + pick([L('Por que o astronauta terminou o namoro? Precisava de espaço!'), L('Cuidado com o lixo espacial: é o único que gira em volta da gente!')]);
       case 'thanks': return pre + L('De nada, Comandante!');
       case 'hi': return pre + L('Olá! Pronto para o que der e vier.');
@@ -215,8 +215,8 @@ const Chat = {
     e.btn.textContent = '💬 ' + label + (this.unread ? ' (' + this.unread + ')' : '');
     e.btn.classList.toggle('new', this.unread > 0);
     e.btn.title = L('Abrir o chat (Enter)');
-    e.title.textContent = Net.role ? '💬 ' + L('Chat da sala') + (Net.room ? ' ' + Net.room : '') : '💬 ' + L('Chat com a tripulação e a NASA');
-    e.inp.placeholder = Net.role ? L('Mensagem para a sala… (Enter envia)') : L('Fale com a tripulação ou “NASA”… (“ajuda”)');
+    e.title.textContent = Net.role ? '💬 ' + L('Chat da sala') + (Net.room ? ' ' + Net.room : '') : '💬 ' + L('Chat com a tripulação e o Controle da Missão');
+    e.inp.placeholder = Net.role ? L('Mensagem para a sala… (Enter envia)') : L('Fale com a tripulação ou “Controle”… (“ajuda”)');
     if (!this.dirty && !force) { this.peekRender(); return; }
     this.dirty = false;
     e.list.textContent = '';
