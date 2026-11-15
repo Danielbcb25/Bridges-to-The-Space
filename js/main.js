@@ -187,6 +187,7 @@ window.addEventListener('keydown', e => {
   if (e.code === 'KeyS' && e.shiftKey) { keys.KeyS = false; UIH.fast(); return; }
   if (e.code === 'Enter' && Net.role && S.scene !== 'intro' && !U.comms) { e.preventDefault(); Chat.focus(); return; }
   if (U.help) { if (e.code === 'Space' || e.code === 'Enter') UIH.helpGo(); const d = /^Digit([1-9])$/.exec(e.code); if (d) { const q = pcQuestions()[+d[1] - 1]; if (q) UIH.pcAsk(q.id); } return; }
+  if (S.scene === 'intro' && U.howto) { if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) UIH.introSkip(); return; }
   if (S.scene === 'intro') { if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) UIH.mNext(); if (e.code === 'ArrowLeft') UIH.mPrev(); return; }
   if (S.scene === 'earth') {
     if (e.code === 'Space') spaceAction();

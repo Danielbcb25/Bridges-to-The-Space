@@ -1829,7 +1829,11 @@
   "Almoçar na Cozinha": "Almorzar en la Cocina",
   "Na Cozinha, aperte E e clique em \"Comer agora\" (entre 11h e 15h).": "En la Cocina, pulsa E y haz clic en \"Comer ahora\" (entre las 11 y las 15 h).",
   "Almoçar na Cozinha · 11h–15h": "Almorzar en la Cocina · 11–15 h",
-  "🍽 Hora do almoço! Vá à Cozinha e clique em Comer agora.": "🍽 ¡Hora del almuerzo! Ve a la Cocina y haz clic en Comer ahora."
+  "🍽 Hora do almoço! Vá à Cozinha e clique em Comer agora.": "🍽 ¡Hora del almuerzo! Ve a la Cocina y haz clic en Comer ahora.",
+  "Andar": "Caminar",
+  "Correr": "Correr",
+  "Usar estações e conversar": "Usar estaciones y hablar",
+  "Computador de bordo: peça ajuda": "Computadora de a bordo: pide ayuda"
  },
  "patterns": [
   [

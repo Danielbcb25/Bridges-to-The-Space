@@ -1828,7 +1828,11 @@
   "Almoçar na Cozinha": "Have lunch in the Kitchen",
   "Na Cozinha, aperte E e clique em \"Comer agora\" (entre 11h e 15h).": "In the Kitchen, press E and click \"Eat now\" (between 11:00 and 15:00).",
   "Almoçar na Cozinha · 11h–15h": "Have lunch in the Kitchen · 11:00–15:00",
-  "🍽 Hora do almoço! Vá à Cozinha e clique em Comer agora.": "🍽 Lunch time! Go to the Kitchen and click Eat now."
+  "🍽 Hora do almoço! Vá à Cozinha e clique em Comer agora.": "🍽 Lunch time! Go to the Kitchen and click Eat now.",
+  "Andar": "Walk",
+  "Correr": "Run",
+  "Usar estações e conversar": "Use stations and talk",
+  "Computador de bordo: peça ajuda": "Onboard computer: ask for help"
  },
  "patterns": [
   [

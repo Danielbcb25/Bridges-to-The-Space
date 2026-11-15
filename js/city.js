@@ -179,11 +179,11 @@ function cityScreen() {
   if (near && near.type === 'b' && !E.panel) houseCard = `<div class="house-card" data-ui="cityEnter"><span class="hc-ic">${near.o.icon}</span><span class="hc-name">${esc(L(near.o.name))}</span><button class="btn small primary" data-ui="cityEnter"><b>E</b> ${esc(L('Entrar'))}</button></div>`;
   if (near && near.type === 'r') houseCard = `<div class="house-card" data-ui="cityEnter"><span class="hc-ic">🚀</span><span class="hc-name">${esc(L('Foguete Pontes-01b'))}</span><button class="btn small primary" data-ui="cityEnter"><b>E</b> ${esc(L('Embarcar'))}</button></div>`;
   const nearForHint = near && (near.type === 'b' || near.type === 'r') ? null : near;
-  const prompt = E.dialog ? `<b>E</b> — ${esc(L('Próxima fala ▶'))} · <b>Esc</b> — ${esc(L('sair'))}` : nearForHint ? `<b>E</b> — ${nearForHint.type === 'b' ? esc(L('Entrar: ')) + esc(L(near.o.name)) : esc(L('Conversar com ')) + esc(near.o.name)}` : esc(L('← → / A D para andar · explore os prédios e converse com as pessoas'));
+  const prompt = E.dialog ? `<b>E</b> — ${esc(L('Próxima fala ▶'))} · <b>Esc</b> — ${esc(L('sair'))}` : nearForHint ? `<b>E</b> — ${nearForHint.type === 'b' ? esc(L('Entrar: ')) + esc(L(near.o.name)) : esc(L('Conversar com ')) + esc(near.o.name)}` : '';
   return `<div class="earth-hud">
     <div class="tbox tl small"><b>TERRA · 2091</b><br>Qualidade do ar: <span class="red">péssima (IQA 312)</span><br>Temperatura: <span class="orange">46 °C</span><br>Água: racionamento nível 4</div>
     <div class="tbox tr small">${esc(L('Explore a cidade.'))}<br>🚀 ${esc(L('O foguete da missão fica no fim da rua, à direita.'))}<br><button class="btn tiny" data-ui="earthSkip">⏭ ${esc(L('Pular para o foguete'))}</button></div>
-    <div class="hint">${prompt}</div></div>${houseCard}${ov}`;
+    ${prompt ? `<div class="hint">${prompt}</div>` : ''}</div>${houseCard}${ov}`;
 }
 function cityPanel() {
   const E = U.earth; const b = CITY_BUILDINGS.find(x => x.id === E.panel); if (!b) return '';

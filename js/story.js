@@ -92,7 +92,58 @@ function modeIntroStart(mode) {
 UIH.mNext = () => { const m = U.mintro; if (!m) return; const sl = modeSlides(); if (m.i >= sl.length - 1) return UIH.introSkip(); m.i++; m.t = 0; Narrator.say(sl[m.i].t); };
 UIH.mPrev = () => { const m = U.mintro; if (!m || m.i === 0) return; m.i--; m.t = 0; Narrator.say(modeSlides()[m.i].t); };
 UIH.mGo = i => { const m = U.mintro; if (!m) return; m.i = +i; m.t = 0; Narrator.say(modeSlides()[m.i].t); };
+// ---------- animação dos controles (no lugar do "como jogar") ----------
+const HOWTO = [
+  { k: ['←', '→'], t: 'Andar', mode: 'walk' },
+  { k: ['Shift'], t: 'Correr', mode: 'run' },
+  { k: ['Espaço'], t: K('Pular', 'Jump', 'Saltar'), mode: 'jump' },
+  { k: ['E'], t: 'Usar estações e conversar', mode: 'use' },
+  { k: ['H'], t: 'Computador de bordo: peça ajuda', mode: 'help' },
+];
+const HOWTO_STEP = 2.8;
+function drawHowto(dt) {
+  const h = U.howto; h.t += dt;
+  const i = Math.floor(h.t / HOWTO_STEP);
+  if (i >= HOWTO.length) { UIH.introSkip(); return; }
+  const st = HOWTO[i], lt = h.t - i * HOWTO_STEP;
+  spaceBg(); drawStars(0.3, dt);
+  const fl = 158, cons = 330;
+  // chão da nave e um console
+  cx.fillStyle = '#1c2550'; cx.fillRect(60, fl, 360, 6); cx.fillStyle = '#2b376e'; cx.fillRect(60, fl + 6, 360, 3);
+  cx.fillStyle = '#3a4a86'; cx.fillRect(cons - 9, fl - 26, 18, 26);
+  const lit = st.mode === 'use' && lt > 1.2;
+  cx.fillStyle = lit ? (Math.floor(R.t * 6) % 2 ? '#7dffb0' : '#3fbf6a') : '#16303a'; cx.fillRect(cons - 6, fl - 22, 12, 7);
+  const av = (S && S.crew[0] && S.crew[0].avatar) || DEFAULT_AVATAR;
+  let x = 200, jy = 0, face = 1, fr = 0;
+  if (st.mode === 'walk') { x = 200 + Math.sin(lt * 1.7) * 70; face = Math.cos(lt * 1.7) >= 0 ? 1 : -1; fr = Math.floor(R.t * 8); }
+  if (st.mode === 'run') { x = 200 + Math.sin(lt * 3.4) * 95; face = Math.cos(lt * 3.4) >= 0 ? 1 : -1; fr = Math.floor(R.t * 14); }
+  if (st.mode === 'jump') { const p = (lt % 1.2) / 1.2; jy = Math.sin(p * Math.PI) * 34; }
+  if (st.mode === 'use') { x = 200 + Math.min(1, lt / 1.1) * (cons - 222); fr = lt < 1.1 ? Math.floor(R.t * 8) : 0; }
+  drawChar(av, 'suit', x, fl - jy, face, fr, 'happy');
+  if (lit) { // painel da estação abre
+    const a = Math.min(1, (lt - 1.2) * 3); cx.globalAlpha = a;
+    cx.fillStyle = 'rgba(8,14,44,0.95)'; cx.fillRect(cons - 40, fl - 92, 80, 44); cx.strokeStyle = '#2f5bd7'; cx.strokeRect(cons - 40, fl - 92, 80, 44);
+    cx.fillStyle = '#3fbf6a'; cx.fillRect(cons - 32, fl - 80, 50, 4); cx.fillStyle = '#ffd34c'; cx.fillRect(cons - 32, fl - 70, 34, 4); cx.fillStyle = '#7ad8ff'; cx.fillRect(cons - 32, fl - 60, 42, 4);
+    cx.globalAlpha = 1;
+  }
+  if (st.mode === 'help') { // o computador responde
+    const a = Math.min(1, lt * 2); cx.globalAlpha = a;
+    cx.fillStyle = '#fff'; cx.fillRect(x + 10, fl - 70, 70, 26); cx.fillStyle = '#fff'; cx.fillRect(x + 14, fl - 44, 6, 5);
+    cx.fillStyle = '#16303a'; cx.fillRect(x + 16, fl - 66, 14, 10); cx.fillStyle = '#7dffb0'; cx.fillRect(x + 18, fl - 64, 10, 6);
+    for (let k = 0; k < Math.min(3, Math.floor(lt * 3)); k++) { cx.fillStyle = '#2f5bd7'; cx.fillRect(x + 36 + k * 12, fl - 60, 8, 3); }
+    cx.globalAlpha = 1;
+  }
+}
+function howtoScreen() {
+  const h = U.howto; const i = Math.min(HOWTO.length - 1, Math.floor(h.t / HOWTO_STEP)); const st = HOWTO[i];
+  const press = Math.floor(R.t * 3) % 2 === 0;
+  return `<div class="howto"><div class="howkeys">${st.k.map(k => `<kbd class="${press ? 'on' : ''}">${esc(L(k))}</kbd>`).join('')}</div>
+    <div class="howcap">${esc(L(st.t))}</div>
+    <div class="dots">${HOWTO.map((_, j) => `<i class="${j === i ? 'on' : j < i ? 'done' : ''}"></i>`).join('')}</div>
+    <div class="row"><button class="btn primary" data-ui="introSkip">${esc(L('Começar'))} ▶</button></div></div>`;
+}
 function drawModeIntro(dt) {
+  if (U.howto) return drawHowto(dt);
   const m = U.mintro; spaceBg(); drawStars(0.6, dt);
   if (!m) return;
   const sl = modeSlides(); const cur = sl[m.i]; const used = sl.map(s => s.node === 'crew' ? 'viagem' : s.node);
@@ -117,6 +168,7 @@ function drawModeIntro(dt) {
   if (cur) { const [tx, ty] = MAP_NODES[cur.node]; m.sx += (tx - m.sx) * Math.min(1, dt * 2.5); m.sy += (ty - 22 - m.sy) * Math.min(1, dt * 2.5); drawShipExterior(m.sx - 20, m.sy, 0.55, true); }
 }
 function introScreen() {
+  if (U.howto) return howtoScreen();
   const m = U.mintro; if (!m) return '';
   const sl = modeSlides(); const cur = sl[m.i]; if (!cur) return '';
   const full = L(cur.t); const shown = full.slice(0, Math.floor(m.t * 50));

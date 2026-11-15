@@ -865,7 +865,12 @@ UIH.startGame = journey => {
   modeIntroStart(Net.role === 'host' ? 'multi' : journey); // introdução interativa do modo escolhido
 };
 UIH.introNext = () => UIH.mNext();
-UIH.introSkip = () => { Narrator.stop(); U.mintro = null; S.scene = 'earth'; cityInit(); };
+// depois da apresentação do caminho vem a animação dos controles; pular de novo entra no jogo
+UIH.introSkip = () => {
+  Narrator.stop();
+  if (S.scene === 'intro' && !U.howto && U.mintro) { U.mintro = null; U.howto = { t: 0 }; return; }
+  U.mintro = null; U.howto = null; S.scene = 'earth'; cityInit();
+};
 UIH.comms2 = () => { U.comms = 2; Narrator.say(F('comms.next')); };
 UIH.toSetup = () => { S.earthBonus = cityBonus(); S.scene = 'setup'; U.setupStep = 0; U.setupDirty = true; Music.play('fase'); };
 UIH.setStep = i => { U.setupStep = +i; U.setupDirty = true; };

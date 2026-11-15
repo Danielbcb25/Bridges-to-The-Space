@@ -546,3 +546,10 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 @keyframes impactIn { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: none; } }
 .portions .opt span.big { color: var(--yellow); font-size: 1em; display: block; }
 .goals .missed { color: var(--red); opacity: 0.7; }
+/* animação dos controles */
+.howto { position: absolute; left: 0; right: 0; bottom: 6%; display: flex; flex-direction: column; align-items: center; gap: 0.5em; pointer-events: auto; }
+.howkeys { display: flex; gap: 0.5em; }
+.howkeys kbd { font-family: var(--sk); font-size: 1.6em; min-width: 2.2em; padding: 0.2em 0.5em; text-align: center; background: #0a1030; color: #fff; border: 3px solid #4a5a9a; box-shadow: 0 5px 0 #1a2350; transition: transform 0.08s; }
+.howkeys kbd.on { background: var(--yellow); color: #111; border-color: #fff; transform: translateY(4px); box-shadow: 0 1px 0 #1a2350; }
+.howcap { font-family: var(--sk); font-size: 1.5em; color: var(--cyan); text-shadow: 3px 3px 0 #000; }
+.howto .dots i { display: inline-block; width: 10px; height: 10px; margin: 0 3px; background: #2a3a7a; } .howto .dots i.on { background: var(--yellow); } .howto .dots i.done { background: var(--cyan); }
