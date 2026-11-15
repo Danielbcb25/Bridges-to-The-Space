@@ -109,25 +109,89 @@ function goStep(s) {
   if (g.earth != null && U.earth) U.earth.target = g.earth;
   if (g.setup != null) { U.setupStep = g.setup; U.setupDirty = true; }
 }
-UIH.help = () => { U.help = !U.help; Sfx.click(); };
-UIH.helpGo = () => { const n = assistNext(); U.help = false; if (n && n.act) { if (n.act === 'report') UIH.panel('report'); else act(n.act); } else goStep(n); };
+// ---------- computador de bordo interativo ----------
+// Não é um tutorial: ele observa a nave, avisa o que está ruim, sugere o
+// próximo passo da missão e responde perguntas. (H abre / fecha.)
+function pcTips() {
+  if (!S || S.scene !== 'ship') return [];
+  const t = []; const add = (k, icon, go, lvl) => t.push({ t: k, icon, go, lvl });
+  const r = S.res, c = S.cap, m = me();
+  const crew = alive().filter(x => !x.hibernating);
+  if (r.oxigenio < c.oxigenio * 0.3) add('O₂ baixo: confira o Suporte à vida.', '🫁', { st: 'suporte' }, 3);
+  if (r.energia < c.energia * 0.2) add('Energia baixa: economize (plantio e reparos gastam energia).', '⚡', null, 3);
+  if (r.agua < c.agua * 0.2) add('Pouca água: o Suporte à vida recicla a água da nave.', '💧', { st: 'suporte' }, 2);
+  const fome = crew.length ? crew.reduce((a, x) => a + x.saciedade, 0) / crew.length : 100;
+  if (fome < 45) add('A tripulação está com fome: veja o cardápio na Cozinha.', '🍱', { st: 'cozinha' }, 2);
+  if (m && m.alive && !m.hibernating && m.humor < 35) add('Você está exausto: durma nos Dormitórios.', '😴', { st: 'dormitorio' }, 2);
+  else if (crew.some(x => x.id !== U.me && x.humor < 25)) add('Alguém da tripulação precisa dormir: mande descansar nos Dormitórios.', '😴', { st: 'dormitorio' }, 1);
+  if (r.lixo > 15) add('Muito lixo a bordo: use o Compactador.', '🗑', { st: 'lixo' }, 1);
+  return t.sort((a, b) => b.lvl - a.lvl);
+}
+const PC_KEYS = {
+  earth: '← → andar · Shift correr · E conversar · Esc fechar',
+  ship: '← → andar · ↑ ↓ escadas · Shift correr · E usar a estação · Espaço pular · R relatório · T tripulação · Esc fechar',
+  colony: '← → andar · Shift correr · E abrir o prédio · Espaço pular · Esc fechar',
+};
+// perguntas: sc = cenas onde aparecem; a = resposta (lista de frases) e go = "Ir até lá"
+const PC_QA = [
+  { id: 'now', q: 'O que faço agora?', a: () => { const tp = pcTips()[0], n = assistNext(); const out = []; if (tp) out.push(tp.t); if (n) out.push((tp ? 'Depois: ' : '') + '@' + n.t); if (!out.length) out.push('Tudo em ordem. Explore ou acelere o tempo (Shift+S).'); return { a: out, go: tp && tp.go ? tp.go : n && n.go, act: !tp && n && n.act }; } },
+  { id: 'rocket', sc: ['earth'], q: 'Onde fica o foguete?', a: () => ({ a: ['No fim da rua, à direita. Siga a seta amarela ou use "Pular para o foguete".'], go: { earth: rocketX() } }) },
+  { id: 'city', sc: ['earth'], q: 'Por que explorar a cidade?', a: () => ({ a: ['Os prédios mostram por que a Terra ficou inabitável e o que a missão precisa resolver. É opcional, mas ajuda a entender a história.'] }) },
+  { id: 'food', sc: ['ship'], q: 'Como consigo comida?', a: () => ({ a: ['A ração fica na Cozinha: lá você define o cardápio. A Estufa produz comida fresca (plante, regue e colha), que traz vitaminas.'], go: { st: 'cozinha' } }) },
+  { id: 'sleep', sc: ['ship'], q: 'Como recupero o humor e o sono?', a: () => ({ a: ['Durma nos Dormitórios (+25). O humor cai sem dormir e com lixo acumulado; refeições na mesa completa ajudam.'], go: { st: 'dormitorio' } }) },
+  { id: 'o2', sc: ['ship'], q: 'E se o oxigênio acabar?', a: () => ({ a: ['O Suporte à vida gera O₂ a partir da água, usando energia. Mantenha água e energia; em emergência, a nave usa cilindros de O₂.'], go: { st: 'suporte' } }) },
+  { id: 'ev', sc: ['ship'], q: 'Como funcionam os desafios?', a: () => ({ a: ['Quando o alarme tocar, siga a seta amarela até a estação indicada e cumpra os passos numerados. Chame a pessoa da função certa para ajudar.'] }) },
+  { id: 'build', sc: ['colony'], q: 'Como construo a colônia?', a: () => ({ a: ['Siga a seta amarela até o próximo prédio e aperte E para ver as opções. Comece pelo campo solar: sem energia nada funciona.'] }) },
+  { id: 'fast', sc: ['ship', 'colony'], q: 'Posso acelerar o tempo?', a: () => ({ a: ['Sim: Shift+S ou o botão ⏩ (2x → 5x → 10x → normal). Ele volta ao normal sozinho nos desafios.'] }) },
+  { id: 'keys', q: 'Quais são os controles?', a: () => ({ a: [PC_KEYS[S.scene] || PC_KEYS.ship] }) },
+];
+function pcQuestions() { return PC_QA.filter(x => !x.sc || x.sc.includes(S.scene)); }
+// frases que começam com @ são textos já traduzíveis vindos de assistSteps
+const pcLine = k => k.split('@').map(x => esc(L(x))).join('');
+UIH.help = () => { U.help = !U.help; if (U.help && !(U.pcLog && U.pcLog.scene === S.scene)) U.pcLog = { scene: S.scene, items: [] }; Sfx.click(); };
+UIH.pcAsk = id => {
+  const qa = PC_QA.find(x => x.id === id); if (!qa) return;
+  const r = qa.a(); U.pcLog.items.push({ q: qa.q, a: r.a, go: r.go, act: r.act }); U.pcLog.items = U.pcLog.items.slice(-3);
+  Sfx.tone(1320, 0.05, 'square', 0.03);
+};
+UIH.pcGo = p => {
+  if (typeof p === 'string') p = JSON.parse(p);
+  U.help = false;
+  if (p.act) { if (p.act === 'report') UIH.panel('report'); else act(p.act); return; }
+  goStep({ go: p.go });
+};
+UIH.helpGo = () => { const tp = pcTips()[0], n = assistNext(); if (tp && tp.go) return UIH.pcGo({ go: tp.go }); if (n) UIH.pcGo({ go: n.go, act: n.act }); else U.help = false; };
 
 function assistMini() {
-  const all = assistSteps(); const n = all.find(x => !x.done); if (!n) return '';
-  const done = all.filter(x => x.done).length;
-  const key = JSON.stringify(n.t);
+  const tp = pcTips()[0]; const n = assistNext();
+  // saudação curta na 1ª vez em cada cena, no lugar de um tutorial
+  S.seen = S.seen || {};
+  if (!S.seen[S.scene] && Net.role !== 'client') { S.seen[S.scene] = true; U.greetUntil = R.t + 7; }
+  const greet = R.t < (U.greetUntil || 0) && !tp;
+  const show = greet ? { t: 'Olá! Sou o computador de bordo. Aperte H e pergunte o que quiser.', icon: '👋' } : tp ? tp : n;
+  if (!show) return '';
+  const key = JSON.stringify(show.t);
   if (U.lastAssist !== key) { U.lastAssist = key; U.assistFlash = R.t + 2.5; if (S.scene !== 'intro') Sfx.tone(1180, 0.06, 'sine', 0.04); }
   const flash = R.t < (U.assistFlash || 0) ? 'flash' : '';
-  return `<div class="assist-mini ${flash}" data-ui="help" title="${esc(L('Computador de bordo (H)'))}"><span class="pc">💻</span><span class="ic">${n.icon}</span><span class="tx">${esc(L(n.t))}</span><span class="cnt">${done}/${all.length}</span>${n.go || n.act ? `<button class="btn tiny primary" data-ui="helpGo">▶ ${esc(L('Ir'))}</button>` : ''}<kbd>H</kbd></div>`;
+  const canGo = !greet && (show.go || show.act);
+  return `<div class="assist-mini ${flash} ${tp && !greet ? 'warn' : ''}" data-ui="help" title="${esc(L('Computador de bordo (H)'))}"><span class="pc">💻</span><span class="ic">${show.icon}</span><span class="tx">${esc(L(show.t))}</span>${canGo ? `<button class="btn tiny primary" data-ui="helpGo">▶ ${esc(L('Ir'))}</button>` : ''}<kbd>H</kbd></div>`;
 }
 function helpPanel() {
-  const all = assistSteps(); const n = all.find(s => !s.done);
-  const keysHelp = [['← →', 'andar'], ['Shift', 'correr'], ['Espaço', 'interagir / pular'], ['E', 'interagir'], ['Esc', 'fechar / voltar'], ['Shift+S', 'tempo 2x'], ['H', 'ajuda'], ['R / T', 'relatório / tripulação']];
+  const tips = pcTips(); const all = assistSteps(); const n = all.find(s => !s.done);
+  const done = all.filter(s => s.done).length;
+  const log = (U.pcLog && U.pcLog.items) || [];
+  const goBtn = (go, a) => go || a ? `<button class="btn tiny primary" data-ui="pcGo" data-arg='${J({ go, act: a })}'>📍 ${esc(L('Ir até lá'))}</button>` : '';
+  const status = tips.length ? `<span class="${tips[0].lvl >= 3 ? 'red' : 'orange'}">⚠ ${esc(L('Atenção'))}: ${tips.length}</span>` : `<span class="green">✔ ${esc(L('Sistemas estáveis'))}</span>`;
   return `<div class="modal-bg" data-ui="help"><div class="panel station wide pcpanel" data-stop="1"><button class="x" data-ui="help">✕</button>
-    <h2>💻 ${esc(L('COMPUTADOR DE BORDO'))}</h2>
-    ${n ? `<div class="nextcard"><div class="big-ic">${n.icon}</div><div><small>${esc(L('PRÓXIMO PASSO'))}</small><p>${esc(L(n.t))}</p>${n.go || n.act ? `<button class="btn primary" data-ui="helpGo">${n.act ? '▶ ' + esc(L('Fazer agora')) : '📍 ' + esc(L('Ir até lá'))}</button>` : ''}</div></div>` : `<p class="green">✔ ${esc(L('Tudo em dia!'))}</p>`}
-    <h4>${esc(L('Lista de tarefas'))}</h4>
-    <ul class="todo">${all.map(s => `<li class="${s.done ? 'done' : s === n ? 'cur' : ''}"><span>${s.done ? '☑' : s === n ? '▶' : '☐'}</span> ${s.icon} ${esc(L(s.t))}</li>`).join('')}</ul>
+    <h2>💻 ${esc(L('COMPUTADOR DE BORDO'))} <small>${status}</small></h2>
+    <div class="term">
+      <div class="ln sys">&gt; ${esc(L('Olá, Comandante. Em que posso ajudar?'))}</div>
+      ${tips.map(t => `<div class="ln ${t.lvl >= 3 ? 'red' : 'orange'}">${t.icon} ${esc(L(t.t))} ${goBtn(t.go)}</div>`).join('')}
+      ${n ? `<div class="ln mis">🎯 <small>${esc(L('Missão'))} ${done}/${all.length}:</small> ${esc(L(n.t))} ${goBtn(n.go, n.act)}</div>` : ''}
+      ${log.map(e => `<div class="ln q">&gt; ${esc(L(e.q))}</div><div class="ln a">${e.a.map(pcLine).join(' ')} ${goBtn(e.go, e.act)}</div>`).join('')}
+      <div class="ln cur">_</div>
+    </div>
+    <div class="qs">${pcQuestions().map((x, i) => `<button class="btn tiny" data-ui="pcAsk" data-arg="${x.id}">${i + 1}. ${esc(L(x.q))}</button>`).join('')}</div>
 </div></div>`;
 }
 
@@ -146,25 +210,3 @@ function sitePlayMode() {
   }).join(''));
 }
 
-// ---------- tutorial: boas-vindas e lista de objetivos sempre visível ----------
-const WELCOME = {
-  earth: { t: 'Terra, 2091', lines: ['← → andar · Shift correr', 'Passe pelos prédios: as informações abrem sozinhas', 'E conversar com as pessoas', 'Siga a seta amarela ▶', 'Objetivo: embarcar no foguete no fim da rua'] },
-  ship: { t: 'A bordo da nave', lines: ['← → andar · ↑ ↓ escadas', 'E usar a estação da sala onde você está', 'Siga a seta amarela até cada objetivo', 'Desafios aparecem com aviso e passos numerados', 'H abre o computador de bordo'] },
-};
-function welcomeCheck() {
-  if (!S || U.screen !== 'game' || Net.role === 'client') return;
-  S.seen = S.seen || {};
-  if (WELCOME[S.scene] && !S.seen[S.scene] && !(S.scene === 'earth' && U.comms)) { S.seen[S.scene] = true; U.welcome = S.scene; }
-}
-function welcomeCard() {
-  const w = WELCOME[U.welcome]; if (!w || !S || S.scene !== U.welcome) { U.welcome = null; return ''; }
-  return `<div class="modal-bg"><div class="panel center welcome"><h2>${esc(L(w.t))}</h2><ul class="wl">${w.lines.map(x => `<li>${esc(L(x))}</li>`).join('')}</ul>
-    <div class="row" style="justify-content:center"><button class="btn primary big" data-ui="welcomeOk">${esc(L('Entendi ▶'))}</button></div></div></div>`;
-}
-UIH.welcomeOk = () => { U.welcome = null; };
-// lista curta de objetivos enquanto o tutorial da nave não termina
-function goalsBox() {
-  if (!S || S.scene !== 'ship' || S.tutorial >= 4 || (S.event && S.event.phase !== 'result') || U.help) return '';
-  const all = assistSteps().filter(x => x.go && x.go.st || x.done).slice(0, 3); const n = all.find(x => !x.done);
-  return `<div class="goals"><b>${esc(L('OBJETIVOS'))}</b>${all.map(x => `<div class="${x.done ? 'done' : x === n ? 'cur' : ''}">${x.done ? '☑' : x === n ? '▶' : '☐'} ${esc(L(x.t))}</div>`).join('')}</div>`;
-}

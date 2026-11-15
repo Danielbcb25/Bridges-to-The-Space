@@ -330,7 +330,8 @@ function hudTop() {
   let items = [
     big('🫁', 'Oxigênio', r.oxigenio, c.oxigenio, `${fmt(r.oxigenio, 0)}<small>kg</small>`, `O₂: ${fmt(r.oxigenio)} kg`),
     big('🍱', 'Fome', fome, 100, `${fmt(fome, 0)}<small>%</small>`, L('Saciedade média da tripulação · comida: ') + fmt(r.comida) + ' kg'),
-    big('😴', 'Humor/Sono', mo, 100, `${fmt(mo, 0)}`, L('Humor e sono da tripulação: cai sem dormir; durmam nos Dormitórios')),
+    // mesmo número do Dormitório: o seu humor/sono (a média da tripulação vai na dica)
+    (() => { const m = me(); const v = m && m.alive && !m.hibernating ? m.humor : mo; return big('😴', 'Humor/Sono', v, 100, `${fmt(v, 0)}`, L('Seu humor e sono: cai sem dormir; durma nos Dormitórios') + ' · ' + L('média da tripulação: ') + fmt(mo, 0)); })(),
     big('📦', 'Armazenamento', st.avg, 100, `${fmt(st.avg, 0)}<small>%</small>`, ['agua', 'comida', 'energia', 'combustivel', 'medicos'].map(k => { const m = RES_META.find(x => x.id === k); return `${T(m.name)}: ${fmt(r[k], 0)} ${m.unit}`; }).join(' · '), low ? `<b class="lowres blink">${low}</b>` : ''),
   ].join('');
   if (U.hudFull) items += '<div class="hudfull">' + RES_META.map(m => { const v = r[m.id], cap = m.id === 'lixo' ? 30 : c[m.id]; return `<div class="rb" title="${m.name}: ${fmt(v)} ${m.unit}"><span class="ic">${m.icon}</span>${bar(v, cap, '', m.inverse)}<span class="v">${fmt(v, v < 10 ? 1 : 0)}<small>${m.unit}</small></span></div>`; }).join('') + '</div>';
@@ -726,7 +727,7 @@ function renderUI() {
       case 'setup': scr = U.setupDirty ? setupScreen() : U.cache.scr; U.setupDirty = false; break;
       case 'launch': scr = ''; break;
       case 'ship':
-        hud = hudTop() + assistMini() + goalsBox() + hudBottom();
+        hud = hudTop() + assistMini() + hudBottom();
         side = eventPanel();
         if (U.panel === 'report') modal = reportPanel();
         else if (U.panel === 'crew') modal = `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Tripulação</h2>${crewList()}</div></div>`;
@@ -751,7 +752,6 @@ function renderUI() {
     }
   }
   if (S && U.screen === 'game' && !hud && !['intro', 'launch', 'end'].includes(S.scene) && !(S.scene === 'earth' && U.comms)) hud = assistMini();
-  if (S && U.screen === 'game') { welcomeCheck(); if (U.welcome) modal = welcomeCard(); }
   if (U.help && S && U.screen === 'game') modal = helpPanel();
   sitePlayMode();
   const gameEl = document.getElementById('game'); const sc = S && U.screen === 'game' ? S.scene : 'menu'; if (gameEl.dataset.scene !== sc) gameEl.dataset.scene = sc;

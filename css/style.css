@@ -390,6 +390,16 @@ kbd { font-family: var(--vt); font-size: 0.8em; border: 1px solid #5a6aa8; borde
 .pcpanel .nextcard { display: flex; gap: 0.8em; align-items: center; border: 2px solid var(--yellow); border-radius: 8px; padding: 0.5em 0.8em; background: rgba(255, 210, 63, 0.06); }
 .pcpanel .big-ic { font-size: 2.4em; }
 .pcpanel .nextcard p { font-size: 1.2em; margin: 0.1em 0 0.4em; }
+.assist-mini.warn { border-color: var(--orange, #ff9a3c); }
+.pcpanel h2 small { font-size: 0.55em; margin-left: 0.6em; }
+.pcpanel .term { background: #020a08; border: 2px solid #1d5b3a; padding: 0.5em 0.7em; font-family: var(--mono, monospace); color: #7dffb0; max-height: 52vh; overflow-y: auto; box-shadow: inset 0 0 18px rgba(40, 255, 140, 0.08); }
+.pcpanel .term .ln { padding: 0.15em 0; animation: pcin 0.25s steps(4); }
+.pcpanel .term .ln .btn { margin-left: 0.4em; vertical-align: middle; }
+.pcpanel .term .sys { color: #8ad; } .pcpanel .term .q { color: #fff; margin-top: 0.35em; } .pcpanel .term .a { color: #7dffb0; padding-left: 1em; }
+.pcpanel .term .mis { color: var(--yellow); } .pcpanel .term .red { color: #ff6b6b; } .pcpanel .term .orange { color: #ffb15c; }
+.pcpanel .term .cur { animation: blink 1s steps(2) infinite; }
+.pcpanel .qs { display: flex; flex-wrap: wrap; gap: 0.35em; margin-top: 0.6em; }
+@keyframes pcin { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: none; } }
 .todo { list-style: none; padding: 0; margin: 0.2em 0; }
 .todo li { padding: 0.1em 0; } .todo li.done { color: var(--muted); text-decoration: line-through; } .todo li.cur { color: var(--yellow); }
 .keys { display: flex; flex-wrap: wrap; gap: 0.4em 1em; font-size: 0.9em; }
