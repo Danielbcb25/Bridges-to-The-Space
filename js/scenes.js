@@ -298,6 +298,14 @@ function drawShipInterior(dt, me) {
   const targets = new Set();
   if (ev && ev.phase === 'run') for (const st of ev.steps) if (!st.done && st.station) { if (!st.optional && st !== curStep(ev)) continue; targets.add(st.station); }
   for (const id in STATIONS) drawStation(id, targets.has(id));
+  // brecha no casco: rachadura com ar escapando e resina na Eclusa
+  if (S.event && S.event.type === 'brecha' && S.event.phase === 'run') {
+    const ev = S.event, st = STATIONS[ev.data.at], sealed = ev.steps[1].done;
+    const bx = st.x + 26, by = DECKS[st.deck].top + 18;
+    cx.fillStyle = sealed ? '#9a8a6a' : '#000'; for (let i = 0; i < 6; i++) cx.fillRect(bx + (i % 2 ? 2 : -1), by + i * 4, 2, 4);
+    if (!sealed) for (let i = 0; i < 8; i++) { const t = (R.t * 1.6 + i / 8) % 1; cx.fillStyle = `rgba(200,235,255,${1 - t})`; cx.fillRect(Math.round(bx + 2 + t * 26), Math.round(by + 10 - t * 14 + Math.sin(i) * 3), 2, 2); }
+    if (!ev.steps[0].done) { const e = STATIONS.eclusa; cx.drawImage(getItemSprite('resina'), e.x - 20, DECKS[e.deck].floor - 34 + Math.round(Math.sin(R.t * 4) * 2)); }
+  }
   // lixo flutuante
   for (const t of S.trash) { const y = DECKS[t.deck].floor - 14 + Math.sin(R.t * 2 + t.ph) * 4; cx.drawImage(getItemSprite(t.kind), Math.round(t.x - 4), Math.round(y)); }
   // tripulação

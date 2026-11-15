@@ -233,6 +233,7 @@ const EXOPLANETS = [
 // Descrição de cada desafio. Lógica em events.js
 const EVENT_INFO = {
   termico: { title: 'Regulação Térmica', icon: '🌡', systems: ['termico', 'suporte'], energy: true, desc: 'A nave entra numa zona de calor extremo. Mantenha a temperatura interna entre 18 °C e 26 °C.' },
+  brecha: { title: 'Brecha no casco', icon: '💨', systems: ['casco', 'suporte'], desc: 'Um meteoro furou o casco e o ar está vazando! Pegue a resina epóxi na Eclusa, sele a brecha e confira a pressão.' },
   asteroides: { title: 'Chuva de meteoros', icon: '☄', systems: ['casco', 'propulsao'], desc: 'Pedras espaciais em alta velocidade! Ative o escudo, use o manche para desviar e confira o radar.' },
   combFalta: { title: 'Falta de combustível', icon: '⛽', systems: ['tanques', 'propulsao'], desc: 'A velocidade da nave está caindo. Abra a válvula do tanque auxiliar, ligue a bomba e confira o painel.' },
   combVaz: { title: 'Vazamento de combustível', icon: '💧', systems: ['tanques', 'comunicacao'], desc: 'Vazamento de combustível! A equipe em solo precisa recalcular a rota para gastar menos.' },

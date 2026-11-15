@@ -24,11 +24,11 @@ function moveHuman(c, dt) {
   const pilot = S.event && S.event.puzzle && S.event.puzzle.kind === 'pilot';
   if (pilot) return;
   if (c.climb > 0) { stepMove(c, dt); return; }
-  if (L || Rr || up || down) { U.autopilot = null; U.clickTarget = null; } // teclado tem prioridade sobre o mouse
+  if (L || Rr || up || down) { U.autopilot = null; U.clickTarget = null; U.afterArrive = null; } // teclado tem prioridade sobre o mouse
   if (U.autopilot) {
     const st = STATIONS[U.autopilot];
     c.tx = st.x; c.tdeck = st.deck; stepMove(c, dt);
-    if (atStation(c, U.autopilot, 2)) U.autopilot = null;
+    if (atStation(c, U.autopilot, 2)) { U.autopilot = null; if (U.afterArrive) { const a = U.afterArrive; U.afterArrive = null; act(a.type, a.p); } }
     return;
   }
   if (U.clickTarget) { c.tx = U.clickTarget.x; c.tdeck = U.clickTarget.deck; stepMove(c, dt); if (!c.moving) U.clickTarget = null; return; }
@@ -47,10 +47,16 @@ function interact() {
   const c = me(); if (!c || !c.alive) return;
   const ev = S.event;
   if (ev && ev.type === 'lixo' && ev.phase === 'run' && S.trash.some(t => t.deck === c.deck && Math.abs(t.x - c.x) < 16)) { act('pickTrash'); Sfx.pick(); return; }
-  const near = stationNear(c); if (!near) return;
+  let near = stationNear(c); if (!near) return;
+  // durante um desafio, se o console do passo atual fica nesta sala, ele tem prioridade
+  if (ev && ev.phase === 'run') {
+    const room = ROOMS.find(r => r.deck === c.deck && c.x >= r.x0 && c.x <= r.x1);
+    const want = ev.steps.find(s => !s.done && s.station && (s === curStep(ev) || s.optional) && room && STATIONS[s.station].deck === room.deck && STATIONS[s.station].x >= room.x0 && STATIONS[s.station].x <= room.x1);
+    if (want) near = want.station;
+  }
   if (ev && ev.phase === 'run') {
     const step = ev.steps.find(s => !s.done && s.station === near && (s === curStep(ev) || s.optional));
-    if (step) { act('doStep', { step: step.id }); return; }
+    if (step) { if (atStation(c, near, 20)) act('doStep', { step: step.id }); else { U.autopilot = near; U.afterArrive = { type: 'doStep', p: { step: step.id } }; } return; }
   }
   if (near === 'termico' && ev && ev.type === 'termico') return;
   U.panel = near; U.tab = null;
@@ -149,7 +155,7 @@ function escAll() {
   if (U.cook && U.cook.length) { U.cook = []; return true; }
   if (U.farmSel != null && U.panel === 'estufa') { U.farmSel = null; return true; }
   if (U.panel) { UIH.closePanel(); return true; }
-  if (U.autopilot || U.clickTarget) { U.autopilot = null; U.clickTarget = null; return true; }
+  if (U.autopilot || U.clickTarget) { U.autopilot = null; U.clickTarget = null; U.afterArrive = null; return true; }
   if (U.hudFull) { U.hudFull = false; return true; }
   return false;
 }
@@ -161,7 +167,7 @@ function spaceAction() {
   if (S.scene === 'colony') { if (S.colony.tut === 0 || nearBuilding(c)) return interact(); jumpStart(c, 'colony'); return; }
   if (S.scene === 'ship') {
     const trash = S.event && S.event.type === 'lixo' && S.event.phase === 'run' && S.trash.some(t => t.deck === c.deck && Math.abs(t.x - c.x) < 16);
-    if (trash || stationNear(c)) return interact();
+    if (trash || stationAt(c)) return interact();
     if (!c.climb) jumpStart(c, 'ship');
   }
 }
@@ -194,7 +200,7 @@ window.addEventListener('keydown', e => {
   }
   if (S.scene !== 'ship') return;
   if (e.code === 'Space') spaceAction();
-  if (e.code === 'KeyE') interact();
+  if (e.code === 'KeyE') { if (U.panel && STATIONS[U.panel]) UIH.closePanel(); else interact(); }
   if (e.code === 'KeyR') { U.panel === 'report' ? UIH.closePanel() : UIH.panel('report'); }
   if (e.code === 'KeyT') { U.panel === 'crew' ? UIH.closePanel() : UIH.panel('crew'); }
   if (e.code === 'KeyF') { U.panel === 'fund' ? UIH.closePanel() : UIH.panel('fund'); }

@@ -326,7 +326,10 @@ function atStation(c, stationId, tol = 18) {
   const st = STATIONS[stationId];
   return c.deck === st.deck && Math.abs(c.x - st.x) <= tol && c.climb <= 0;
 }
+// console bem à frente do personagem (usado pelo Espaço, que também pula)
+function stationAt(c) { if (!c) return null; for (const id in STATIONS) { const st = STATIONS[id]; if (st.deck === c.deck && Math.abs(st.x - c.x) < 22) return id; } return null; }
 function stationNear(c) {
+  if (!c || c.climb > 0) return null;
   let best = null, bd = 22;
   for (const id in STATIONS) {
     const st = STATIONS[id];
@@ -334,6 +337,12 @@ function stationNear(c) {
     const d = Math.abs(st.x - c.x);
     if (d < bd) { bd = d; best = id; }
   }
+  if (best) return best;
+  // em qualquer ponto da sala (perto do motor, dos tanques, das camas…), vale o console daquela sala
+  const room = ROOMS.find(r => r.deck === c.deck && c.x >= r.x0 && c.x <= r.x1);
+  if (!room) return null;
+  let bd2 = 1e9;
+  for (const id in STATIONS) { const st = STATIONS[id]; if (st.deck !== c.deck || st.x < room.x0 || st.x > room.x1) continue; const d = Math.abs(st.x - c.x); if (d < bd2) { bd2 = d; best = id; } }
   return best;
 }
 

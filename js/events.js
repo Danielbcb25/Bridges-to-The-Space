@@ -66,6 +66,7 @@ function closeEvent() {
   S.event = null; S.thermal = null; S.speedMod = 1; S.cylinders = false;
   S.eventsDone.push(ev.type);
   S.v++;
+  if (S.pendingBreach) { S.pendingBreach = false; startEvent('brecha'); goEvent(); }
 }
 function tickEvents(dt) {
   const ev = S.event;
@@ -269,8 +270,8 @@ EV.asteroides = {
     pz.rocks = pz.rocks.filter(r => r.x > -0.1 && !r.hit);
     if (pz.t <= 0) { ev.data.hits = pz.hits; puzzleDone(ev); }
   },
-  success(ev) { return `A nave atravessou a chuva de meteoros com ${ev.data.hits || 0} impacto(s).`; },
-  failure() { damageSys('casco', 20); damageSys('propulsao', 15); addRes('casco', -20, 'Impactos de meteoros'); return 'Sem desvio a tempo: vários impactos no casco e na propulsão.'; },
+  success(ev) { if ((ev.data.hits || 0) >= 3) S.pendingBreach = true; return `A nave atravessou a chuva de meteoros com ${ev.data.hits || 0} impacto(s).` + ((ev.data.hits || 0) >= 3 ? ' ' + 'Um dos impactos furou o casco!' : ''); },
+  failure() { damageSys('casco', 20); damageSys('propulsao', 15); addRes('casco', -20, 'Impactos de meteoros'); S.pendingBreach = true; return 'Sem desvio a tempo: vários impactos no casco e na propulsão. Um meteoro furou o casco!'; },
 };
 function asteroidHits(n, big) {
   for (let i = 0; i < n; i++) {
@@ -281,6 +282,36 @@ function asteroidHits(n, big) {
   }
   if (n) S.shake = 0.5;
 }
+
+// Brecha no casco: consequência de falhar (ou levar muitos impactos) na chuva de meteoros
+const BREACH_ROOMS = ['lab', 'enfermaria', 'cozinha', 'estufa', 'dormitorio', 'antena'];
+EV.brecha = {
+  time: 50, points: 30, tip: 'Selem a brecha com resina epóxi antes que o ar acabe!', ai: 'pegar a resina na Eclusa e selar a brecha.',
+  setup(ev) {
+    const st = pick(BREACH_ROOMS);
+    ev.data.at = st;
+    ev.steps = [
+      { id: 'resina', label: 'Pegar a resina epóxi na Eclusa', station: 'eclusa', dur: 2 },
+      { id: 'selar', label: 'Selar a brecha no casco', station: st, dur: 4, role: 'engenheiro' },
+      { id: 'pressao', label: 'Conferir a pressão no Suporte à vida', station: 'suporte', dur: 2 },
+    ];
+  },
+  start(ev) { S.shake = 0.8; S.cylinders = true; sayRole('engenheiro1', 'Brecha no casco! O ar está vazando, precisamos selar agora!'); },
+  tick(ev, dt) {
+    const sealed = ev.steps[1].done;
+    if (!sealed) { addRes('oxigenio', -0.35 * dt, 'Brecha no casco'); if (Math.random() < dt * 0.6) S.shake = 0.15; }
+    if (sealed) S.cylinders = false;
+  },
+  success() { S.cylinders = false; damageSys('casco', -5); return 'Brecha selada com resina epóxi. A pressão voltou ao normal.'; },
+  failure(ev) {
+    S.cylinders = false;
+    damageSys('casco', 15); addRes('casco', -15, 'Brecha no casco'); addRes('oxigenio', -15, 'Brecha no casco');
+    const room = ROOMS.find(r => STATIONS[ev.data.at] && STATIONS[ev.data.at].x >= r.x0 && STATIONS[ev.data.at].x <= r.x1 && r.deck === STATIONS[ev.data.at].deck);
+    const hurt = alive().filter(c => c.id !== 'cmd' && room && c.deck === room.deck && c.x >= room.x0 && c.x <= room.x1);
+    hurt.forEach(c => { c.status = 'ferido'; c.statusT = 30; });
+    return 'A brecha não foi selada a tempo: perdemos ar, o casco piorou' + (hurt.length ? ' e quem estava na sala se feriu.' : '.');
+  },
+};
 
 EV.combFalta = {
   time: 55, points: 25, tip: 'A reserva do tanque auxiliar resolve. Válvula, bomba e confirmação no painel.', ai: 'tanque auxiliar → bomba → painel.',
