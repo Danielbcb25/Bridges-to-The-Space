@@ -328,7 +328,7 @@ function hudTop() {
   let items = [
     big('🫁', 'Oxigênio', r.oxigenio, c.oxigenio, `${fmt(r.oxigenio, 0)}<small>kg</small>`, `O₂: ${fmt(r.oxigenio)} kg`),
     big('🍱', 'Fome', fome, 100, `${fmt(fome, 0)}<small>%</small>`, L('Saciedade média da tripulação · comida: ') + fmt(r.comida) + ' kg'),
-    big('☺', 'Humor', mo, 100, `${fmt(mo, 0)}`, L('Moral (média do humor + bônus)')),
+    big('😴', 'Humor/Sono', mo, 100, `${fmt(mo, 0)}`, L('Humor e sono da tripulação: cai sem dormir; durmam nos Dormitórios')),
     big('📦', 'Armazenamento', st.avg, 100, `${fmt(st.avg, 0)}<small>%</small>`, ['agua', 'comida', 'energia', 'combustivel', 'medicos'].map(k => { const m = RES_META.find(x => x.id === k); return `${T(m.name)}: ${fmt(r[k], 0)} ${m.unit}`; }).join(' · '), low ? `<b class="lowres blink">${low}</b>` : ''),
   ].join('');
   if (U.hudFull) items += '<div class="hudfull">' + RES_META.map(m => { const v = r[m.id], cap = m.id === 'lixo' ? 30 : c[m.id]; return `<div class="rb" title="${m.name}: ${fmt(v)} ${m.unit}"><span class="ic">${m.icon}</span>${bar(v, cap, '', m.inverse)}<span class="v">${fmt(v, v < 10 ? 1 : 0)}<small>${m.unit}</small></span></div>`; }).join('') + '</div>';
@@ -545,9 +545,10 @@ function stationPanel(id) {
       break;
     }
     case 'eclusa': body = repairRow('acoplamento') + `<div class="row"><button class="btn small" data-act="ejectTrash">Ejetar lixo (${fmt(S.res.lixo, 1)} kg)</button></div>`; break;
-    case 'dormitorio': body = `<p>Descansar recupera humor. ${shopBonus().moral ? 'Itens de lazer da loja dão bônus.' : ''}</p><div class="row"><button class="btn small" data-act="rest">Descansar (eu)</button></div>
-      <h4>Mandar descansar</h4>${S.crew.filter(c => c.alive && c.id !== 'cmd').map(c => `<div class="sysline"><span>${esc(c.name)}</span>${bar(c.humor, 100)}<b>${fmt(c.humor, 0)}</b><button class="btn tiny" data-act="rest" data-p='${J({ id: c.id })}'>Descansar</button>${has('hibernacao') ? `<button class="btn tiny" data-act="hibernate" data-p='${J({ id: c.id })}'>${c.hibernating ? 'Acordar' : 'Hibernar'}</button>` : ''}</div>`).join('')}
-      <h4>Itens de lazer</h4><p class="small">${SHOP.filter(i => Save.owns(i.id) && i.moral).map(i => i.name).join(', ') || 'Nenhum (compre na Loja da tela inicial).'}</p>`; break;
+    case 'dormitorio': { const me_ = me(); body = `<p class="small">${esc(L('Dormir e descansar recuperam o humor e o sono.'))}</p>
+      <div class="sysline"><span>${esc(L('Você'))}</span>${bar(me_ ? me_.humor : 100, 100)}<b>${fmt(me_ ? me_.humor : 100, 0)}</b><button class="btn tiny primary" data-act="sleep">😴 ${esc(L('Dormir'))}</button><button class="btn tiny" data-act="rest">${esc(L('Descansar'))}</button></div>
+      <h4>${esc(L('Tripulação'))}</h4>${S.crew.filter(c => c.alive && c.id !== U.me).map(c => `<div class="sysline"><span>${esc(c.name)}</span><small>😴</small>${bar(c.humor, 100)}<b>${fmt(c.humor, 0)}</b><button class="btn tiny" data-act="sleep" data-p='${J({ id: c.id })}'>${esc(L('Dormir'))}</button><button class="btn tiny" data-act="rest" data-p='${J({ id: c.id })}'>${esc(L('Descansar'))}</button>${has('hibernacao') ? `<button class="btn tiny" data-act="hibernate" data-p='${J({ id: c.id })}'>${c.hibernating ? 'Acordar' : 'Hibernar'}</button>` : ''}</div>`).join('')}
+      <h4>Itens de lazer</h4><p class="small">${SHOP.filter(i => Save.owns(i.id) && i.moral).map(i => i.name).join(', ') || 'Nenhum (compre na Loja da tela inicial).'}</p>`; break; }
     case 'estufa': body = farmPanel(); break;
     case 'cozinha': body = kitchenPanel(); break;
   }
@@ -618,7 +619,7 @@ function reportPanel() {
 }
 function crewList() {
   return `<div class="crewlist">${S.crew.map(c => `<div class="crew ${c.alive ? '' : 'dead'}"><img src="${spriteURL(c.avatar, 'suit', c.alive && c.humor >= 40 ? 'happy' : 'sad', 2)}" alt=""><div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small> ${c.owner && c.owner !== 'bot' ? '<span class="tag">🎮 jogador</span>' : '<span class="tag">🤖 bot</span>'}<br>
-    ${c.alive ? `<div class="meters"><span>Humor</span>${bar(c.humor, 100)}<span>Saciedade</span>${bar(c.saciedade, 100)}<span>Nutrição</span>${bar(c.nutricao, 100)}<span class="nutr" title="${esc(L(NUTR_NAMES[0]))} / ${esc(L(NUTR_NAMES[1]))} / ${esc(L(NUTR_NAMES[2]))}">${(c.nut || [80, 80, 80]).map((v, i) => `<i class="n${i} ${v < 25 ? 'low' : ''}" style="height:${Math.round(v)}%"></i>`).join('')}</span></div>${c.nut && c.nut[2] < 25 ? `<small class="orange">${esc(L('Faltam vitaminas: sirva comida fresca.'))}</small><br>` : ''}<small><span>${c.hibernating ? '💤 ' + esc(L('hibernando')) : c.sickness ? '🤒 ' + esc(L('doente')) : c.status === 'ok' ? '✔ ok' : '✚ ' + esc(T(c.status))}</span>${c.task ? ' · <span>' + esc(T(c.task.label)) + '</span>' : ''} · ❤ ${esc(tagNames(c.likes))}${c.allergy.length ? ' · ' + esc(L('alergia')) + ': ' + esc(tagNames(c.allergy)) : ''}</small>` : '☠ morto'}</div></div>`).join('')}</div>`;
+    ${c.alive ? `<div class="meters"><span>${esc(L('Humor e sono'))}</span>${bar(c.humor, 100)}<span>Saciedade</span>${bar(c.saciedade, 100)}<span>Nutrição</span>${bar(c.nutricao, 100)}<span class="nutr" title="${esc(L(NUTR_NAMES[0]))} / ${esc(L(NUTR_NAMES[1]))} / ${esc(L(NUTR_NAMES[2]))}">${(c.nut || [80, 80, 80]).map((v, i) => `<i class="n${i} ${v < 25 ? 'low' : ''}" style="height:${Math.round(v)}%"></i>`).join('')}</span></div>${c.nut && c.nut[2] < 25 ? `<small class="orange">${esc(L('Faltam vitaminas: sirva comida fresca.'))}</small><br>` : ''}<small><span>${c.hibernating ? '💤 ' + esc(L('hibernando')) : c.sickness ? '🤒 ' + esc(L('doente')) : c.status === 'ok' ? '✔ ok' : '✚ ' + esc(T(c.status))}</span>${c.task ? ' · <span>' + esc(T(c.task.label)) + '</span>' : ''} · ❤ ${esc(tagNames(c.likes))}${c.allergy.length ? ' · ' + esc(L('alergia')) + ': ' + esc(tagNames(c.allergy)) : ''}</small>` : '☠ morto'}</div></div>`).join('')}</div>`;
 }
 function fundPanel() {
   const o = [['peca', 'Peça de reposição', 2], ['medico', 'Tratamento médico urgente (todos)', 3], ['energia', 'Baterias de emergência (+20 kWh)', 2], ['oxigenio', 'Oxigênio de emergência (+15 kg)', 2]];

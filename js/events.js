@@ -116,7 +116,7 @@ ACTIONS.callRole = (p) => {
   if (step.claimed) return;
   step.claimed = c.id;
   callCrew(c, { station: step.station, dur: step.dur * (roleMatches(c, step.role) ? 1 : 1.5), label: step.label, key: 'evStep', data: { ev: ev.id, step: step.id }, ev: ev.id }, role);
-  if (!isHumanCrew(c)) say(c, 'Indo agora: ' + step.label.toLowerCase() + '.');
+  if (!isHumanCrew(c)) say(c, 'Indo agora: ' + step.label.charAt(0).toLowerCase() + step.label.slice(1) + '.');
 };
 function roleMatches(c, role) {
   if (!role) return true;

@@ -58,7 +58,8 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const d20 = () => 1 + Math.floor(Math.random() * 20);
 const d10 = () => 1 + Math.floor(Math.random() * 10);
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-const fmt = (v, d = 1) => (Math.round(v * Math.pow(10, d)) / Math.pow(10, d)).toLocaleString('pt-BR');
+// números no formato do idioma (1.5 em inglês, 1,5 em português/espanhol)
+const fmt = (v, d = 1) => (Math.round(v * Math.pow(10, d)) / Math.pow(10, d)).toLocaleString(typeof I18n !== 'undefined' && I18n.lang === 'en' ? 'en-US' : typeof I18n !== 'undefined' && I18n.lang === 'es' ? 'es-ES' : 'pt-BR');
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
 // ---------- Persistência (créditos, loja, avatar) ----------
@@ -347,6 +348,7 @@ function taskSpeed(c) {
   let s = effIndex() / 82;
   if (c.status === 'ferido') s *= 0.6;
   if (c.sickness) s *= 0.7;
+  if (c.humor < 25) s *= 0.8; // cansado (humor/sono baixo) trabalha mais devagar
   return clamp(s, 0.3, 1.4);
 }
 const TASK_DONE = {}; // preenchido por events.js / ui
@@ -386,6 +388,8 @@ function tickCrew(dt) {
           if (roll < 0.12) dest = 'cozinha'; else if (roll < 0.2) dest = 'dormitorio'; else if (roll < 0.26 && has('cupula')) dest = 'lab';
         }
         if (S.food.mesaNow > 0) dest = 'cozinha';
+        const night = S.dayT / S.dayLen > 0.82 || S.dayT / S.dayLen < 0.06;
+        if (!bigEvent && (c.humor < 35 || (night && c.humor < 75))) { assignTask(c, { station: 'dormitorio', dur: 9, label: 'Dormir', key: 'sleep' }); continue; }
         goTo(c, dest, Math.random() * 40 - 20);
       }
     }
@@ -477,6 +481,8 @@ function simulate(dt) {
     if (c.sickness) decay += 4;
     c.humor = clamp(c.humor - decay * f, 0, 100);
     c.saciedade = clamp(c.saciedade - 60 * f, 0, 100);
+    // o humor também é o sono: acordado ele cai um pouco mais; dormir (Dormitórios) recupera
+    if (!(c.task && c.task.key === 'sleep')) c.humor = clamp(c.humor - 4 * f, 0, 100);
     if (!c.nut) c.nut = [80, 80, 80];
     for (let k = 0; k < 3; k++) c.nut[k] = clamp(c.nut[k] - 35 * f, 0, 100);
     c.nutricao = (c.nut[0] + c.nut[1] + c.nut[2]) / 3;
@@ -853,6 +859,11 @@ ACTIONS.hibernate = p => {
   if (c.hibernating) { c.statusT = c.statusT ? 1 : 0; goTo(c, 'dormitorio'); c.x = STATIONS.dormitorio.x; c.deck = 'L'; }
   toast(c.hibernating ? `${c.name} entrou em hibernação.` : `${c.name} saiu da hibernação.`);
 };
+ACTIONS.sleep = (p, actor) => {
+  const c = crewById(p.id || actor.id); if (!available(c)) return;
+  if (p.id && p.id !== actor.id) callCrew(c, { station: 'dormitorio', dur: 9, label: 'Dormir', key: 'sleep' }); else assignTask(c, { station: 'dormitorio', dur: 9, label: 'Dormir', key: 'sleep' });
+};
+TASK_DONE.sleep = c => { c.humor = clamp(c.humor + 25, 0, 100); };
 ACTIONS.rest = (p, actor) => {
   const c = crewById(p.id || actor.id); if (!available(c)) return;
   assignTask(c, { station: 'dormitorio', dur: 6, label: 'Descansar / lazer', key: 'rest' });

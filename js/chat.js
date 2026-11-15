@@ -104,11 +104,19 @@ const Chat = {
     setTimeout(() => {
       if (!S) return;
       const intent = this.intent(low);
-      if (mc && !target) return this.reply({ name: L('Controle da Missão'), role: 'NASA', mc: true }, this.mcAnswer(low, intent));
+      if (mc && !target) return this.reply({ name: 'Controle da Missão', role: 'NASA', mc: true }, this.allLangs(() => this.mcAnswer(low, intent)));
       if (!target) target = crew.length ? pick(crew) : null;
-      if (!target) return this.reply({ name: L('Controle da Missão'), role: 'NASA', mc: true }, this.mcAnswer(low, intent));
-      this.reply({ name: target.name, role: target.roleName, rid: target.id }, this.crewAnswer(target, intent));
+      if (!target) return this.reply({ name: 'Controle da Missão', role: 'NASA', mc: true }, this.allLangs(() => this.mcAnswer(low, intent)));
+      this.reply({ name: target.name, role: target.roleName, rid: target.id }, this.allLangs(() => this.crewAnswer(target, intent)));
     }, delay);
+  },
+  // gera a mesma resposta nos 3 idiomas, para cada jogador ler no seu
+  allLangs(fn) {
+    const cur = I18n.lang, real = Math.random, vals = []; const out = {};
+    try {
+      for (const l of ['pt', 'en', 'es']) { I18n.lang = l; let i = 0; Math.random = () => (i < vals.length ? vals[i++] : (vals[i++] = real())); out[l] = fn(); }
+    } finally { Math.random = real; I18n.lang = cur; }
+    return out.pt ? out : null;
   },
   reply(who, text) {
     if (!text) return;
@@ -218,9 +226,9 @@ const Chat = {
   line(m) {
     const d = document.createElement('div'); d.className = 'cm' + (m.sys ? ' sys ' + (m.kind || '') : '') + (m.mine ? ' mine' : '') + (m.bot ? ' bot' : '') + (m.mc ? ' mcm' : '');
     if (m.sys) { d.textContent = L(m.k); return d; }
-    const b = document.createElement('b'); b.textContent = m.from + (m.role && !m.mc ? ' · ' + T(m.role) : '') + ': ';
+    const b = document.createElement('b'); b.textContent = T(m.from) + (m.role && !m.mc ? ' · ' + T(m.role) : '') + ': ';
     b.style.color = this.color(m);
-    const s = document.createElement('span'); s.textContent = m.bot && m.text.startsWith(m.from + ': ') ? m.text.slice(m.from.length + 2) : m.text;
+    const txt = typeof m.text === 'object' ? L(m.text) : m.text; const s = document.createElement('span'); s.textContent = m.bot && txt.startsWith(m.from + ': ') ? txt.slice(m.from.length + 2) : txt;
     d.append(b, s); return d;
   },
   color(m) {
