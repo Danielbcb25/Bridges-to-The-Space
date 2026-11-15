@@ -1,7 +1,7 @@
 // ============================================================
 //  A TERRA EM COLAPSO — cidade explorável (história inicial)
 //  8 edifícios com painéis educativos (dados da NASA), 8 NPCs com
-//  diálogos e um Diário do Explorador que rende bônus de verba.
+//  diálogos; o foguete no fim da rua começa a missão.
 // ============================================================
 'use strict';
 
@@ -78,11 +78,14 @@ function cityInit() {
   U.earth = { t: 0, limit: Save.data.settings.fastEarth ? 45 : 240, p: { x: 80, face: 1, moving: false, walkT: 0 }, read: {}, panel: null, tab: 0, dialog: null, diary: false };
   U.comms = 0;
 }
+// foguete da missão no fim da cidade: embarcar nele começa a jornada
+const rocketX = () => EARTH_W - 73;
 function cityNear() {
   const E = U.earth, px = E.p.x;
   let best = null, bd = 44;
   for (const b of CITY_BUILDINGS) { const d = Math.abs(b.x - px); if (d < bd) { bd = d; best = { type: 'b', o: b }; } }
   for (const n of CITY_NPCS) { const d = Math.abs(n.x - px); if (d < Math.min(bd, 34)) { bd = d; best = { type: 'n', o: n }; } }
+  if (Math.abs(rocketX() - px) < 45) best = { type: 'r' };
   return best;
 }
 // o cartão da casa fica no canto e não trava a caminhada; só diálogo e diário param o jogador
@@ -100,7 +103,6 @@ function tickCity(dt) {
     else if (E.target != null) { const d = E.target - p.x; if (Math.abs(d) < 3) E.target = null; else dx = Math.sign(d); }
     const sp = 62 * (keys.ShiftLeft || keys.ShiftRight ? RUN_MULT : 1);
     if (dx) { p.x = clamp(p.x + dx * sp * dt, 20, EARTH_W - 20); p.face = dx; p.moving = true; p.walkT += dt * (sp / 62); } else p.moving = false;
-    if (E.t >= E.limit) cityComms();
   } else { E.p.moving = false; if (E.target != null && E.dialog) { const d = E.target - E.p.x; if (Math.abs(d) > 3) { E.p.x += Math.sign(d) * 62 * dt; E.p.face = Math.sign(d); E.p.moving = true; E.p.walkT += dt; } else E.target = null; } }
 }
 function cityComms() {
@@ -113,6 +115,7 @@ function cityInteract() {
   if (E.panel || E.diary) return;
   const n = cityNear(); if (!n) return;
   Sfx.click();
+  if (n.type === 'r') return cityComms();
   if (n.type === 'b') { E.panel = n.o.id; E.tab = 0; E.read[n.o.id + ':0'] = 1; }
   else { E.dialog = { id: n.o.id, i: 0 }; E.read['npc:' + n.o.id] = 1; }
 }
@@ -163,20 +166,20 @@ function drawCity(dt, cam) {
 
 // ---------- interface ----------
 function cityScreen() {
-  const E = U.earth; const left = Math.max(0, Math.ceil(E.limit - E.t));
+  const E = U.earth;
   if (U.comms) return commsScreen();
   const n = cityCount();
   let ov = '';
   if (E.panel) ov = cityPanel();
-  else if (E.diary) ov = cityDiary();
   const near = !cityBusy() ? cityNear() : null;
   let houseCard = '';
   if (near && near.type === 'b' && !E.panel) houseCard = `<div class="house-card" data-ui="cityEnter"><span class="hc-ic">${near.o.icon}</span><span class="hc-name">${esc(L(near.o.name))}</span><button class="btn small primary" data-ui="cityEnter"><b>E</b> ${esc(L('Entrar'))}</button></div>`;
-  const nearForHint = near && near.type === 'b' ? null : near;
+  if (near && near.type === 'r') houseCard = `<div class="house-card" data-ui="cityEnter"><span class="hc-ic">🚀</span><span class="hc-name">${esc(L('Foguete Pontes-01b'))}</span><button class="btn small primary" data-ui="cityEnter"><b>E</b> ${esc(L('Embarcar'))}</button></div>`;
+  const nearForHint = near && (near.type === 'b' || near.type === 'r') ? null : near;
   const prompt = E.dialog ? `<b>E</b> — ${esc(L('Próxima fala ▶'))} · <b>Esc</b> — ${esc(L('sair'))}` : nearForHint ? `<b>E</b> — ${nearForHint.type === 'b' ? esc(L('Entrar: ')) + esc(L(near.o.name)) : esc(L('Conversar com ')) + esc(near.o.name)}` : esc(L('← → / A D para andar · explore os prédios e converse com as pessoas'));
   return `<div class="earth-hud">
     <div class="tbox tl small"><b>TERRA · 2091</b><br>Qualidade do ar: <span class="red">péssima (IQA 312)</span><br>Temperatura: <span class="orange">46 °C</span><br>Água: racionamento nível 4</div>
-    <div class="tbox tr small">${esc(L('Explore a cidade.'))}<br>${esc(L('Comunicado em'))} <b>${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}</b><br>🔍 ${esc(L('Descobertas'))}: <b>${n}/${CITY_TOTAL}</b> · ${esc(L('verba extra'))}: <b>+${cityBonus()}</b><br><button class="btn tiny" data-ui="cityDiary">📓 ${esc(L('Diário'))} [J]</button> <button class="btn tiny" data-ui="earthSkip">⏭ ${esc(L('Ir ao comunicado'))}</button></div>
+    <div class="tbox tr small">${esc(L('Explore a cidade.'))}<br>🚀 ${esc(L('O foguete da missão fica no fim da rua, à direita.'))}</div>
     <div class="hint">${prompt}</div></div>${houseCard}${ov}`;
 }
 function cityPanel() {
@@ -187,7 +190,7 @@ function cityPanel() {
   return `<div class="house-card open"><div class="panel"><button class="x" data-ui="cityClose">✕</button><h2>${b.icon} ${esc(L(b.name))}</h2>
     <div class="tabs">${tabs}</div><p class="citytxt">${esc(L(t.b))}</p>
     <p class="small muted">${esc(L('Descobertas lidas: '))}${cityCount()}/${CITY_TOTAL}</p>
-    <div class="row">${last ? `<button class="btn primary" data-ui="cityAccept">🚀 ${esc(L('Estou pronto: aceitar a missão'))}</button>` : ''}<button class="btn" data-ui="cityClose">${esc(L('Sair'))}</button></div></div></div>`;
+    <div class="row">${last ? `<p class="small cyan">🚀 ${esc(L('O foguete da missão fica no fim da rua, à direita.'))}</p>` : ''}<button class="btn" data-ui="cityClose">${esc(L('Sair'))}</button></div></div></div>`;
 }
 function cityDialog() {
   const E = U.earth; const n = CITY_NPCS.find(x => x.id === E.dialog.id); if (!n || !n.av) return '';
@@ -198,17 +201,8 @@ function cityDialog() {
   return `<div class="dialog"><img src="${spriteURL(n.av, 'civil', 'happy', 3)}" alt=""><div><b>${esc(n.name)}</b> <small>${esc(L(n.role))}</small><p>${esc(L(line))}</p>
     <div class="row"><button class="btn primary" data-ui="cityNext">${E.dialog.i < n.say.length - 1 ? esc(L('Próximo ▶')) : esc(L('Tchau ✔'))}</button></div></div></div>`;
 }
-function cityDiary() {
-  const E = U.earth;
-  return `<div class="modal-bg" data-ui="cityClose"><div class="panel station wide" data-stop="1"><button class="x" data-ui="cityClose">✕</button><h2>📓 ${esc(L('Diário do Explorador'))}</h2>
-    <p>${esc(L('Cada painel lido e cada conversa é uma descoberta. A cada 10 descobertas, +1 ponto de verba para montar a nave (máx. +3).'))}</p>
-    <div class="kv"><span>${esc(L('Descobertas'))}</span><b>${cityCount()}/${CITY_TOTAL}</b><span>${esc(L('Bônus de verba'))}</span><b>+${cityBonus()}</b></div>
-    <h4>${esc(L('Lugares'))}</h4>${CITY_BUILDINGS.map(b => `<div class="alert ${b.tabs.every((_, i) => E.read[b.id + ':' + i]) ? 'good' : 'info'}">${b.icon} ${esc(L(b.name))} — ${b.tabs.filter((_, i) => E.read[b.id + ':' + i]).length}/${b.tabs.length}</div>`).join('')}
-    <h4>${esc(L('Pessoas'))}</h4>${CITY_NPCS.map(n => `<div class="alert ${E.read['npc:' + n.id] ? 'good' : 'info'}">${E.read['npc:' + n.id] ? '✔' : '▫'} ${esc(n.name)} — ${esc(L(n.role))}</div>`).join('')}</div></div>`;
-}
 UIH.cityTab = i => { const E = U.earth; E.tab = +i; E.read[E.panel + ':' + i] = 1; };
 UIH.cityEnter = () => { const E = U.earth; if (E && !E.panel) cityInteract(); };
 UIH.cityClose = () => { const E = U.earth; E.panel = null; E.dialog = null; E.diary = false; };
-UIH.cityDiary = () => { const E = U.earth; E.diary = !E.diary; E.panel = null; E.dialog = null; };
 UIH.cityNext = () => { const E = U.earth; if (!E.dialog) return; const n = CITY_NPCS.find(x => x.id === E.dialog.id); if (E.dialog.i < n.say.length - 1) E.dialog.i++; else E.dialog = null; };
 UIH.cityAccept = () => { cityComms(); };

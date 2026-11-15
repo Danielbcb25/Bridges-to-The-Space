@@ -176,6 +176,9 @@ function drawEarth(dt, player) {
     cx.fillStyle = '#ddd'; cx.fillRect(px, GROUND - 80, 14, 74); cx.fillStyle = '#c33'; cx.fillRect(px, GROUND - 86, 14, 6); cx.fillRect(px + 3, GROUND - 92, 8, 6);
     cx.fillStyle = '#1f5bff'; cx.fillRect(px + 2, GROUND - 50, 10, 3);
     text('PONTES-01b', px - 10, GROUND - 104, '#ffd34c');
+    const nr = U.earth && Math.abs(rocketX() - U.earth.p.x) < 45;
+    if (nr) { cx.strokeStyle = '#ffd34c'; cx.lineWidth = 1; cx.strokeRect(px - 4.5, GROUND - 96.5, 22, 92); }
+    else { cx.fillStyle = '#ffd34c'; cx.fillRect(px + 6, GROUND - 120 + Math.round(Math.sin(R.t * 4) * 2), 2, 6); cx.fillRect(px + 6, GROUND - 112 + Math.round(Math.sin(R.t * 4) * 2), 2, 2); }
   }
   // props
   for (const p of L.props) {

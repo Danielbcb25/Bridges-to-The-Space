@@ -190,7 +190,6 @@ window.addEventListener('keydown', e => {
   if (S.scene === 'earth') {
     if (e.code === 'Space') spaceAction();
     if (e.code === 'KeyE') cityInteract();
-    if (e.code === 'KeyJ' && !U.comms) UIH.cityDiary();
     return;
   }
   if (S.scene === 'colony') {

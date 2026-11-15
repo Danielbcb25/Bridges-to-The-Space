@@ -808,7 +808,6 @@ UIH.startGame = journey => {
 };
 UIH.introNext = () => UIH.mNext();
 UIH.introSkip = () => { Narrator.stop(); U.mintro = null; S.scene = 'earth'; cityInit(); };
-UIH.earthSkip = () => { cityComms(); };
 UIH.comms2 = () => { U.comms = 2; Narrator.say(F('comms.next')); };
 UIH.toSetup = () => { S.earthBonus = cityBonus(); S.scene = 'setup'; U.setupStep = 0; U.setupDirty = true; Music.play('fase'); };
 UIH.setStep = i => { U.setupStep = +i; U.setupDirty = true; };
