@@ -76,7 +76,7 @@ function update(dt) {
   if (S.scene === 'earth' && host) tickCity(dt);
   if (S.scene === 'colony') {
     const c = me(); if (c) moveColonyHuman(c, dt);
-    if (host && !(U.panel === 'menu' && !Net.role) && !U.help) stepScaled(tickColony, dt, k); // no solo, o menu e a ajuda pausam a colônia
+    if (host && !(!Net.role && (U.panel === 'menu' || U.help))) stepScaled(tickColony, dt, k); // só no solo o menu e a ajuda pausam a colônia (no multiplayer o jogo segue para todos)
   }
   if (S.scene === 'launch' && host) {
     U.launchT += dt;
@@ -231,6 +231,18 @@ function bindCanvas() {
     if (st) U.autopilot = st; else U.clickTarget = { x: clamp(x, 64, WORLD_W - 70), deck };
   });
   // controles de toque
+  // botões de ação do toque: pular, correr (liga/desliga), ajuda, tempo 2x e fechar
+  document.querySelectorAll('#touch [data-tact]').forEach(b => {
+    b.addEventListener('pointerdown', e => {
+      e.preventDefault(); Music.unlock(); Sfx.ensure();
+      const a = b.dataset.tact;
+      if (a === 'jump') spaceAction();
+      else if (a === 'help') UIH.help();
+      else if (a === 'fast') UIH.fast();
+      else if (a === 'esc') { escAll() || (S && U.screen === 'game' && ['ship', 'colony'].includes(S.scene) && UIH.panel('menu')); }
+      else if (a === 'run') { keys.ShiftLeft = !keys.ShiftLeft; b.classList.toggle('on', !!keys.ShiftLeft); }
+    });
+  });
   document.querySelectorAll('#touch [data-key]').forEach(b => {
     const k = b.dataset.key;
     const on = e => { e.preventDefault(); Music.unlock(); if (k === 'KeyE') (S && S.scene === 'earth' ? cityInteract() : interact()); else keys[k] = true; };

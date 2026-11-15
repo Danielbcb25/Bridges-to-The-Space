@@ -619,7 +619,7 @@ function reportPanel() {
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Relatório da nave</h2>${tabs}${body}</div></div>`;
 }
 function crewList() {
-  return `<div class="crewlist">${S.crew.map(c => `<div class="crew ${c.alive ? '' : 'dead'}"><img src="${spriteURL(c.avatar, 'suit', c.alive && c.humor >= 40 ? 'happy' : 'sad', 2)}" alt=""><div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small> ${c.owner && c.owner !== 'bot' ? '<span class="tag">🎮 jogador</span>' : '<span class="tag">🤖 bot</span>'}<br>
+  return `<div class="crewlist">${S.crew.map(c => `<div class="crew ${c.alive ? '' : 'dead'}"><img src="${spriteURL(c.avatar, 'suit', c.alive && c.humor >= 40 ? 'happy' : 'sad', 2)}" alt=""><div><b>${esc(c.name)}</b>${c.alive ? '' : ' 💀'} <small>${esc(c.roleName)}</small> ${c.owner && c.owner !== 'bot' ? '<span class="tag">🎮 jogador</span>' : '<span class="tag">🤖 bot</span>'}<br>
     ${c.alive ? `<div class="meters"><span>${esc(L('Humor e sono'))}</span>${bar(c.humor, 100)}<span>Saciedade</span>${bar(c.saciedade, 100)}<span>Nutrição</span>${bar(c.nutricao, 100)}<span class="nutr" title="${esc(L(NUTR_NAMES[0]))} / ${esc(L(NUTR_NAMES[1]))} / ${esc(L(NUTR_NAMES[2]))}">${(c.nut || [80, 80, 80]).map((v, i) => `<i class="n${i} ${v < 25 ? 'low' : ''}" style="height:${Math.round(v)}%"></i>`).join('')}</span></div>${c.nut && c.nut[2] < 25 ? `<small class="orange">${esc(L('Faltam vitaminas: sirva comida fresca.'))}</small><br>` : ''}<small><span>${c.hibernating ? '💤 ' + esc(L('hibernando')) : c.sickness ? '🤒 ' + esc(L('doente')) : c.status === 'ok' ? '✔ ok' : '✚ ' + esc(T(c.status))}</span>${c.task ? ' · <span>' + esc(T(c.task.label)) + '</span>' : ''} · ❤ ${esc(tagNames(c.likes))}${c.allergy.length ? ' · ' + esc(L('alergia')) + ': ' + esc(tagNames(c.allergy)) : ''}</small>` : '☠ morto'}</div></div>`).join('')}</div>`;
 }
 function fundPanel() {
@@ -753,6 +753,7 @@ function renderUI() {
   if (U.help && S && U.screen === 'game') modal = helpPanel();
   sitePlayMode();
   const gameEl = document.getElementById('game'); const sc = S && U.screen === 'game' ? S.scene : 'menu'; if (gameEl.dataset.scene !== sc) gameEl.dataset.scene = sc;
+  { const ov = (!!modal || !!U.help || !!(U.earth && S && S.scene === 'earth' && (U.earth.panel || U.earth.dialog || U.earth.diary || U.comms))) ? '1' : ''; if (gameEl.dataset.ov !== ov) gameEl.dataset.ov = ov; }
   setHTML('scr', scr); setHTML('hud', hud); setHTML('side', side); setHTML('modal', modal);
   document.getElementById('side').className = S && S.event && S.event.type === 'termico' && S.event.phase === 'run' ? 'wide' : '';
   // toast
@@ -789,6 +790,7 @@ UIH.paintColor = c => { U.paintColor = c; U.avatarDirty = true; };
 UIH.paintClear = () => { U.avatarDraft.paint = {}; };
 UIH.avSave = () => { if (U.avatarDraft) { delete U.avatarDraft.paint; U.avatarDraft.visor = DEFAULT_AVATAR.visor; } const n = $('#av-name'); if (n) U.avatarDraft.name = n.value.trim() || 'Comandante'; Save.data.avatar = U.avatarDraft; Save.write(); Sfx.ok(); UIH.title(); };
 function enterGameFullscreen() {
+  try { if (screen.orientation && screen.orientation.lock && matchMedia('(pointer: coarse)').matches) screen.orientation.lock('landscape').catch(() => {}); } catch (e) { /* */ }
   const el = document.documentElement;
   try { if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch (e) { /* sem permissão: o CSS já ocupa a janela */ }
 }
@@ -865,7 +867,25 @@ function bindUI() {
     else { const fn = UIH[t.dataset.ui]; if (fn) { Sfx.click(); fn(t.dataset.arg); } }
     e.preventDefault();
   };
-  layer.addEventListener('pointerdown', e => { if (e.button !== 0) return; if (e.target.closest('input,select,details,summary')) return; handle(e); });
+  // mouse: age ao pressionar. Toque: age ao soltar, se o dedo não rolou (assim rolar uma lista não aperta botões)
+  let tap = null;
+  const runSig = (sig) => {
+    Music.unlock(); Sfx.ensure();
+    if (sig.act) { let p = {}; try { p = sig.p ? JSON.parse(sig.p) : {}; } catch (er) { /* */ } act(sig.act, p); }
+    else { const fn = UIH[sig.ui]; if (fn) { Sfx.click(); fn(sig.arg); } }
+  };
+  layer.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    if (e.target.closest('input,select,textarea,details,summary,label')) return;
+    if (e.pointerType === 'mouse') return handle(e);
+    const t = e.target.closest('[data-ui],[data-act]');
+    if (!t || t.disabled) { tap = null; return; }
+    if (t.dataset.ui === 'closePanel' && e.target.closest('[data-stop]') && !e.target.closest('.x')) { tap = null; return; }
+    tap = { id: e.pointerId, x: e.clientX, y: e.clientY, sig: { ui: t.dataset.ui, act: t.dataset.act, arg: t.dataset.arg, p: t.dataset.p }, at: performance.now() };
+  });
+  layer.addEventListener('pointermove', e => { if (tap && e.pointerId === tap.id && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 12) tap = null; });
+  layer.addEventListener('pointercancel', () => { tap = null; });
+  layer.addEventListener('pointerup', e => { if (tap && e.pointerId === tap.id) { const s = tap.sig; tap = null; runSig(s); e.preventDefault(); } });
   layer.addEventListener('click', e => { if (e.detail === 0) handle(e); });
   layer.addEventListener('input', e => {
     const t = e.target;

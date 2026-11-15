@@ -386,6 +386,7 @@ function drawColony(dt) {
     text(sh.name + ' · ' + Math.max(0, Math.ceil(sh.eta - sh.t)) + 's', bx, Math.max(4, y - 42), '#ffd34c', 8, 'center');
   }
   // tripulantes
+  for (const c of S.crew) if (!c.alive) { const x = Math.round(c.x - cam); if (x > -40 && x < VW + 40) drawCorpse(c, x, CGROUND + 14); }
   const order = S.crew.filter(c => c.alive).sort((a, b) => a.x - b.x);
   for (const c of order) {
     const x = Math.round(c.x - cam); if (x < -30 || x > VW + 30) continue;

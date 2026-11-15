@@ -143,7 +143,7 @@ function sitePlayMode() {
   const key = S.crew.map(c => [c.name, c.roleName, c.alive, c.status, !!c.sickness, Math.round(c.humor / 10), c.hibernating, avatarKey(c.avatar)].join('|')).join(';') + I18n.lang;
   if (key === _crewStripKey) return; _crewStripKey = key;
   box.innerHTML = I18n.dom(S.crew.map(c => {
-    const st = !c.alive ? '☠' : c.hibernating ? '💤' : c.sickness ? '🤒' : c.status !== 'ok' ? '✚' : '✔';
+    const st = !c.alive ? '💀' : c.hibernating ? '💤' : c.sickness ? '🤒' : c.status !== 'ok' ? '✚' : '✔';
     return `<div class="${c.alive ? '' : 'dead'}"><img src="${spriteURL(c.avatar, 'suit', c.alive && c.humor >= 40 ? 'happy' : 'sad', 3)}" alt=""><b>${esc(c.name)}</b><span>${esc(c.roleName)}</span><em>${st} ☺ ${Math.round(c.humor)}</em></div>`;
   }).join(''));
 }

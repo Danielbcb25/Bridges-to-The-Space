@@ -233,6 +233,26 @@ function drawStreetSign(p, x) {
   lines.forEach((l, i) => text(l, x, top + 4 + i * 9, '#ffcf6a', 8, 'center'));
 }
 
+// ---------- corpo de tripulante morto: deitado, apagado e com caveira ----------
+const SKULL = ['..WWWWW..', '.WWWWWWW.', 'WWWWWWWWW', 'WKKWWWKKW', 'WKKWWWKKW', 'WWWWKWWWW', '.WWWWWWW.', '..WKWKW..', '..WWWWW..'];
+function drawSkull(x, y, s = 1) {
+  const X = Math.round(x - 4.5 * s), Y = Math.round(y);
+  for (let j = 0; j < SKULL.length; j++) for (let i = 0; i < 9; i++) { const ch = SKULL[j][i]; if (ch === '.') continue; cx.fillStyle = ch === 'W' ? '#f2f2f2' : '#14141c'; cx.fillRect(X + i * s, Y + j * s, s, s); }
+  cx.fillStyle = 'rgba(0,0,0,0.5)'; cx.fillRect(X - 1, Y + 9 * s, 9 * s + 2, 1);
+}
+function drawCorpse(c, x, floorY, label = true) {
+  const spr = getSprite(c.avatar, 'suit', 'sad', 0);
+  cx.save();
+  cx.translate(Math.round(x), Math.round(floorY));
+  cx.rotate(-Math.PI / 2 * (c.face < 0 ? -1 : 1)); // deitado
+  cx.globalAlpha = 0.62;
+  cx.drawImage(spr, -SPR_W / 2, -SPR_H);
+  cx.globalAlpha = 1; cx.restore();
+  cx.fillStyle = 'rgba(40,44,60,0.45)'; cx.fillRect(Math.round(x - SPR_H / 2), Math.round(floorY - SPR_W - 1), SPR_H, SPR_W + 1); // sombra acinzentada
+  drawSkull(x, floorY - SPR_W - 30 + Math.sin(R.t * 2 + x) * 1.5, 2);
+  if (label) text(c.name, Math.round(x), Math.round(floorY - SPR_W - 42), '#ff7a8a', 8, 'center');
+}
+
 // ---------- personagem ----------
 function drawChar(av, outfit, x, floorY, face, walkFrame, mood, mask) {
   const wf = [0, 1, 0, 2][walkFrame % 4];
@@ -311,7 +331,7 @@ function drawShipInterior(dt, me) {
   // tripulação
   const list = S.crew.slice().sort((a, b) => (a === me) - (b === me));
   for (const c of list) {
-    if (!c.alive) continue;
+    if (!c.alive) { drawCorpse(c, c.x, DECKS[c.deck].floor); continue; }
     if (c.eva) { drawEVA(c); continue; }
     const floor = c.climb > 0 ? DECKS.U.floor + (DECKS.L.floor - DECKS.U.floor) * (c.climbTo === 'L' ? (1 - c.climb / 0.7) : c.climb / 0.7) : DECKS[c.deck].floor;
     const outfit = S.cylinders ? 'helmet' : c.outfit;
