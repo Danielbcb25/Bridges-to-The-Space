@@ -637,3 +637,51 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .thc.onoff .onsw { display: flex; align-items: center; justify-content: center; gap: 6px; }
 .thc.onoff .led { display: inline-block; width: 0.7em; height: 0.7em; background: #3a4560; border: 2px solid #8aa0c8; }
 .thc.onoff.on .led { background: #7dffb0; border-color: #7dffb0; box-shadow: 0 0 8px #7dffb0; }
+/* quebra-cabeças visuais e de um clique */
+.puzzle.vis h4 { font-size: 1.15em; margin: 0.2em 0; }
+.pzhow { font-size: 1.05em; color: #ffe98a; font-weight: bold; margin: 0.3em 0; }
+.btn.pzbig { font-size: 1.05em; padding: 0.55em 0.8em; min-height: 2.4em; border-width: 3px; }
+.filters .fbtn { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; font: inherit; color: #fff; border: 3px solid #2b3a78; background: rgba(8, 14, 44, .9); padding: 6px; }
+.filters .fbtn:hover { border-color: var(--cyan); }
+.fbtn .fic { font-size: 1.6em; } .fbtn em { font-style: normal; font-size: 1em; } .fbtn small { color: #8aa0c8; }
+.fbtn .flow { width: 70%; height: 28px; background: #1a2350; display: flex; align-items: flex-end; }
+.fbtn .flow i { display: block; width: 100%; background: #7dd8ff; }
+.fbtn.ok { opacity: .5; }
+.map3 .tile { font-size: 1.8em; min-height: 1.8em; }
+.map3 .tile.bent { border-color: #ff9a3c; background: rgba(255, 154, 60, .18); }
+.map3 .tile.okt { border-color: #3fbf7f; color: #7dffb0; }
+.bands { display: flex; gap: 2px; height: 46px; align-items: stretch; margin: 4px 0; }
+.band { flex: 1; display: flex; align-items: flex-end; padding: 0; background: #0b1440; border: 2px solid #22357a; cursor: pointer; }
+.band i { display: block; width: 100%; background: #4fa3ff; }
+.band:hover { border-color: var(--cyan); } .band.on { border-color: #ffd84a; } .band.on i { background: #ffd84a; }
+.wslots { display: flex; align-items: center; gap: 4px; margin: 6px 0; flex-wrap: wrap; }
+.wslot { flex: 1; min-width: 60px; border: 3px dashed #3a4f9a; text-align: center; padding: 4px; display: flex; flex-direction: column; align-items: center; }
+.wslot b { color: #8aa0c8; } .wslot span { font-size: 1.5em; } .wslot.on { border-style: solid; border-color: #3fbf7f; background: rgba(63, 191, 127, .15); }
+.warr { font-style: normal; color: #8aa0c8; }
+.wopts, .meds { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
+.wopt, .med { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; font: inherit; color: #fff; background: rgba(8, 14, 44, .9); border: 3px solid #2b3a78; cursor: pointer; }
+.wopt:hover, .med:hover { border-color: var(--cyan); }
+.wopt span, .med span { font-size: 1.8em; } .wopt small { color: #bcd3ff; font-size: .8em; }
+.wopt.used { opacity: .35; }
+.vitals { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.vital { border: 2px solid #2b3a78; padding: 4px; text-align: center; font-size: .9em; } .vital span { display: block; font-size: 1.4em; }
+.medref { font-size: .85em; color: #bcd3ff; margin-top: 6px; }
+.solbox.okbox { border-color: #3fbf7f; background: rgba(63, 191, 127, .14); color: #7dffb0; }
+/* nave recomendada */
+.setup.quickset { display: flex; align-items: center; justify-content: center; }
+.qpanel { background: rgba(8, 14, 44, .95); border: 3px solid #4fa3ff; padding: 18px 22px; max-width: 760px; width: 92%; text-align: center; }
+.qgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 12px 0; }
+.qitem { border: 2px solid #2b3a78; padding: 8px 4px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.qitem span { font-size: 1.8em; } .qitem b { font-size: .85em; }
+.qline { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; color: #bcd3ff; margin-bottom: 12px; }
+.qbtns { justify-content: center; gap: 14px; }
+.btn.huge { font-size: 1.4em; padding: .6em 1.6em; }
+.btn.huge2 { font-size: 1.05em; padding: .7em 1.2em; }
+.wopts { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.meds { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.wopt, .med { padding: 5px 2px; font-size: .85em; }
+.wopt span, .med span { font-size: 1.5em; }
+.wslot { padding: 2px; min-width: 0; } .wslot span { font-size: 1.2em; }
+.vitals .vital { padding: 2px; font-size: .8em; } .vital span { font-size: 1.2em; }
+.puzzle.vis .opts1 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.puzzle.vis .opts1 .btn.pzbig { padding: .4em .5em; min-height: 2.2em; font-size: .9em; }

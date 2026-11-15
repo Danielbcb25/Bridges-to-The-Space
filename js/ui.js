@@ -428,18 +428,22 @@ function eventPanel() {
 }
 
 const AGUA_ORDER = ['Destilação', 'Filtração', 'Oxidação', 'Desinfecção'];
+const AGUA_ICON = { 'Destilação': '♨', 'Filtração': '🧽', 'Oxidação': '🫧', 'Desinfecção': '☀' };
+const AGUA_WHAT = { 'Destilação': 'ferver e condensar', 'Filtração': 'tirar a sujeira', 'Oxidação': 'quebrar químicos', 'Desinfecção': 'matar germes (UV)' };
+const MED_ICON = { analgesico: '💊', antiemetico: '🍋', antialergico: '🌼', antibiotico: '🦠', oxigenio: '😮‍💨' };
 const solBox = t => `<div class="solbox">💡 ${esc(L('Solução'))}: <b>${esc(t)}</b></div>`;
 function puzzleHTML(ev) {
   const pz = ev.puzzle;
   if (pz.by && me() && pz.by !== me().id) { const o = crewById(pz.by); return `<div class="puzzle"><p class="small">🔒 ${esc(o ? o.name : '')} ${esc(L(K('chegou primeiro e está resolvendo este passo.', 'got here first and is solving this step.', 'llegó primero y está resolviendo este paso.')))}</p></div>`; }
   if (pz.kind === 'filtros') {
-    return `<div class="puzzle"><h4>Filtros de ar (CDRA)</h4><p class="small">Inspecione os filtros (custa tempo) e troque o entupido pelo reserva.</p><div class="filters">${Array.from({ length: pz.n }, (_, i) => {
-      const seen = pz.seen.includes(i); const bad = seen && i === pz.bad; const sol = pz.hint && i === pz.bad;
-      return `<div class="filter ${seen ? (bad ? 'bad' : 'ok') : ''} ${sol ? 'sol' : ''}"><span>F${i + 1}</span><em>${seen ? esc(L(bad ? 'ENTUPIDO' : 'limpo')) : '?'}</em><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'inspect', i })}' ${seen ? 'disabled' : ''}>Inspecionar</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'swap', i })}'>Trocar</button></div>`;
+    // um clique: o filtro com menos ar passando é o entupido
+    return `<div class="puzzle vis"><h4>💨 ${esc(L('Filtros de ar'))}</h4><p class="pzhow">👆 ${esc(L('Clique no filtro com MENOS ar passando'))}</p><div class="filters">${Array.from({ length: pz.n }, (_, i) => {
+      const seen = pz.seen.includes(i); const bad = i === pz.bad; const sol = pz.hint && bad; const fl = bad ? 8 : pz.flow[i];
+      return `<button class="filter fbtn ${seen && !bad ? 'ok' : ''} ${sol ? 'sol' : ''}" data-act="puzzle" data-p='${J({ op: 'swap', i })}' ${seen && !bad ? 'disabled' : ''}><span class="fic">${bad ? '🟫' : '⬜'}</span><span class="flow"><i style="height:${fl}%"></i></span><em>${fl}%</em><small>F${i + 1}</small></button>`;
     }).join('')}</div>${pz.hint ? solBox(L('Troque o filtro') + ' F' + (pz.bad + 1)) : ''}</div>`;
   }
   if (pz.kind === 'mapa') {
-    return `<div class="puzzle"><h4>Recalibrar mapa estelar</h4><p class="small">Gire os setores até todas as setas apontarem para cima ↑ (para a estrela-guia).</p><div class="map3">${pz.tiles.map((t, i) => `<button class="tile" data-act="puzzle" data-p='${J({ i })}' style="transform:rotate(${t * 90}deg)">↑</button>`).join('')}</div>${pz.hint ? solBox(L('Clique em cada seta até ela apontar para cima ↑')) : ''}</div>`;
+    return `<div class="puzzle vis"><h4>⭐ ${esc(L('Mapa estelar'))}</h4><p class="pzhow">👆 ${esc(L('Clique nas setas tortas para apontar para cima ↑'))}</p><div class="map3">${pz.tiles.map((t, i) => `<button class="tile ${t ? 'bent' : 'okt'}" data-act="puzzle" data-p='${J({ i })}'><span style="display:inline-block;transform:rotate(${t * 90}deg)">↑</span></button>`).join('')}</div>${pz.hint ? solBox(L('Só clique nas setas que não apontam para cima ↑')) : ''}</div>`;
   }
   if (pz.kind === 'radio') {
     const msg = RADIO_MESSAGES[pz.msgIdx];
@@ -448,32 +452,40 @@ function puzzleHTML(ev) {
     const q = clamp(1 - dist / (fixed ? 40 : 28), 0, 1);
     let s = pz.seed;
     const shown = [...T(msg.full)].map(ch => { s = (s * 9301 + 49297) % 233280; return (ch === ' ' || s / 233280 < q) ? ch : (s % 3 ? '█' : '~'); }).join('');
-    return `<div class="puzzle"><h4>Rádio — ${fmt(100 + pz.freq * 0.5, 1)} MHz</h4><div class="signal">${bar(q, 1)}<b>${q > 0.85 ? 'sinal limpo' : q > 0.4 ? 'chiado' : 'só ruído'}</b></div>
+    // faixa de sintonia: clique onde as ondas são mais altas
+    const bands = Array.from({ length: 20 }, (_, i) => { const f = i * 5 + 2; const h = clamp(1 - Math.abs(f - pz.target) / 40, 0.08, 1); const on = Math.abs(pz.freq - f) <= 2; return `<button class="band ${on ? 'on' : ''}" data-act="puzzle" data-p='${J({ op: 'set', f })}'><i style="height:${Math.round(h * 100)}%"></i></button>`; }).join('');
+    return `<div class="puzzle vis"><h4>📻 ${esc(L('Rádio'))} — ${fmt(100 + pz.freq * 0.5, 1)} MHz</h4><p class="pzhow">👆 ${esc(L('Clique onde a onda é mais alta'))}</p><div class="bands">${bands}</div>
+      <div class="signal">${bar(q, 1)}<b>${q > 0.85 ? 'sinal limpo' : q > 0.4 ? 'chiado' : 'só ruído'}</b></div>
       <div class="radiomsg">${esc(shown)}</div>
-      <div class="row"><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'tune', d: -10 })}'>◀◀</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'tune', d: -1 })}'>◀</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'tune', d: 1 })}'>▶</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'tune', d: 10 })}'>▶▶</button></div>
-      ${q < 0.5 ? '<p class="small muted">Sintonize melhor para entender a mensagem.</p>' : `<p class="small">O que a base está tentando avisar?</p><div class="opts1">${shuffleStable(msg.options, pz.seed).map(o => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'answer', answer: o })}'>${esc(o)}</button>`).join('')}</div>`}</div>`;
+      ${q < 0.5 ? '' : `<p class="pzhow">❓ ${esc(L('O que a base está tentando avisar?'))}</p><div class="opts1">${shuffleStable(msg.options, pz.seed).map(o => `<button class="btn pzbig" data-act="puzzle" data-p='${J({ op: 'answer', answer: o })}'>${esc(o)}</button>`).join('')}</div>`}</div>`;
   }
   if (pz.kind === 'agua') {
-    return `<div class="puzzle"><h4>Ciclo fechado de descontaminação</h4><p class="small">Clique nas etapas na ordem correta.</p><div class="row">${pz.options.map(o => `<button class="btn tiny ${pz.order.includes(o) ? 'on' : ''} ${pz.hint && o === AGUA_ORDER[pz.order.length] ? 'sol' : ''}" data-act="puzzle" data-p='${J({ stage: o })}' ${pz.order.includes(o) ? 'disabled' : ''}>${o}</button>`).join('')}</div><p>${esc(L('Sequência'))}: ${pz.order.map((o, i) => `${i + 1}. ${esc(T(o))}`).join(' → ') || '—'}</p>${pz.hint ? solBox(AGUA_ORDER.map((o, i) => `${i + 1}. ${T(o)}`).join(' → ')) : ''}</div>`;
+    const slots = AGUA_ORDER.map((o, i) => { const d = pz.order[i]; return `<div class="wslot ${d ? 'on' : ''}"><b>${i + 1}</b>${d ? `<span>${AGUA_ICON[d]}</span><small>${esc(T(d))}</small>` : '<span>?</span>'}</div>`; }).join('<i class="warr">→</i>');
+    return `<div class="puzzle vis"><h4>💧 ${esc(L('Limpar a água'))}</h4><p class="pzhow">👆 ${esc(L('Clique nas etapas na ordem: 1 → 4'))}</p><div class="wslots">${slots}</div><div class="wopts">${pz.options.map(o => `<button class="wopt ${pz.order.includes(o) ? 'used' : ''} ${pz.hint && o === AGUA_ORDER[pz.order.length] ? 'sol' : ''}" data-act="puzzle" data-p='${J({ stage: o })}' ${pz.order.includes(o) ? 'disabled' : ''}><span>${AGUA_ICON[o]}</span><b>${esc(T(o))}</b><small>${esc(L(AGUA_WHAT[o]))}</small></button>`).join('')}</div>${pz.hint ? solBox(AGUA_ORDER.map((o, i) => `${i + 1}. ${T(o)}`).join(' → ')) : ''}</div>`;
   }
   if (pz.kind === 'remedio') {
     const expired = S.day > S.meds.validUntil;
-    return `<div class="puzzle"><h4>Aparelhos médicos</h4><div class="devs">${MED_DEVICES.map(d => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'device', dev: d.id })}'>${d.name}</button>${pz.seen[d.id] ? `<span class="reading">${esc(I18n.lang === 'en' ? T(pz.seen[d.id]).replace(/(\d),(\d)/g, '$1.$2') : T(pz.seen[d.id]))}</span>` : ''}`).join('')}</div>
-      ${expired ? `<p class="red small">Estoque vencido! <button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'replace' })}'>Trocar lote (2 recursos)</button></p>` : ''}
-      <h4>Kit de remédios</h4><div class="row">${MEDICINES.map(m => `<button class="btn tiny ${pz.hint && !expired && m.id === (DISEASES.find(d => d.id === ev.data.disease) || {}).med ? 'sol' : ''}" data-act="puzzle" data-p='${J({ op: 'give', med: m.id })}'>${m.name}</button>`).join('')}</div>
-      <p class="small muted">Referência: febre e ruído no pulmão → infecção; SpO₂ baixo → hipóxia; pressão alta e dor de cabeça → fluidos na cabeça; náusea → enjoo espacial; coceira e chiado → alergia.</p>${pz.hint ? solBox(expired ? L('Primeiro troque o lote vencido, depois dê o remédio.') : L('Dê este remédio') + ': ' + T((MEDICINES.find(m => m.id === (DISEASES.find(d => d.id === ev.data.disease) || {}).med) || {}).name || '')) : ''}</div>`;
+    const dis = DISEASES.find(d => d.id === ev.data.disease) || {}; const rd = dis.readings || {};
+    // os aparelhos simples já mostram a leitura; escolher o remédio é um clique
+    const reading = k => esc(I18n.lang === 'en' ? T(rd[k] || '').replace(/(\d),(\d)/g, '$1.$2') : T(rd[k] || ''));
+    const vit = [['temp', '🌡'], ['spo2', '🫁'], ['pressao', '❤'], ['esteto', '🩺']].map(([k, ic]) => `<div class="vital"><span>${ic}</span><b>${reading(k)}</b></div>`).join('');
+    return `<div class="puzzle vis"><h4>🩺 ${esc(L('Paciente'))}</h4><div class="vitals">${vit}</div>
+      ${expired ? `<div class="solbox">⚠ ${esc(L('Remédios vencidos!'))} <button class="btn pzbig" data-act="puzzle" data-p='${J({ op: 'replace' })}'>🔄 ${esc(L('Trocar lote'))}</button></div>` : ''}
+      <p class="pzhow">👆 ${esc(L('Clique no remédio certo'))}</p><div class="meds">${MEDICINES.map(m => `<button class="med ${pz.hint && !expired && m.id === dis.med ? 'sol' : ''}" data-act="puzzle" data-p='${J({ op: 'give', med: m.id })}'><span>${MED_ICON[m.id] || '💊'}</span><b>${esc(T(m.name))}</b></button>`).join('')}</div>
+      <div class="medref">🔥 ${esc(L('febre'))} → 🦠 · 🫁 ${esc(L('SpO₂ baixo'))} → 😮‍💨 O₂ · ❤ ${esc(L('pressão alta'))} → 💊 · 🌀 ${esc(L('náusea'))} → 🍋 · 🤧 ${esc(L('chiado'))} → 🌼</div>
+      ${pz.hint ? solBox(expired ? L('Primeiro troque o lote vencido, depois dê o remédio.') : L('Dê este remédio') + ': ' + T((MEDICINES.find(m => m.id === dis.med) || {}).name || '')) : ''}</div>`;
   }
   if (pz.kind === 'substituto') {
     const v = S.event.data.victim;
-    return `<div class="puzzle"><h4>Quem vai substituir?</h4><div class="opts1">${S.crew.filter(c => c.alive && c.id !== v && !c.hibernating).map(c => `<button class="btn tiny" data-act="puzzle" data-p='${J({ id: c.id })}' ${available(c) || c.id === 'cmd' ? '' : 'disabled'}>${esc(c.roleName)} ${esc(c.name)}${roleMatches(c, 'engenheiro') ? ' ★' : ''}</button>`).join('')}</div><p class="small muted">★ engenheiro: termina o reparo com segurança.</p></div>`;
+    return `<div class="puzzle"><h4>Quem vai substituir?</h4><div class="opts1">${S.crew.filter(c => c.alive && c.id !== v && !c.hibernating).map(c => `<button class="btn pzbig" data-act="puzzle" data-p='${J({ id: c.id })}' ${available(c) || c.id === 'cmd' ? '' : 'disabled'}>${esc(c.roleName)} ${esc(c.name)}${roleMatches(c, 'engenheiro') ? ' ★' : ''}</button>`).join('')}</div><p class="small muted">★ engenheiro: termina o reparo com segurança.</p></div>`;
   }
   if (pz.kind === 'rota') {
     return `<div class="puzzle"><h4>Rotas calculadas pela Terra</h4><div class="opts1">
-      <button class="btn tiny" data-act="puzzle" data-p='${J({ opt: 'gravidade' })}'>Assistência gravitacional: −15% de combustível, +2 dias</button>
-      <button class="btn tiny" data-act="puzzle" data-p='${J({ opt: 'economico' })}'>Cruzeiro econômico: −30% de combustível, mais lento</button>
-      <button class="btn tiny" data-act="puzzle" data-p='${J({ opt: 'manter' })}'>Manter a rota atual (moral −3)</button></div></div>`;
+      <button class="btn pzbig" data-act="puzzle" data-p='${J({ opt: 'gravidade' })}'><span>🪐</span> Assistência gravitacional: −15% de combustível, +2 dias</button>
+      <button class="btn pzbig" data-act="puzzle" data-p='${J({ opt: 'economico' })}'><span>🐢</span> Cruzeiro econômico: −30% de combustível, mais lento</button>
+      <button class="btn pzbig" data-act="puzzle" data-p='${J({ opt: 'manter' })}'><span>➡</span> Manter a rota atual (moral −3)</button></div></div>`;
   }
-  if (pz.kind === 'pilot') return `<div class="puzzle"><h4>Pilotagem</h4><p>Use ↑/↓ (W/S) para desviar. ${Math.ceil(pz.t)} s · impactos: ${pz.hits}</p><div class="row"><button class="btn" data-ui="pilot" data-arg="-1">▲</button><button class="btn" data-ui="pilot" data-arg="1">▼</button></div></div>`;
+  if (pz.kind === 'pilot') return `<div class="puzzle"><h4>Pilotagem</h4><p>Use ↑/↓ (W/S) para desviar. ${Math.ceil(pz.t)} s · impactos: ${pz.hits}</p><div class="row"><button class="btn pzbig" data-ui="pilot" data-arg="-1">▲</button><button class="btn pzbig" data-ui="pilot" data-arg="1">▼</button></div></div>`;
   return '';
 }
 function shuffleStable(arr, seed) { const a = arr.slice(); let s = seed; for (let i = a.length - 1; i > 0; i--) { s = (s * 9301 + 49297) % 233280; const j = s % (i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -483,14 +495,16 @@ function thermalPanel() {
   const tcol = th.T > 26 ? 'red' : th.T < 18 ? 'cyan' : 'green';
   const scene = th.scene >= 5 ? 'Entrada na sombra' : th.scene >= 4 ? 'Sobrecarga elétrica' : th.scene >= 2 ? 'A estrela se aproxima' : 'Alerta de calor';
   const thermo = (label, v, min, max, cls) => `<div class="thermo"><div class="tube"><i class="${cls}" style="height:${clamp((v - min) / (max - min), 0, 1) * 100}%"></i></div><b>${fmt(v, 0)}°</b><small>${esc(L(label))}</small></div>`;
-  const hint = th.T > 24 ? ['red', '🔥 ' + L('Está esquentando: ligue o resfriador.')] : th.T < 20 ? ['cyan', '❄ ' + L('Está esfriando: ligue o aquecedor.')] : ['green', '✔ ' + L('Temperatura boa. Fique de olho.')];
-  // o que deveria estar ligado agora (a dica vira um selo piscando no botão)
-  const want = { cool: th.T > 24, heat: th.T < 20 };
+  // o que deveria estar ligado agora vem do calor de fora (não da leitura do momento),
+  // então desligar quando o selo pede não deixa a nave errada de novo
+  const want = th.want || { cool: false, heat: false };
+  const hint = want.cool ? ['red', '🔥 ' + L('Lá fora está quente: deixe o resfriador LIGADO.')] : want.heat ? ['cyan', '❄ ' + L('Lá fora está frio: deixe o aquecedor LIGADO.')] : ['green', '✔ ' + L('Lá fora está ameno: deixe os dois DESLIGADOS.')];
   const ctrl = k => { const c = TH_CTRL[k]; const on = th.on[k]; const todo = on !== want[k];
     const tag = todo ? `<i class="thtodo blink">▶ ${esc(L(want[k] ? 'LIGUE' : 'DESLIGUE'))}</i>` : '';
     return `<button class="thc onoff ${on ? 'on' : ''} ${todo ? 'todo' : ''}" data-act="thToggle" data-p='${J({ k })}'>${tag}<span class="ic">${c.icon}</span><b>${esc(L(c.name))}</b><em class="onsw"><span class="led"></span>${on ? L('LIGADO') : L('DESLIGADO')}</em></button>`; };
   // jornada curta: fora da faixa, a solução aparece bem grande
-  const fix = (th.T > 26 || th.T < 18) && S.journey === 'curta' ? `<div class="solbox blink">💡 ${esc(th.T > 26 ? L('LIGUE O RESFRIADOR ❄') : L('LIGUE O AQUECEDOR 🔥'))}</div>` : '';
+  const need = want.cool && !th.on.cool ? L('LIGUE O RESFRIADOR ❄') : want.heat && !th.on.heat ? L('LIGUE O AQUECEDOR 🔥') : (!want.cool && th.on.cool) || (!want.heat && th.on.heat) ? L('DESLIGUE') + ' ' + (th.on.cool ? L('o resfriador') : L('o aquecedor')) : '';
+  const fix = need ? `<div class="solbox blink">💡 ${esc(need)}</div>` : `<div class="solbox okbox">✔ ${esc(L('Certo! Mantenha assim.'))}</div>`;
   return `<div class="evp thermal simple">
     <h2>🌡 ${esc(L('Regulação Térmica'))} <small>${esc(L(scene))}</small></h2>
     <div class="timer">${bar(S.event.t, th.D, 'time')}<b>${Math.floor(S.event.t / 60)}:${String(Math.floor(S.event.t % 60)).padStart(2, '0')}</b></div>
