@@ -511,3 +511,23 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .goals { position: absolute; left: 0.6em; top: 6.6em; max-width: 34%; background: rgba(8, 14, 44, 0.92); border: 2px solid var(--yellow); padding: 0.3em 0.6em; font-size: 0.9em; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); }
 .goals b { font-family: var(--sk); color: var(--yellow); display: block; margin-bottom: 0.15em; }
 .goals .done { color: var(--muted); text-decoration: line-through; } .goals .cur { color: #fff; }
+
+/* zona de trocas da Ponte-Alfa */
+.tradezone h4 { margin: 0.5em 0 0.25em; }
+.tz-stock { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3em; }
+.tz-res { display: flex; flex-direction: column; align-items: center; background: rgba(8, 14, 44, 0.8); border: 2px solid #2b3a78; padding: 0.1em 0.2em; font-size: 0.9em; }
+.tz-res small { color: var(--muted); font-size: 0.75em; text-align: center; } .tz-res b { font-size: 1.05em; }
+.tz-res.ok { border-color: #3fbf6a; } .tz-res.warn { border-color: #ffb15c; } .tz-res.bad { border-color: #ff4a5a; animation: blink 1.2s steps(2) infinite; }
+.tz-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.3em; font-size: 0.88em; }
+.tz-card { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.4em; text-align: left; background: rgba(8, 14, 44, 0.9); border: 2px solid #2f5bd7; color: #fff; padding: 0.25em 0.4em; font: inherit; cursor: pointer; }
+.tz-card:hover { border-color: var(--cyan); } .tz-card.cant { opacity: 0.5; cursor: not-allowed; } .tz-card.rec { border-color: var(--yellow); box-shadow: 0 0 10px rgba(255, 210, 63, 0.45); }
+.tz-card small { display: block; color: var(--muted); font-size: 0.8em; }
+.tz-give { color: #ff9a8a; } .tz-get { color: #7dffb0; } .tz-arrow { color: var(--yellow); }
+.tz-card em { grid-column: 1 / -1; font-style: normal; font-size: 0.8em; }
+@media (max-width: 800px) { .tz-stock { grid-template-columns: repeat(4, 1fr); } .tz-list { grid-template-columns: 1fr; } }
+.yellow { color: var(--yellow); }
+.goals.routine { max-width: 30%; }
+.goals.routine b small { color: var(--muted); font-family: inherit; margin-left: 0.4em; }
+.goals .how { color: var(--cyan); font-size: 0.85em; padding: 0.1em 0 0.25em 1.3em; }
+.goals.paused { border-color: var(--red); } .goals.paused b { color: var(--red); } .goals.paused > div:not(.evline):not(.muted) { opacity: 0.45; }
+.goals .evline { color: #fff; }

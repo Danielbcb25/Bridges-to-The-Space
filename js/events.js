@@ -839,15 +839,25 @@ function thermalEnd(ev) {
 }
 
 // ===================== ESTÁGIOS: ESTAÇÃO, PLANETA E MIGRAÇÃO =====================
+// give/get: o que sai e o que entra (para o painel mostrar antes → depois)
 const TRADES = [
-  { id: 'racao', name: '50 GB de dados → 10 kg de ração', can: () => S.res.dados >= 50, do: () => { addRes('dados', -50, 'Escambo'); addRes('comida', 10, 'Escambo'); } },
-  { id: 'sementes', name: '1 peça sobressalente → sementes (+8 kg de plantação)', can: () => S.peças >= 1, do: () => { S.peças--; addRes('plantacao', 8, 'Escambo'); } },
-  { id: 'receita', name: '100 GB de dados → receita rara', can: () => S.res.dados >= 100 && RECIPES.some(r => !S.food.recipes.includes(r.id)), do: () => { addRes('dados', -100, 'Escambo'); const r = RECIPES.find(x => !S.food.recipes.includes(x.id)); S.food.recipes.push(r.id); toast('Nova receita no livro: ' + r.name); } },
-  { id: 'medicos', name: '30 GB de dados → 3 recursos médicos', can: () => S.res.dados >= 30, do: () => { addRes('dados', -30, 'Escambo'); addRes('medicos', 3, 'Escambo'); } },
-  { id: 'energia', name: '40 GB de dados → recarga de 30 kWh', can: () => S.res.dados >= 40, do: () => { addRes('dados', -40, 'Escambo'); addRes('energia', 30, 'Escambo'); } },
-  { id: 'agua', name: '40 GB de dados → 100 L de água', can: () => S.res.dados >= 40, do: () => { addRes('dados', -40, 'Escambo'); addRes('agua', 100, 'Escambo'); } },
-  { id: 'reparo', name: '10 kg de ração → reparo completo da Aviônica', can: () => S.res.comida >= 10, do: () => { addRes('comida', -10, 'Escambo'); S.systems.avionica.hp = 100; } },
+  { id: 'racao', name: '50 GB de dados → 10 kg de ração', give: ['dados', 50], get: ['comida', 10], can: () => S.res.dados >= 50, do: () => { addRes('dados', -50, 'Escambo'); addRes('comida', 10, 'Escambo'); } },
+  { id: 'agua', name: '40 GB de dados → 100 L de água', give: ['dados', 40], get: ['agua', 100], can: () => S.res.dados >= 40, do: () => { addRes('dados', -40, 'Escambo'); addRes('agua', 100, 'Escambo'); } },
+  { id: 'sementes', name: '1 peça sobressalente → sementes (+8 kg de plantação)', give: ['peças', 1], get: ['plantacao', 8], can: () => S.peças >= 1, do: () => { S.peças--; addRes('plantacao', 8, 'Escambo'); } },
+  { id: 'medicos', name: '30 GB de dados → 3 recursos médicos', give: ['dados', 30], get: ['medicos', 3], can: () => S.res.dados >= 30, do: () => { addRes('dados', -30, 'Escambo'); addRes('medicos', 3, 'Escambo'); } },
+  { id: 'energia', name: '40 GB de dados → recarga de 30 kWh', give: ['dados', 40], get: ['energia', 30], can: () => S.res.dados >= 40, do: () => { addRes('dados', -40, 'Escambo'); addRes('energia', 30, 'Escambo'); } },
+  { id: 'receita', name: '100 GB de dados → receita rara', give: ['dados', 100], getTxt: 'Receita rara', can: () => S.res.dados >= 100 && RECIPES.some(r => !S.food.recipes.includes(r.id)), do: () => { addRes('dados', -100, 'Escambo'); const r = RECIPES.find(x => !S.food.recipes.includes(x.id)); S.food.recipes.push(r.id); toast('Nova receita no livro: ' + r.name); } },
+  { id: 'reparo', name: '10 kg de ração → reparo completo da Aviônica', give: ['comida', 10], getTxt: 'Aviônica 100%', can: () => S.res.comida >= 10, do: () => { addRes('comida', -10, 'Escambo'); S.systems.avionica.hp = 100; } },
 ];
+// quanto tempo a ração dura e quantos dias faltam até Pontes-01b
+function foodOutlook() {
+  const n = alive().filter(c => !c.hibernating).length || 1;
+  const per = { pleno: 0.2, reduzido: 0.133, minimo: 0.067 }[S.food.racionamento] || 0.2;
+  const perDay = per * 3 * n;
+  const cr = cruiseObj() || { speed: 1 };
+  const left = Math.ceil((1 - S.progress) * S.totalDays / Math.max(0.3, cr.speed * (S.speedMod || 1)));
+  return { perDay, days: S.res.comida / perDay, left, n };
+}
 ACTIONS.trade = p => { const t = TRADES.find(x => x.id === p.id); if (!t || !t.can()) return; t.do(); S.explore.trades++; toast('Troca feita: ' + t.name, 'good'); };
 ACTIONS.analyzeExo = p => {
   if (S.explore.analyzed.includes(p.id)) return;

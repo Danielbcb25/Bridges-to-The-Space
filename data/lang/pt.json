@@ -14,7 +14,6 @@
   "s9": "A Missão",
   "s10": "Em razão do iminente colapso terrestre, as lideranças do planeta se uniram pela sobrevivência humana. Observatórios do mundo todo localizaram o planeta habitável mais próximo: <b class=\"cyan\">Pontes-01b</b>, a única esperança da Terra.",
   "s11": "Você gerencia uma das centenas de naves lançadas ao espaço: seus <b>recursos</b>, sua <b>tripulação</b> e a <b>rota</b>. No caminho: chuvas de meteoros, radiação, microgravidade, escassez e o psicológico de todos a bordo.",
-  "s12": "⚠ O jogo possui apenas um final. Se ele não for alcançado, a missão falha.",
   "s13": "<b>Preparação</b> — 30 pontos de verba, 5 slots de módulo. Cada escolha é um sacrifício.",
   "s14": "<b>Partida e viagem</b> — controle a nave e enfrente os primeiros problemas espaciais.",
   "s15": "<b>Exploração científica</b> — compare dados reais de exoplanetas da NASA.",
@@ -88,8 +87,7 @@
    "Em meio ao caos, observatórios do mundo todo se uniram com o objetivo de localizar o planeta habitável mais próximo da Terra. E assim o fizeram.",
    "Nomeado de “Pontes-01b”, este passou a ser a única esperança de sobrevivência da Terra.",
    "Você passará a gerenciar uma das centenas de estações e naves espaciais lançadas ao espaço: seus recursos, sua tripulação e a rota para Pontes-01b.",
-   "Durante a expedição, você enfrentará chuvas de asteroides, radiação, microgravidade, a escassez de recursos e o psicológico de todos a bordo.",
-   "Atenção! O jogo possui apenas um final. Caso este não seja alcançado, o jogador falha."
+   "Durante a expedição, você enfrentará chuvas de asteroides, radiação, microgravidade, a escassez de recursos e o psicológico de todos a bordo."
   ],
   "npc": {
    "lia": {
@@ -232,7 +230,7 @@
     },
     {
      "node": "colonia",
-     "t": "Na superfície, construa a colônia, envie dados à Terra e receba as naves de tripulação. Só existe um final!"
+     "t": "Na superfície, construa a colônia, envie dados à Terra e receba as naves de tripulação."
     }
    ],
    "curta": [

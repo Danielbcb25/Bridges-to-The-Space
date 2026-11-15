@@ -100,7 +100,12 @@ function assistSteps() {
   }
   return list;
 }
-function assistNext() { return assistSteps().find(s => !s.done) || null; }
+function assistNext() {
+  const n = assistSteps().find(s => !s.done) || null;
+  // na nave, depois do tutorial: a rotina do dia vem antes do "siga viagem" (e pausa nos desafios)
+  if (S && S.scene === 'ship' && !(n && n.go && n.go.st) && !(S.event && S.event.phase !== 'result') && typeof routineNext === 'function') { const r = routineNext(); if (r) return r; }
+  return n;
+}
 function goStep(s) {
   if (!s || !s.go) return;
   const g = s.go;
@@ -134,12 +139,13 @@ const PC_KEYS = {
 };
 // perguntas: sc = cenas onde aparecem; a = resposta (lista de frases) e go = "Ir até lá"
 const PC_QA = [
-  { id: 'now', q: 'O que faço agora?', a: () => { const tp = pcTips()[0], n = assistNext(); const out = []; if (tp) out.push(tp.t); if (n) out.push((tp ? 'Depois: ' : '') + '@' + n.t); if (!out.length) out.push('Tudo em ordem. Explore ou acelere o tempo (Shift+S).'); return { a: out, go: tp && tp.go ? tp.go : n && n.go, act: !tp && n && n.act }; } },
+  { id: 'now', q: 'O que faço agora?', a: () => { const tp = pcTips()[0], n = assistNext(); const out = []; if (tp) out.push(tp.t); if (n) { out.push((tp ? 'Depois: ' : '') + '@' + n.t); if (n.how) out.push(n.how); } if (!out.length) out.push('Tudo em ordem. Explore ou acelere o tempo (Shift+S).'); return { a: out, go: tp && tp.go ? tp.go : n && n.go, act: !tp && n && n.act }; } },
   { id: 'rocket', sc: ['earth'], q: 'Onde fica o foguete?', a: () => ({ a: ['No fim da rua, à direita. Siga a seta amarela ou use "Pular para o foguete".'], go: { earth: rocketX() } }) },
   { id: 'city', sc: ['earth'], q: 'Por que explorar a cidade?', a: () => ({ a: ['Os prédios mostram por que a Terra ficou inabitável e o que a missão precisa resolver. É opcional, mas ajuda a entender a história.'] }) },
   { id: 'food', sc: ['ship'], q: 'Como consigo comida?', a: () => ({ a: ['A ração fica na Cozinha: lá você define o cardápio. A Estufa produz comida fresca (plante, regue e colha), que traz vitaminas.'], go: { st: 'cozinha' } }) },
   { id: 'sleep', sc: ['ship'], q: 'Como recupero o humor e o sono?', a: () => ({ a: ['Durma nos Dormitórios (+25). O humor cai sem dormir e com lixo acumulado; refeições na mesa completa ajudam.'], go: { st: 'dormitorio' } }) },
   { id: 'o2', sc: ['ship'], q: 'E se o oxigênio acabar?', a: () => ({ a: ['O Suporte à vida gera O₂ a partir da água, usando energia. Mantenha água e energia; em emergência, a nave usa cilindros de O₂.'], go: { st: 'suporte' } }) },
+  { id: 'rot', sc: ['ship'], q: 'O que é a rotina?', a: () => ({ a: ['Todo dia há tarefas pequenas de manutenção (lista no canto). Cada uma melhora um sistema; completar o dia anima a tripulação e dá pontos. Quando chega um desafio, a rotina pausa.'] }) },
   { id: 'ev', sc: ['ship'], q: 'Como funcionam os desafios?', a: () => ({ a: ['Quando o alarme tocar, siga a seta amarela até a estação indicada e cumpra os passos numerados. Chame a pessoa da função certa para ajudar.'] }) },
   { id: 'build', sc: ['colony'], q: 'Como construo a colônia?', a: () => ({ a: ['Siga a seta amarela até o próximo prédio e aperte E para ver as opções. Comece pelo campo solar: sem energia nada funciona.'] }) },
   { id: 'fast', sc: ['ship', 'colony'], q: 'Posso acelerar o tempo?', a: () => ({ a: ['Sim: Shift+S ou o botão ⏩ (2x → 5x → 10x → normal). Ele volta ao normal sozinho nos desafios.'] }) },
@@ -187,6 +193,7 @@ function helpPanel() {
     <div class="term">
       <div class="ln sys">&gt; ${esc(L('Olá, Comandante. Em que posso ajudar?'))}</div>
       ${tips.map(t => `<div class="ln ${t.lvl >= 3 ? 'red' : 'orange'}">${t.icon} ${esc(L(t.t))} ${goBtn(t.go)}</div>`).join('')}
+      ${(() => { const rn = typeof routineNext === 'function' ? routineNext() : null; return rn ? `<div class="ln mis">📋 <small>${esc(L('Rotina'))}:</small> ${esc(L(rn.t))} <small class="muted">— ${esc(L(rn.how))}</small> ${goBtn(rn.go)}</div>` : ''; })()}
       ${n ? `<div class="ln mis">🎯 <small>${esc(L('Missão'))} ${done}/${all.length}:</small> ${esc(L(n.t))} ${goBtn(n.go, n.act)}</div>` : ''}
       ${log.map(e => `<div class="ln q">&gt; ${esc(L(e.q))}</div><div class="ln a">${e.a.map(pcLine).join(' ')} ${goBtn(e.go, e.act)}</div>`).join('')}
       <div class="ln cur">_</div>

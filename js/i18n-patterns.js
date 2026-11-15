@@ -37,6 +37,7 @@ function registerFnPatterns() {
   P(/^Resultado: (.+)\. Custo para manter a temperatura: ([\d.,]+) kWh de energia, ([\d.,]+) kg de combustível\. Plantação perdida: ([\d.,]+) kg\. Tempo fora da faixa segura: ([\d.,]+) s\.$/,
     (m, g, k, f, p, s) => `Result: ${t(g)}. Cost of keeping the temperature: ${k} kWh of energy, ${f} kg of fuel. Crops lost: ${p} kg. Time outside the safe range: ${s} s.`,
     (m, g, k, f, p, s) => `Resultado: ${t(g)}. Costo de mantener la temperatura: ${k} kWh de energía, ${f} kg de combustible. Cultivo perdido: ${p} kg. Tiempo fuera del rango seguro: ${s} s.`);
+  P(/^✔ Rotina: (.+)$/, (m, a) => `✔ Routine: ${t(a)}`, (m, a) => `✔ Rutina: ${t(a)}`);
   P(/^Troca feita: (.+)$/, (m, a) => `Trade done: ${t(a)}`, (m, a) => `Intercambio hecho: ${t(a)}`);
   P(/^Análise de (.+) concluída\.\s*(.*)$/, (m, a, r) => `${t(a)} analysis complete.${r ? ' ' + t(r) : ''}`, (m, a, r) => `Análisis de ${low(t(a))} completado.${r ? ' ' + t(r) : ''}`);
   P(/^A expedição pousou no (.+?)\. A humanidade tem um novo começo(?: — que custou caro\.)?$/, (m, a) => `The expedition landed at ${t(a)}. Humanity has a new beginning — one that came at a high price.`, (m, a) => `La expedición aterrizó en ${t(a)}. La humanidad tiene un nuevo comienzo — que costó caro.`);

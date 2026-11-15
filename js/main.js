@@ -59,7 +59,7 @@ function interact() {
     if (step) { if (atStation(c, near, 20)) act('doStep', { step: step.id }); else { U.autopilot = near; U.afterArrive = { type: 'doStep', p: { step: step.id } }; } return; }
   }
   if (near === 'termico' && ev && ev.type === 'termico') return;
-  U.panel = near; U.tab = null;
+  U.panel = near; U.tab = null; act('inspect', { st: near });
   if (near === 'ponte' && S.tutorial === 0) act('tut', { n: 1 });
   if (near === 'cozinha' && S.tutorial >= 2 && S.tutorial < 4) act('tut', { n: 4 });
 }

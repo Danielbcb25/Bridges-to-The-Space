@@ -51,7 +51,7 @@ const CITY_BUILDINGS = [
     ] },
   { id: 'alistamento', x: 1958, w: 110, h: 84, col: '#3a4f7a', roof: '#22345a', icon: '🚀', name: 'Centro de Alistamento Pontes-01b',
     tabs: [
-      { t: 'A missão', b: 'Centenas de naves partem ao mesmo tempo. A sua tem destino Pontes-01b. Você vai gerenciar recursos, tripulação e rota, enfrentar asteroides, radiação, falhas e o estresse de todos a bordo. O jogo tem apenas um final: se ele não for alcançado, a missão falha.' },
+      { t: 'A missão', b: 'Centenas de naves partem ao mesmo tempo. A sua tem destino Pontes-01b. Você vai gerenciar recursos, tripulação e rota, enfrentar asteroides, radiação, falhas e o estresse de todos a bordo.' },
       { t: 'Verba e bônus', b: 'Você terá 30 pontos de verba e 5 espaços de módulo: não dá para ter tudo. Quem explora a cidade, lê os painéis e conversa com as pessoas chega mais preparado: cada 10 descobertas no Diário do Explorador rendem +1 ponto de verba (máx. +3).' },
     ] },
 ];

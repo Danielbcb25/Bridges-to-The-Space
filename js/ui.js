@@ -637,6 +637,30 @@ function menuPanel() {
     <p class="small muted">Pontos desta jornada: ${S.points} · Créditos: ${Save.data.credits}</p></div></div>`;
 }
 
+// ---------- zona de trocas da Ponte-Alfa ----------
+const TRADE_RES = { dados: ['💾', 'Dados científicos', 'GB'], comida: ['🍱', 'Ração', 'kg'], agua: ['💧', 'Água', 'L'], energia: ['⚡', 'Energia', 'kWh'], medicos: ['✚', 'Recursos médicos', 'un'], plantacao: ['🌱', 'Plantação', 'kg'], peças: ['⚙', 'Peças', 'un'] };
+const tradeHave = k => k === 'peças' ? S.peças : S.res[k];
+function tradeZone() {
+  const fo = foodOutlook(); const short = fo.days < fo.left; const tight = !short && fo.days < fo.left * 1.25;
+  const stock = Object.entries(TRADE_RES).map(([k, [ic, nm, u]]) => `<div class="tz-res ${k === 'comida' ? (short ? 'bad' : tight ? 'warn' : 'ok') : ''}"><span>${ic}</span><small>${esc(L(nm))}</small><b>${fmt(tradeHave(k), 0)} ${u}</b></div>`).join('');
+  const verdict = short ? `<div class="alert bad">🍱 ${esc(L('A ração NÃO chega a Pontes-01b'))}: ${esc(L('dura'))} ≈ <b>${fmt(fo.days, 0)}</b> ${esc(L('dias'))}, ${esc(L('faltam'))} ≈ <b>${fo.left}</b> ${esc(L('dias de viagem'))}. ${esc(L('Faltam'))} ≈ <b>${fmt(Math.ceil((fo.left - fo.days) * fo.perDay), 0)} kg</b>. ${esc(L('Troque dados por ração ou racione na Cozinha.'))}</div>`
+    : `<div class="alert ${tight ? 'warn' : 'good'}">🍱 ${esc(L('Ração para'))} ≈ <b>${fmt(fo.days, 0)}</b> ${esc(L('dias'))} · ${esc(L('viagem restante'))} ≈ <b>${fo.left}</b> ${esc(L('dias'))}${tight ? ' — ' + esc(L('margem apertada')) : ' — ' + esc(L('suficiente'))}</div>`;
+  const card = t => {
+    const [gk, gn] = t.give; const [ic, nm, u] = TRADE_RES[gk]; const have = tradeHave(gk); const ok = t.can();
+    let getHtml;
+    if (t.get) { const [rk, rn] = t.get; const [ric, rnm, ru] = TRADE_RES[rk]; getHtml = `<span class="tz-get">+${rn} ${ru} ${ric} ${esc(L(rnm))}<small>${fmt(tradeHave(rk), 0)} → ${fmt(tradeHave(rk) + rn, 0)}</small></span>`; }
+    else getHtml = `<span class="tz-get">${esc(L(t.getTxt))}</span>`;
+    let note = '';
+    if (!ok) note = have < gn ? `<em class="red">${esc(L('Falta'))} ${fmt(gn - have, 0)} ${u}</em>` : `<em class="muted">${esc(L('indisponível'))}</em>`;
+    else if (t.id === 'racao' && short) note = `<em class="yellow">★ ${esc(L('recomendado'))}</em>`;
+    else if (gk === 'comida' && (S.res.comida - gn) / fo.perDay < fo.left) note = `<em class="red">⚠ ${esc(L('a ração não chegaria ao destino'))}</em>`;
+    return `<button class="tz-card ${ok ? '' : 'cant'} ${t.id === 'racao' && short ? 'rec' : ''}" data-act="trade" data-p='${J({ id: t.id })}'><span class="tz-give">−${gn} ${u} ${ic} ${esc(L(nm))}<small>${ok ? fmt(have, 0) + ' → ' + fmt(have - gn, 0) : fmt(have, 0)}</small></span><span class="tz-arrow">➜</span>${getHtml}${note}</button>`;
+  };
+  return `<div class="tradezone"><h4>${esc(L('Seu estoque'))}</h4><div class="tz-stock">${stock}</div>${verdict}
+    <h4>${esc(L('Ofertas da estação'))} <small class="muted">${esc(L('você dá → você recebe'))}</small></h4><div class="tz-list">${TRADES.map(card).join('')}</div>
+    <p class="small muted">${esc(L('Dados valem pontos de ciência, mas comida mantém a tripulação viva.'))} ${esc(L('Trocas feitas'))}: ${S.explore.trades}</p></div>`;
+}
+
 // ---------- estágios finais ----------
 function stationScreen() {
   const tab = U.tab || 'exo';
@@ -651,7 +675,7 @@ function stationScreen() {
         return `<div class="exo ${dest === e.id ? 'on' : ''} ${vis ? 'visited' : ''}"><b>${e.name}</b>${vis ? ` <em class="red">✖ ${esc(L('visitado: inabitável'))}</em>` : ''}${an || vis ? `<div class="kv small"><span>${esc(L('Distância'))}</span><b>${dist}</b><span>${esc(L('Raio/massa'))}</span><b>${e.radius}</b><span>${esc(L('Temp. de equilíbrio'))}</span><b>${e.teq} K</b><span>${esc(L('Ano'))}</span><b>${e.period} ${esc(L('dias'))}</b><span>${esc(L('Distância orbital'))}</span><b>${e.sma} UA</b><span>${esc(L('Descoberta'))}</span><b>${esc(T(e.disc))}</b><span>${esc(L('Estrela'))}</span><b>${esc(T(e.star))}</b><span>ESI</span><b>${e.esi}</b></div><p class="small muted">${esc(T(e.issues))}</p>` : `<button class="btn tiny" data-act="analyzeExo" data-p='${J({ id: e.id })}'>${esc(L('Analisar'))}</button>`}
         <button class="btn tiny ${dest === e.id ? 'primary' : ''}" data-act="setDest" data-p='${J({ id: e.id })}'>${dest === e.id ? '✔ ' : ''}${esc(L('Destino'))}</button></div>`;
       }).join('')}</div>`;
-  } else body = `<p class="small">Troque dados científicos e peças por recursos. Dados valem pontos de ciência, mas comida mantém a tripulação viva.</p><div class="opts">${TRADES.map(t => `<button class="opt ${t.can() ? '' : 'cant'}" data-act="trade" data-p='${J({ id: t.id })}'><b>${t.name}</b></button>`).join('')}</div>`;
+  } else body = tradeZone();
   let foot = '';
   if (dexo && dexo.id !== 'pontes') {
     const c = tripCost(dexo);
@@ -727,7 +751,7 @@ function renderUI() {
       case 'setup': scr = U.setupDirty ? setupScreen() : U.cache.scr; U.setupDirty = false; break;
       case 'launch': scr = ''; break;
       case 'ship':
-        hud = hudTop() + assistMini() + hudBottom();
+        hud = hudTop() + assistMini() + routineBox() + hudBottom();
         side = eventPanel();
         if (U.panel === 'report') modal = reportPanel();
         else if (U.panel === 'crew') modal = `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Tripulação</h2>${crewList()}</div></div>`;
