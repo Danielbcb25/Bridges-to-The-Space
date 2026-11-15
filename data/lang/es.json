@@ -1825,7 +1825,11 @@
   "Plante e colha na Estufa para ter comida fresca.": "Planta y cosecha en el Invernadero para tener comida fresca.",
   "Sem Estufa, a nave depende da ração.": "Sin Invernadero, la nave depende de la ración.",
   "A tripulação come sozinha 3 vezes por dia.": "La tripulación come sola 3 veces al día.",
-  "Commander": "Comandante"
+  "Commander": "Comandante",
+  "Almoçar na Cozinha": "Almorzar en la Cocina",
+  "Na Cozinha, aperte E e clique em \"Comer agora\" (entre 11h e 15h).": "En la Cocina, pulsa E y haz clic en \"Comer ahora\" (entre las 11 y las 15 h).",
+  "Almoçar na Cozinha · 11h–15h": "Almorzar en la Cocina · 11–15 h",
+  "🍽 Hora do almoço! Vá à Cozinha e clique em Comer agora.": "🍽 ¡Hora del almuerzo! Ve a la Cocina y haz clic en Comer ahora."
  },
  "patterns": [
   [

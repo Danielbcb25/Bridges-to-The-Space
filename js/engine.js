@@ -146,8 +146,8 @@ function applySetup() {
   const st = S.setup;
   const route = ROUTES.find(r => r.id === st.route);
   S.totalDays = Math.round((S.journey === 'curta' ? 12 : 30) * route.days);
-  S.res = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: 60, plantacao: 40, dados: 200, medicos: 10, lixo: 0 };
-  S.cap = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: 60, plantacao: 40, dados: 400, medicos: 10, lixo: 40 };
+  S.res = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: S.journey === 'curta' ? 70 : 140, plantacao: 40, dados: 200, medicos: 10, lixo: 0 };
+  S.cap = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: S.journey === 'curta' ? 70 : 140, plantacao: 40, dados: 400, medicos: 10, lixo: 40 };
   const addR = (k, v) => { S.res[k] += v; S.cap[k] = Math.max(S.cap[k], S.res[k]); };
   if (has('tanqueExtra')) { addR('combustivel', 100); }
   if (has('baterias')) { S.cap.energia += 20; S.res.energia += 20; }
@@ -588,7 +588,8 @@ function serveMeal(slot) {
   const fd = S.food;
   const per = { pleno: 0.2, reduzido: 0.133, minimo: 0.067 }[fd.racionamento];
   const full = { pleno: 34, reduzido: 22, minimo: 11 }[fd.racionamento];
-  const eaters = alive().filter(c => !c.hibernating);
+  // no almoço (refeição do meio-dia) os jogadores precisam ir à Cozinha comer; os bots comem sozinhos
+  const eaters = alive().filter(c => !c.hibernating && !(slot === 1 && S.scene === 'ship' && isHumanCrew(c)));
   const n = eaters.length;
   let item = fd.menu[slot] || 'racao';
   let tags = [], humor = 0, label = 'ração';
@@ -917,7 +918,8 @@ ACTIONS.hibernate = p => {
 // comer fora de hora: prato pronto > comida fresca > ração
 ACTIONS.eat = (p, actor) => {
   const c = actor; if (!c || !c.alive) return;
-  if (c.saciedade >= 85) return toast('Você ainda está satisfeito.', 'info');
+  const lunch = typeof lunchOpen === 'function' && lunchOpen() && !lunchDone(c);
+  if (c.saciedade >= 85 && !lunch) return toast('Você ainda está satisfeito.', 'info');
   const fd = S.food; let item = null;
   const dish = Object.keys(fd.dishes).find(k => fd.dishes[k] >= 1);
   const crop = Object.keys(fd.fresh).find(k => fd.fresh[k] >= 0.3);
@@ -930,7 +932,8 @@ ACTIONS.eat = (p, actor) => {
   for (let k = 0; k < 3; k++) c.nut[k] = clamp(c.nut[k] + n[k] * 0.5, 0, 100);
   c.nutricao = (c.nut[0] + c.nut[1] + c.nut[2]) / 3;
   addRes('lixo', 0.05, 'Restos de comida');
-  toast('🍴 ' + c.name + ' comeu.', 'good');
+  if (lunch) { S.lunch = S.lunch || {}; S.lunch[c.id] = S.day; c.humor = clamp(c.humor + 3, 0, 100); toast('🍽 ' + c.name + ' almoçou.', 'good'); }
+  else toast('🍴 ' + c.name + ' comeu.', 'good');
 };
 ACTIONS.sleep = (p, actor) => {
   const c = crewById(p.id || actor.id); if (!available(c)) return;

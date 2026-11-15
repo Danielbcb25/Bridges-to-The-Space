@@ -1824,7 +1824,11 @@
   "Só ração por enquanto.": "Only rations for now.",
   "Plante e colha na Estufa para ter comida fresca.": "Plant and harvest in the Greenhouse to get fresh food.",
   "Sem Estufa, a nave depende da ração.": "Without a Greenhouse, the ship relies on rations.",
-  "A tripulação come sozinha 3 vezes por dia.": "The crew eats on its own 3 times a day."
+  "A tripulação come sozinha 3 vezes por dia.": "The crew eats on its own 3 times a day.",
+  "Almoçar na Cozinha": "Have lunch in the Kitchen",
+  "Na Cozinha, aperte E e clique em \"Comer agora\" (entre 11h e 15h).": "In the Kitchen, press E and click \"Eat now\" (between 11:00 and 15:00).",
+  "Almoçar na Cozinha · 11h–15h": "Have lunch in the Kitchen · 11:00–15:00",
+  "🍽 Hora do almoço! Vá à Cozinha e clique em Comer agora.": "🍽 Lunch time! Go to the Kitchen and click Eat now."
  },
  "patterns": [
   [

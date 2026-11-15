@@ -289,7 +289,7 @@ function readinessAlerts() {
   const st = S.setup; const h = id => st.modules.includes(id) || st.upgrades.includes(id) || st.reserves.includes(id) || st.skills.includes(id) || st.pantry.includes(id) || st.gadgets.includes(id) || st.training.includes(id);
   const a = [];
   const days = Math.round((S.journey === 'curta' ? 12 : 30) * ROUTES.find(r => r.id === st.route).days);
-  const food = 60 + (h('racaoExtra') ? 30 : 0);
+  const food = (S.journey === 'curta' ? 70 : 140) + (h('racaoExtra') ? 30 : 0);
   if (!h('filtroReserva')) a.push(['bad', 'Sem filtro de ar reserva: risco alto em falhas do Suporte à Vida.']);
   if (!h('enfermaria')) a.push(['bad', 'Sem enfermaria: feridos graves podem morrer.']);
   if (st.route === 'rapida' && !h('tanqueExtra')) a.push(['warn', 'Combustível justo para a rota rápida.']);
