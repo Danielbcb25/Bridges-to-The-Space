@@ -1957,7 +1957,13 @@
   "Antes de descer, descubra se o planeta é seguro e prepare a tripulação.": "Antes de bajar, descubre si el planeta es seguro y prepara a la tripulación.",
   "Prepare a tripulação para descer.": "Prepara a la tripulación para bajar.",
   "Escolha onde pousar.": "Elige dónde aterrizar.",
-  "O Comandante embarca todos no foguete quando estiver pronto.": "El Comandante sube a todos al cohete cuando esté listo."
+  "O Comandante embarca todos no foguete quando estiver pronto.": "El Comandante sube a todos al cohete cuando esté listo.",
+  "Ouvir": "Escuchar",
+  "Usar esta": "Usar esta",
+  "Escolha a voz do jogo": "Elige la voz del juego",
+  "Ouça e escolha a voz mais natural para este idioma. Dá para mudar depois nas configurações.": "Escucha y elige la voz más natural para este idioma. Puedes cambiarla después en la configuración.",
+  "Este navegador não tem vozes para este idioma.": "Este navegador no tiene voces para este idioma.",
+  "Pronto": "Listo"
  },
  "patterns": [
   [

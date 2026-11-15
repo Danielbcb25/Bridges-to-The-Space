@@ -1956,7 +1956,13 @@
   "Antes de descer, descubra se o planeta é seguro e prepare a tripulação.": "Before going down, find out if the planet is safe and prepare the crew.",
   "Prepare a tripulação para descer.": "Prepare the crew to go down.",
   "Escolha onde pousar.": "Choose where to land.",
-  "O Comandante embarca todos no foguete quando estiver pronto.": "The Commander boards everyone on the rocket when ready."
+  "O Comandante embarca todos no foguete quando estiver pronto.": "The Commander boards everyone on the rocket when ready.",
+  "Ouvir": "Listen",
+  "Usar esta": "Use this one",
+  "Escolha a voz do jogo": "Choose the game voice",
+  "Ouça e escolha a voz mais natural para este idioma. Dá para mudar depois nas configurações.": "Listen and pick the most natural voice for this language. You can change it later in the settings.",
+  "Este navegador não tem vozes para este idioma.": "This browser has no voices for this language.",
+  "Pronto": "Done"
  },
  "patterns": [
   [

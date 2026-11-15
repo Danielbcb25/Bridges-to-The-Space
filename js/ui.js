@@ -817,6 +817,7 @@ function renderUI() {
   }
   if (S && U.screen === 'game' && !hud && !['intro', 'launch', 'end'].includes(S.scene) && !(S.scene === 'earth' && U.comms)) hud = assistMini() + lessonCard();
   if (U.help && S && U.screen === 'game') modal = helpPanel();
+  if (U.voicePick) modal = voicePickPanel();
   sitePlayMode();
   const gameEl = document.getElementById('game'); const sc = S && U.screen === 'game' ? S.scene : 'menu'; if (gameEl.dataset.scene !== sc) gameEl.dataset.scene = sc;
   { const ov = (!!modal || !!U.help || !!(U.earth && S && S.scene === 'earth' && (U.earth.panel || U.earth.dialog || U.earth.diary || U.comms))) ? '1' : ''; if (gameEl.dataset.ov !== ov) gameEl.dataset.ov = ov; }
@@ -862,7 +863,26 @@ function enterGameFullscreen() {
   try { if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}); } catch (e) { /* sem permissão: o CSS já ocupa a janela */ }
 }
 function exitGameFullscreen() { try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) { /* */ } }
-UIH.setLang = l => { I18n.set(l); };
+UIH.setLang = l => { const was = I18n.lang; I18n.set(l); if (l !== was) U.voicePick = true; };
+// escolha da voz depois de trocar o idioma (as vozes do navegador variam muito de qualidade)
+function voicePickPanel() {
+  const st = Save.data.settings; const cur = (st.voices || {})[I18n.lang] || '';
+  const list = Narrator.voices().slice(0, 10);
+  const row = (name, label) => `<div class="vrow ${cur === name ? 'on' : ''}"><span>${esc(label)}</span><button class="btn tiny" data-ui="voiceTry" data-arg="${esc(name)}">▶ ${esc(L('Ouvir'))}</button><button class="btn tiny ${cur === name ? 'primary' : ''}" data-ui="voiceUse" data-arg="${esc(name)}">${cur === name ? '✔ ' : ''}${esc(L('Usar esta'))}</button></div>`;
+  return `<div class="modal-bg"><div class="panel center voicepick" data-stop="1"><button class="x" data-ui="voiceClose">✕</button>
+    <h2>🔊 ${esc(L('Escolha a voz do jogo'))}</h2><p class="small muted">${esc(L('Ouça e escolha a voz mais natural para este idioma. Dá para mudar depois nas configurações.'))}</p>
+    ${list.length ? row('', L('Automática (a mais natural)')) + list.map(v => row(v.name, v.name + (v.localService ? '' : ' ☁'))).join('') : `<p class="orange">${esc(L('Este navegador não tem vozes para este idioma.'))}</p>`}
+    <div class="row" style="justify-content:center"><button class="btn primary" data-ui="voiceClose">${esc(L('Pronto'))}</button></div></div></div>`;
+}
+UIH.voiceTry = name => {
+  const v = name ? Narrator.voices().find(x => x.name === name) : null;
+  Narrator.voice = v || null; if (!v) Narrator.pickVoice();
+  const keep = Narrator.pickVoice; if (v) Narrator.pickVoice = () => v; // só para este teste
+  Narrator.say(K('Olá, Comandante. Esta é a voz do computador de bordo.', 'Hello, Commander. This is the onboard computer voice.', 'Hola, Comandante. Esta es la voz de la computadora de a bordo.'));
+  Narrator.pickVoice = keep;
+};
+UIH.voiceUse = name => { const st = Save.data.settings; st.voices = st.voices || {}; st.voices[I18n.lang] = name; Save.write(); Narrator.voice = null; Narrator.pickVoice(); };
+UIH.voiceClose = () => { U.voicePick = false; };
 UIH.fullscreen = () => { if (document.fullscreenElement) exitGameFullscreen(); else enterGameFullscreen(); };
 UIH.startGame = journey => {
   enterGameFullscreen();

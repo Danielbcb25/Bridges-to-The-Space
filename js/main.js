@@ -290,7 +290,7 @@ async function boot() {
   await loadFalas();
   I18n.init();
   const sel = document.getElementById('lang');
-  if (sel) { sel.innerHTML = LANGS.map(l => `<option value="${l.id}">${l.flag} ${l.label}</option>`).join(''); sel.value = I18n.lang; sel.addEventListener('change', () => I18n.set(sel.value)); }
+  if (sel) { sel.innerHTML = LANGS.map(l => `<option value="${l.id}">${l.flag} ${l.label}</option>`).join(''); sel.value = I18n.lang; sel.addEventListener('change', () => { const was = I18n.lang; I18n.set(sel.value); if (sel.value !== was) U.voicePick = true; }); }
   Chat.init();
   initCanvas();
   bindUI();

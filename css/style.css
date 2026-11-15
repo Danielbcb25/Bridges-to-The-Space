@@ -5,7 +5,7 @@
   --bg: #05061a; --bg2: #0b1030; --panel: rgba(9, 14, 42, 0.94); --panel2: #111a46;
   --line: #2f7fff; --cyan: #3cd2ff; --cyan2: #8ff0ff; --text: #e8f1ff; --muted: #8fa3d6;
   --orange: #ff8a2a; --red: #ff4a5a; --green: #46e08a; --yellow: #ffd23f;
-  --pix: "Press Start 2P", monospace; --vt: "VT323", monospace; --sk: "Silkscreen", monospace;
+  --pix: "Press Start 2P", monospace; --vt: "Pixelify Sans", "VT323", monospace; /* Pixelify só tem o "l" (carregado com text=l) */ --sk: "Silkscreen", monospace;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -607,3 +607,4 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .cstbox h4 { margin: 0 0 0.2em; font-size: 0.95em; }
 .cst { display: flex; justify-content: space-between; gap: 0.4em; padding: 0.1em 0; } .cst b { color: #7dffb0; } .cst.bad b { color: #ffb15c; }
 .reqs { display: flex; flex-direction: column; gap: 0.15em; margin: 0.2em 0 0.5em; font-size: 0.95em; }
+.voicepick .vrow { display: flex; align-items: center; gap: 0.4em; padding: 0.2em 0; border-bottom: 1px dashed #2a3a7a; } .voicepick .vrow span { flex: 1; text-align: left; } .voicepick .vrow.on span { color: var(--yellow); }
