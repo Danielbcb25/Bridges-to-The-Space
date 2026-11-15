@@ -1788,7 +1788,9 @@
   "porções": "portions",
   "Pesquisa parada": "Research stopped",
   "Salada fresca": "Fresh salad",
-  "Tortilha recheada": "Stuffed tortilla"
+  "Tortilha recheada": "Stuffed tortilla",
+  "⏸ Nova tarefa da rotina: tempo normal.": "⏸ New routine task: normal time.",
+  "Nenhuma tarefa hoje. Acelere o tempo (Shift+S) se quiser.": "No tasks today. Speed up time (Shift+S) if you like."
  },
  "patterns": [
   [
