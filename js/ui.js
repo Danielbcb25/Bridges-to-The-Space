@@ -116,7 +116,7 @@ function journeyScreen() {
 function historyScreen() {
   return `<div class="panel center wide scroll">
     <h2>HISTÓRIA</h2>
-    ${NARRATION_INTRO.map(t => `<p>${esc(t)}</p>`).join('')}
+    ${NARRATION_INTRO.map(t => `<p>${esc(L(t))}</p>`).join('')}
     <h3>As 5 etapas</h3>
     <ol><li><b>Preparação:</b> montar a expedição com verba limitada.</li><li><b>Partida e viagem:</b> controlar a nave e enfrentar os problemas espaciais.</li><li><b>Exploração científica:</b> analisar dados reais de exoplanetas.</li><li><b>O novo mundo:</b> investigar Pontes-01b e se adaptar.</li><li><b>Migração:</b> escolher onde a humanidade vai recomeçar.</li></ol>
     <p class="quote">“Na Terra, a atmosfera regula a temperatura de graça. Numa nave, tudo isso tem custo. Por isso é mais fácil manter a Terra habitável do que habitar outro planeta.”</p>
@@ -362,17 +362,6 @@ function hudBottom() {
     <div class="btns"><button class="btn small" data-ui="panel" data-arg="report">[R] Relatório</button><button class="btn small" data-ui="panel" data-arg="crew">[T] Tripulação</button><button class="btn small" data-ui="panel" data-arg="fund">[F] Fundo ${S.fund}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div>
   </div>`;
 }
-function tutorialBox() {
-  const steps = [
-    'Use ←/→ (A/D) para andar e ↑/↓ (W/S) nas escadas. Vá até a <b>Ponte de comando</b> (à direita, andar de cima) e pressione <b>E</b> no painel.',
-    'Configure a navegação: escolha o <b>modo de cruzeiro</b>.',
-    'Pressione <b>R</b> para abrir o relatório de recursos (busca aprofundada).',
-    'Visite a <b>Cozinha e mesa</b> (andar de baixo) e defina o cardápio do dia.',
-  ];
-  if (S.tutorial >= steps.length || Net.role === 'client') return '';
-  return `<div class="tut"><b>${esc(L('OBJETIVO'))}</b> ${L(steps[S.tutorial])}</div>`;
-}
-
 // ---------- painel de evento ----------
 // painel de desafio: menos texto, mais visual (ícones, barras e um passo de cada vez)
 const SYS_IC = { casco: '▣', termico: '🛡', propulsao: '🔥', tanques: '⛽', avionica: '🖥', suporte: '🫁', comunicacao: '📡', acoplamento: '🚪' };
@@ -610,7 +599,7 @@ function kitchenPanel() {
       <div class="row"><button class="btn primary" data-ui="cook" ${U.cook.length < 2 ? 'disabled' : ''}>Cozinhar (−1 kWh, −2 L)</button><button class="btn" data-ui="cookClear">Esvaziar</button></div>
       <h4>Livro de Receitas (${fd.recipes.length}/${RECIPES.length})</h4><div class="prefs">${RECIPES.map(r => fd.recipes.includes(r.id) ? `<div><b>${r.name}</b> — ${r.ing.map(i => i === 'racao' ? 'ração' : CROPS[i].name).join(' + ')} · humor +${r.humor}<br><small class="muted">${esc(r.fact)}</small></div>` : `<div class="muted">??? (receita não descoberta)</div>`).join('')}</div>`;
   }
-  return tabs + `<div class="kv"><span>Ração liofilizada</span><b>${fmt(S.res.comida, 1)} kg</b>${Object.keys(CROPS).map(k => `<span>${CROPS[k].name}</span><b>${fmt(fd.fresh[k] || 0, 1)} kg</b>`).join('')}${Object.keys(fd.dishes).filter(k => fd.dishes[k] > 0).map(k => `<span>${RECIPES.find(r => r.id === k).name}</span><b>${fd.dishes[k]} porções</b>`).join('')}
+  return tabs + `<div class="kv"><span>Ração liofilizada</span><b>${fmt(S.res.comida, 1)} kg</b>${Object.keys(CROPS).map(k => `<span>${CROPS[k].name}</span><b>${fmt(fd.fresh[k] || 0, 1)} kg</b>`).join('')}${Object.keys(fd.dishes).filter(k => fd.dishes[k] > 0).map(k => `<span>${RECIPES.find(r => r.id === k).name}</span><b>${fd.dishes[k]} ${esc(L('porções'))}</b>`).join('')}
     <span>Comida produzida</span><b>${fmt(fd.produced, 1)} kg</b><span>Desperdiçada</span><b>${fmt(fd.wasted, 1)} kg</b><span>Validade do fresco</span><b>${has('geladeira') ? 6 : 3} dias</b></div>`;
 }
 
