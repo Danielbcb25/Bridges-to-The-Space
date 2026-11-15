@@ -530,8 +530,50 @@ function checkFail() {
   if (S.res.casco <= 0 || sysHp('casco') <= 0) return fail('O casco cedeu. A nave foi perdida.');
   if (S.stage === 1 && S.res.combustivel <= 0 && S.progress < 1) return fail('O combustível acabou. A nave ficou à deriva no espaço.');
 }
+// já chegou a Pontes-01b? (órbita, migração ou colônia)
+function onPlanet() { return !!S && (['planet', 'migration', 'colony'].includes(S.scene) || S.stage >= 3); }
+// fim da jornada em Pontes-01b quando não há mais como avançar: conta como final bom
+function planetEnding(note) {
+  if (!S || S.scene === 'end') return;
+  const C = S.colony;
+  const site = C ? C.site : (S.planet && S.planet.site && (LANDING_SITES.find(x => x.id === S.planet.site) || {}).name) || 'Pontes-01b';
+  addPoints(C ? 120 : 80, 'Chegada a Pontes-01b');
+  S.scene = 'end'; S.stage = 6;
+  S.ending = { ok: true, site, score: (C && C.score) || 0, colony: !!C, note };
+  logMsg(note, 'good');
+  try { Save.data.runs++; if (!Save.data.best || S.points > Save.data.best) Save.data.best = S.points; Save.write(); } catch (e) { /* */ }
+  S.v++;
+}
+// estágios em que não é mais possível ganhar: encerra a jornada
+function checkStuck(dt) {
+  if (!S || S.fail || S.scene === 'end' || (typeof Net !== 'undefined' && Net.role === 'client')) return;
+  const sc = S.scene;
+  if (['ship', 'station', 'detour'].includes(sc)) {
+    S.stuckPower = S.res.energia < 1 ? (S.stuckPower || 0) + dt / S.dayLen : 0;
+    if (S.stuckPower >= 1.5) return fail('Sem energia por dias: os sistemas pararam de vez e a nave não consegue mais seguir viagem.');
+    const fresh = Object.values(S.food.fresh || {}).reduce((a, b) => a + b, 0) + Object.values(S.food.dishes || {}).reduce((a, b) => a + b, 0);
+    const canGrow = S.trays.some(t => t.crop) || (S.trays.length && S.res.plantacao >= 0.5);
+    if (S.res.comida < 0.05 && fresh < 0.2 && !canGrow) {
+      S.stuckFood = (S.stuckFood || 0) + dt / S.dayLen;
+      if (S.stuckFood >= 1) return fail('A comida acabou e não há como produzir mais: a tripulação não chegaria viva a Pontes-01b.');
+    } else S.stuckFood = 0;
+    if (sc === 'station' && S.res.combustivel < 1) return fail('Sem combustível na Estação Ponte-Alfa: a nave não consegue mais partir.');
+  }
+  if (sc === 'migration') {
+    const need = has('pouso') ? 40 : 80;
+    if (S.res.combustivel < need) return planetEnding('Sem combustível para pousar, a tripulação ficou em órbita de Pontes-01b enviando dados e preparando o caminho para as próximas naves.');
+  }
+  if (sc === 'colony' && S.colony) {
+    const C = S.colony, solarCost = (typeof CCOST !== 'undefined' && CCOST.solar[1]) ? CCOST.solar[1].kwh : 8;
+    const noPower = S.res.energia < 1 || (!(C.b && C.b.solar) && S.res.energia < solarCost);
+    S.stuckPower = noPower ? (S.stuckPower || 0) + dt / (C.dayLen || 30) : 0;
+    if (S.stuckPower >= 2) return planetEnding('A energia da colônia acabou, mas a tripulação chegou a Pontes-01b e abriu caminho para quem vem depois.');
+  }
+}
 function fail(reason) {
   if (S.fail) return;
+  // em Pontes-01b, uma situação sem saída encerra a jornada com o final bom
+  if (onPlanet()) return planetEnding(String(L(reason)).length && typeof reason === 'string' ? reason.replace(/\s*A missão falhou\.?/, '').trim() || reason : reason);
   S.fail = reason;
   S.scene = 'end';
   S.ending = { ok: false, reason };

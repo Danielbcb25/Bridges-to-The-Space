@@ -15,6 +15,7 @@ function registerFnPatterns() {
   const sev = { en: { leve: 'minor', média: 'moderate', grave: 'severe' }, es: { leve: 'leve', média: 'media', grave: 'grave' } };
 
   P(/^(.+\.) Um dos impactos furou o casco!$/, (m, a) => `${t(a)} One of the impacts holed the hull!`, (m, a) => `${t(a)} ¡Uno de los impactos perforó el casco!`);
+  P(/^(.+): (sucesso|falhou)\. ?(.*)$/, (m, a, r, c) => `${t(a)}: ${r === 'sucesso' ? 'success' : 'failed'}.${c ? ' ' + t(c) : ''}`, (m, a, r, c) => `${t(a)}: ${r === 'sucesso' ? 'éxito' : 'falló'}.${c ? ' ' + t(c) : ''}`);
   P(/^Indo agora: (.+)\.$/, (m, a) => 'On my way: ' + low(t(cap(a))) + '.', (m, a) => 'Voy ahora: ' + low(t(cap(a))) + '.');
   P(/^(\+?)(\d+) pontos \((.+)\)\.$/, (m, s, n, a) => `${s}${n} points (${t(a)}).`, (m, s, n, a) => `${s}${n} puntos (${t(a)}).`);
   P(/^(\d+) tripulante\(s\) ficaram expostos à radiação\.$/, '$1 crew member(s) were exposed to radiation.', '$1 tripulante(s) quedaron expuestos a la radiación.');

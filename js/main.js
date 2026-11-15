@@ -85,6 +85,7 @@ function update(dt) {
       narrate('A nave está no espaço. Comandante, assuma o controle: visite os módulos, configure a navegação e cuide dos recursos e da tripulação.');
     }
   }
+  if (host && ['ship', 'station', 'detour', 'migration', 'colony'].includes(S.scene)) checkStuck(dt * (['ship', 'colony'].includes(S.scene) ? k : 1));
   if (S.scene === 'ship') {
     const c = me();
     if (c) moveHuman(c, dt);
