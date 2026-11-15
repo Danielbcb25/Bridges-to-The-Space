@@ -542,6 +542,15 @@ function onPlanet() { return !!S && (['planet', 'migration', 'colony'].includes(
 // fim da jornada em Pontes-01b quando não há mais como avançar: conta como final bom
 function planetEnding(note) {
   if (!S || S.scene === 'end') return;
+  // ainda em órbita (sem colônia) e com tripulação: em vez de encerrar, a nave faz um pouso forçado e a colônia começa
+  if (!S.colony && ['planet', 'migration'].includes(S.scene) && S.crew.filter(c => c.alive).length >= 3 && crewById('cmd') && crewById('cmd').alive && typeof startColony === 'function') {
+    const site = LANDING_SITES.find(x => x.id === (S.planet && S.planet.site)) || bestSite();
+    S.planet = S.planet || {}; S.planet.site = site.id;
+    damageSys('casco', 20); moral(-5);
+    toast('Pouso forçado em Pontes-01b! A colônia começa em condições difíceis.', 'bad');
+    startColony(site, 1);
+    return;
+  }
   const C = S.colony;
   const site = C ? C.site : (S.planet && S.planet.site && (LANDING_SITES.find(x => x.id === S.planet.site) || {}).name) || 'Pontes-01b';
   addPoints(C ? 120 : 80, 'Chegada a Pontes-01b');

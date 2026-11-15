@@ -70,3 +70,4 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - O **J** deixava de funcionar na nave depois de usar a escada (o estado de subida ficava com um valor residual): corrigido.
 - **Espaço** agora também fecha o painel de uma estação (como o E); as seções "Mais opções" (cozinha e outras) permanecem abertas quando a tela atualiza.
 - **Pouso**: nunca encerra o jogo antes da colônia. Sem combustível suficiente é um pouso de emergência (dano no casco e um ferido); local pouco investigado começa a colônia com menos energia e água.
+- **Colônia sempre aparece**: em órbita, o botão "🛬 Descer para a colônia agora" leva direto ao pouso (a colônia começa mais difícil se faltou investigar). Se algo encerraria a jornada ainda na órbita (ex.: a órbita baixa decai) e a tripulação tem 3 ou mais vivos com o Comandante, a nave faz um **pouso forçado** e a colônia começa.

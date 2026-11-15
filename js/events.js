@@ -783,6 +783,13 @@ ACTIONS.toMigration = () => {
   narrate('Migração. Decida o destino da expedição e organize a chegada, considerando as investigações e os recursos disponíveis.');
 };
 ACTIONS.chooseSite = p => { S.planet.site = p.id; };
+// atalho: descer para a colônia já, sem enfrentar todos os desafios de órbita (a colônia começa mais difícil)
+ACTIONS.landNow = () => {
+  if (S.scene !== 'planet' && S.scene !== 'migration') return;
+  if (!S.planet.site) S.planet.site = bestSite().id;
+  S.stage = 4; S.scene = 'migration';
+  ACTIONS.land();
+};
 ACTIONS.land = () => {
   if (!S.planet.site) return toast('Escolha um local de pouso.', 'warn');
   const site = LANDING_SITES.find(s => s.id === S.planet.site);
