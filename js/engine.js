@@ -492,7 +492,7 @@ function simulate(dt) {
     if (S.food.racionamento === 'minimo') decay += 5;
     if (c.sickness) decay += 4;
     c.humor = clamp(c.humor - decay * f, 0, 100);
-    c.saciedade = clamp(c.saciedade - 60 * f, 0, 100);
+    c.saciedade = clamp(c.saciedade - 35 * f, 0, 100); // fome desce devagar (~1 refeição a cada 1–2 dias)
     // o humor também é o sono: acordado ele cai um pouco mais; dormir (Dormitórios) recupera
     if (!(c.task && c.task.key === 'sleep')) c.humor = clamp(c.humor - 4 * f, 0, 100);
     else c.humor = clamp(c.humor + 60 * f, 0, 100); // dormindo: recupera aos poucos, além do bônus ao acordar
