@@ -580,3 +580,4 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 
 .lesson-card { z-index: 30; }
 .game[data-scene=station] .lesson-card, .game[data-scene=planet] .lesson-card, .game[data-scene=migration] .lesson-card, .game[data-scene=detour] .lesson-card { left: 0.6em; right: auto; bottom: 4.2em; }
+.opt.rec { border-color: var(--yellow); box-shadow: 0 0 10px rgba(255, 210, 63, 0.45); }

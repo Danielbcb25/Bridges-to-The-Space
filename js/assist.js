@@ -83,12 +83,13 @@ function assistSteps() {
       break;
     case 'detour': add('Este planeta não serve: volte à Estação Ponte-Alfa.', false, null, '↩', 'detourReturn'); break;
     case 'planet':
-      add('Faça análises do planeta.', S.planet.analyzed.length >= 2, null, '🔬');
+      // as 4 análises que contam para escolher onde pousar
+      [['atmosfera', 'Analise a atmosfera do planeta.'], ['agua', 'Analise a água do planeta.'], ['solo', 'Analise o solo do planeta.'], ['radiacao', 'Analise a radiação do planeta.']].forEach(([id, t]) => add(t, S.planet.analyzed.includes(id), null, '🔬'));
       CHALLENGES.forEach(ch => add(ch.name, S.planet.challenges.some(c => c.id === ch.id), null, '🎲'));
       add('Planeje a migração.', false, null, '🗺', 'toMigration');
       break;
     case 'migration':
-      add('Escolha o local de pouso.', S.planet.site, null, '📍');
+      add(S.planet.site && S.planet.site !== bestSite().id ? 'O local ideal de pouso é o Vale Equatorial: água, clima ameno e radiação moderada.' : 'Escolha o local de pouso: o ideal é o Vale Equatorial (água, clima ameno e radiação moderada).', S.planet.site === bestSite().id, null, '📍');
       add('Pouse em Pontes-01b.', false, null, '🛬', 'land');
       break;
     case 'colony':
@@ -101,6 +102,8 @@ function assistSteps() {
   }
   return list;
 }
+// local de pouso com a melhor pontuação (o mesmo cálculo do pouso)
+function bestSite() { return LANDING_SITES.slice().sort((a, b) => Object.values(b.score).reduce((x, y) => x + y, 0) - Object.values(a.score).reduce((x, y) => x + y, 0))[0]; }
 function assistNext() {
   const n = assistSteps().find(s => !s.done) || null;
   // na nave, depois do tutorial: a rotina do dia vem antes do "siga viagem" (e pausa nos desafios)
@@ -177,12 +180,15 @@ function assistMini() {
   const tp = pcTips()[0]; const n = assistNext();
   // saudação curta na 1ª vez em cada cena, no lugar de um tutorial
   S.seen = S.seen || {};
-  if (!S.seen[S.scene] && Net.role !== 'client') { S.seen[S.scene] = true; U.greetUntil = R.t + 7; }
+  if (!S.seen[S.scene] && Net.role !== 'client') { S.seen[S.scene] = true; if (!['planet', 'migration'].includes(S.scene)) U.greetUntil = R.t + 7; }
   const greet = R.t < (U.greetUntil || 0) && !tp;
   const show = greet ? { t: 'Olá! Sou o computador de bordo. Aperte H e pergunte o que quiser.', icon: '👋' } : tp ? tp : n;
   if (!show) return '';
   const key = JSON.stringify(show.t);
-  if (U.lastAssist !== key) { U.lastAssist = key; U.assistFlash = R.t + 2.5; if (S.scene !== 'intro') Sfx.tone(1180, 0.06, 'sine', 0.04); }
+  if (U.lastAssist !== key) {
+    U.lastAssist = key; U.assistFlash = R.t + 2.5; if (S.scene !== 'intro') Sfx.tone(1180, 0.06, 'sine', 0.04);
+    if (['planet', 'migration'].includes(S.scene) && !greet && typeof Narrator !== 'undefined') Narrator.later(L(show.t)); // no planeta, o computador fala o que fazer
+  }
   const flash = R.t < (U.assistFlash || 0) ? 'flash' : '';
   const canGo = !greet && (show.go || show.act);
   return `<div class="assist-mini ${flash} ${tp && !greet ? 'warn' : ''}" data-ui="help" title="${esc(L('Computador de bordo (H)'))}"><span class="pc">💻</span><span class="ic">${show.icon}</span><span class="tx">${esc(L(show.t))}</span>${canGo ? `<button class="btn tiny primary" data-ui="helpGo">▶ ${esc(L('Ir'))}</button>` : ''}<kbd>H</kbd></div>`;

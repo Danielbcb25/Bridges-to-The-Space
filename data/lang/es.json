@@ -1895,7 +1895,13 @@
   "Me conte uma curiosidade": "Cuéntame una curiosidad",
   "Tema aprendido: vale bônus no Quiz da tela inicial.": "Tema aprendido: vale bonificación en el Quiz de la pantalla inicial.",
   "Curiosidades do computador de bordo (texto e voz)": "Curiosidades de la computadora de a bordo (texto y voz)",
-  "Termina ao chegar a Pontes-01b (sem colônia).": "Termina al llegar a Pontes-01b (sin colonia)."
+  "Analise a atmosfera do planeta.": "Analice la atmósfera del planeta.",
+  "Analise a água do planeta.": "Analice el agua del planeta.",
+  "Analise o solo do planeta.": "Analice el suelo del planeta.",
+  "Analise a radiação do planeta.": "Analice la radiación del planeta.",
+  "O local ideal de pouso é o Vale Equatorial: água, clima ameno e radiação moderada.": "El lugar ideal de aterrizaje es el Valle Ecuatorial: agua, clima templado y radiación moderada.",
+  "Escolha o local de pouso: o ideal é o Vale Equatorial (água, clima ameno e radiação moderada).": "Elija el lugar de aterrizaje: el ideal es el Valle Ecuatorial (agua, clima templado y radiación moderada).",
+  "ideal": "ideal"
  },
  "patterns": [
   [
@@ -2903,7 +2909,7 @@
     },
     {
      "node": "colonia",
-     "t": "Llegue a Pontes-01b: en la jornada corta, la misión termina al llegar. Pulse H siempre que tenga dudas."
+     "t": "Llegue a Pontes-01b. Pulse H siempre que tenga dudas."
     }
    ],
    "multi": [

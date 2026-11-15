@@ -1894,7 +1894,13 @@
   "Me conte uma curiosidade": "Tell me something interesting",
   "Tema aprendido: vale bônus no Quiz da tela inicial.": "Topic learned: worth a bonus in the Quiz on the title screen.",
   "Curiosidades do computador de bordo (texto e voz)": "Onboard computer fun facts (text and voice)",
-  "Termina ao chegar a Pontes-01b (sem colônia).": "Ends on arrival at Pontes-01b (no colony)."
+  "Analise a atmosfera do planeta.": "Analyze the planet's atmosphere.",
+  "Analise a água do planeta.": "Analyze the planet's water.",
+  "Analise o solo do planeta.": "Analyze the planet's soil.",
+  "Analise a radiação do planeta.": "Analyze the planet's radiation.",
+  "O local ideal de pouso é o Vale Equatorial: água, clima ameno e radiação moderada.": "The ideal landing site is the Equatorial Valley: water, mild climate and moderate radiation.",
+  "Escolha o local de pouso: o ideal é o Vale Equatorial (água, clima ameno e radiação moderada).": "Choose the landing site: the ideal one is the Equatorial Valley (water, mild climate and moderate radiation).",
+  "ideal": "ideal"
  },
  "patterns": [
   [
@@ -2902,7 +2908,7 @@
     },
     {
      "node": "colonia",
-     "t": "Reach Pontes-01b: in the short journey, the mission ends on arrival. Press H whenever you are unsure."
+     "t": "Reach Pontes-01b. Press H whenever you are unsure."
     }
    ],
    "multi": [

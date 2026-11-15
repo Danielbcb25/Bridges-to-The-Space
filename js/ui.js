@@ -111,7 +111,7 @@ function journeyScreen() {
     <p class="muted">Escolha o tamanho da expedição. Os 6 tripulantes que não forem jogadores são controlados por bots.</p>
     <div class="cards two">
       <button class="card big" data-ui="startGame" data-arg="completa"><h3>🚀 Jornada Completa</h3><p>≈ 30 dias de viagem · 9 desafios · as 5 etapas da campanha.</p><p class="muted">Cada dia dura 30 s. Recomendado para a experiência completa.</p></button>
-      <button class="card big" data-ui="startGame" data-arg="curta"><h3>⚡ Jornada Curta</h3><p>≈ 12 dias · 4 desafios · regulação térmica de 3 min.</p><p class="small yellow">${esc(L('Termina ao chegar a Pontes-01b (sem colônia).'))}</p><p class="muted">Ideal para aulas e partidas rápidas.</p></button>
+      <button class="card big" data-ui="startGame" data-arg="curta"><h3>⚡ Jornada Curta</h3><p>≈ 12 dias · 4 desafios · regulação térmica de 3 min.</p><p class="muted">Ideal para aulas e partidas rápidas.</p></button>
     </div>
     <div class="row"><button class="btn" data-ui="title">◀ Voltar</button></div>
   </div>`;
@@ -299,7 +299,7 @@ function readinessAlerts() {
   const st = S.setup; const h = id => st.modules.includes(id) || st.upgrades.includes(id) || st.reserves.includes(id) || st.skills.includes(id) || st.pantry.includes(id) || st.gadgets.includes(id) || st.training.includes(id);
   const a = [];
   const days = Math.round((S.journey === 'curta' ? 12 : 30) * ROUTES.find(r => r.id === st.route).days);
-  const food = Math.ceil(0.4 * 7 * days * 1.08) + (h('racaoExtra') ? 30 : 0);
+  const food = Math.ceil(0.4 * 7 * days * (S.journey === 'curta' ? 0.93 : 1.08)) + (h('racaoExtra') ? 30 : 0);
   if (!h('filtroReserva')) a.push(['bad', 'Sem filtro de ar reserva: risco alto em falhas do Suporte à Vida.']);
   if (!h('enfermaria')) a.push(['bad', 'Sem enfermaria: feridos graves podem morrer.']);
   if (st.route === 'rapida' && !h('tanqueExtra')) a.push(['warn', 'Combustível justo para a rota rápida.']);
@@ -725,7 +725,7 @@ function planetScreen() {
 }
 function migrationScreen() {
   return `<div class="stage-panel"><h2>MIGRAÇÃO</h2>${miniRes()}<div class="scroll"><p class="small">Escolha onde a expedição vai pousar. O que você analisou aparece em detalhes; o resto é risco.</p>
-    <div class="opts">${LANDING_SITES.map(s => `<button class="opt ${S.planet.site === s.id ? 'on' : ''}" data-act="chooseSite" data-p='${J({ id: s.id })}'><b>${s.name}</b><span>✔ ${s.pros}</span><span>✖ ${s.cons}</span><em>${Object.keys(s.score).map(k => S.planet.analyzed.includes(k) ? `${T(PLANET_ANALYSES.find(a => a.id === k).name)}: ${T(s.score[k] > 0 ? 'bom' : s.score[k] < 0 ? 'ruim' : 'neutro')}` : `${T(PLANET_ANALYSES.find(a => a.id === k).name)}: ?`).join(' · ')}</em></button>`).join('')}</div>
+    <div class="opts">${LANDING_SITES.map(s => `<button class="opt ${S.planet.site === s.id ? 'on' : ''} ${s.id === bestSite().id ? 'rec' : ''}" data-act="chooseSite" data-p='${J({ id: s.id })}'><b>${s.name}${s.id === bestSite().id ? ` <em class="yellow">★ ${esc(L('ideal'))}</em>` : ''}</b><span>✔ ${s.pros}</span><span>✖ ${s.cons}</span><em>${Object.keys(s.score).map(k => S.planet.analyzed.includes(k) ? `${T(PLANET_ANALYSES.find(a => a.id === k).name)}: ${T(s.score[k] > 0 ? 'bom' : s.score[k] < 0 ? 'ruim' : 'neutro')}` : `${T(PLANET_ANALYSES.find(a => a.id === k).name)}: ?`).join(' · ')}</em></button>`).join('')}</div>
     <p class="small">Pouso ${has('pouso') ? 'com a nave auxiliar (40 kg de combustível)' : 'com a nave principal — arriscado (80 kg de combustível)'}.</p></div>
     <div class="row"><button class="btn primary big" data-act="land">🛬 POUSAR</button></div></div>`;
 }

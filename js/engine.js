@@ -147,7 +147,7 @@ function applySetup() {
   const route = ROUTES.find(r => r.id === st.route);
   S.totalDays = Math.round((S.journey === 'curta' ? 12 : 30) * route.days);
   // a ração dá certinho para a viagem com a porção MÉDIA (0,4 kg/pessoa/dia): normal falta, mínima sobra
-  const foodKg = Math.ceil(0.4 * 7 * S.totalDays * 1.08);
+  const foodKg = Math.ceil(0.4 * 7 * S.totalDays * (S.journey === 'curta' ? 0.93 : 1.08)); // curta: margem bem justa
   S.res = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: foodKg, plantacao: 40, dados: 200, medicos: 10, lixo: 0 };
   S.cap = { energia: 60, combustivel: 500, escudo: 50, casco: 100, agua: 600, oxigenio: 90, comida: foodKg, plantacao: 40, dados: 400, medicos: 10, lixo: 40 };
   const addR = (k, v) => { S.res[k] += v; S.cap[k] = Math.max(S.cap[k], S.res[k]); };

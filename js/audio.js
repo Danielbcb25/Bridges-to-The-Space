@@ -98,6 +98,8 @@ const Narrator = {
     this.voice = (want && list.find(v => v.name === want)) || list[0] || null;
     return this.voice;
   },
+  // fala depois do que estiver falando agora (sem cortar a narração)
+  later(text) { setTimeout(() => { if (this.speaking || ('speechSynthesis' in window && speechSynthesis.speaking)) this._q = text; else this.say(text); }, 700); },
   say(text, opts) {
     if (!Save.data.settings.narration || !('speechSynthesis' in window)) return;
     try {
@@ -107,7 +109,7 @@ const Narrator = {
       if (!this.voice || !this.voice.lang.toLowerCase().startsWith(I18n.speech().slice(0, 2))) this.pickVoice();
       if (this.voice) u.voice = this.voice;
       u.onstart = () => { this.speaking = true; Music.refreshVolume(); };
-      u.onend = u.onerror = () => { this.speaking = false; Music.refreshVolume(); };
+      u.onend = u.onerror = () => { this.speaking = false; Music.refreshVolume(); if (this._q) { const t = this._q; this._q = null; setTimeout(() => this.say(t), 350); } };
       speechSynthesis.speak(u);
     } catch (e) { /* ignora */ }
   },
