@@ -37,11 +37,21 @@ function bar(v, max, cls = '', inverse = false) {
 // o foco que fica num botão depois do clique faria Espaço/Enter apertarem o botão de novo em vez de agir no jogo
 function dropFocus() { const a = document.activeElement; if (a && a !== document.body && !['INPUT', 'SELECT', 'TEXTAREA'].includes(a.tagName)) a.blur(); }
 function setHTML(id, html) {
+  if (id === 'modal' && U.modalOverride) html = U.modalOverride; // menu/config da barra rápida por cima de tudo
   if (U.cache[id] === html) return;
-  U.cache[id] = html;
   const el = document.getElementById(id);
+  // não redesenha enquanto o jogador arrasta um controle deslizante ou escolhe numa lista (senão o controle "escapa" do mouse)
+  const ae = document.activeElement;
+  if (el && ae && el.contains(ae) && ((U.dragging && ae.type === 'range') || ae.tagName === 'SELECT')) return;
+  U.cache[id] = html;
   if (el) {
+    // guarda a rolagem dos painéis: o conteúdo é trocado a cada atualização e o scroll voltaria ao topo
+    const SCR = '.panel, .scroll, .evp, .stage-panel, .modal-bg, .side, .report-list, .evlog';
+    const keep = []; el.querySelectorAll(SCR).forEach((n, i) => { if (n.scrollTop > 0) keep.push([i, n.className, n.scrollTop]); });
+    const top0 = el.scrollTop;
     el.innerHTML = pixelEmoji(I18n.dom(html));
+    if (keep.length) { const list = el.querySelectorAll(SCR); for (const [i, cls, t] of keep) { const n = list[i] && list[i].className === cls ? list[i] : null; if (n) n.scrollTop = t; } }
+    if (top0) el.scrollTop = top0;
     const od = U.openDet; // mantém abertas as seções "Mais opções" etc. entre atualizações
     if (od) el.querySelectorAll('details').forEach(d => { const s = d.querySelector('summary'); if (s && od[s.textContent.trim()]) d.open = true; });
   }
@@ -135,9 +145,10 @@ function settingsScreen(inGame) {
   const st = Save.data.settings;
   return `<div class="panel center">
     <h2>CONFIGURAÇÕES</h2>
+    <div class="row"><button class="btn ${st.mute ? '' : 'on'}" data-ui="qAudio">${st.mute ? '🔇' : '🔊'} ${esc(L(K('Áudio (música e voz)', 'Audio (music and voice)', 'Audio (música y voz)')))}: <b>${esc(L(st.mute ? 'DESLIGADO' : 'LIGADO'))}</b></button><button class="btn ${st.sfxOff ? '' : 'on'}" data-ui="qSfx">${st.sfxOff ? '🔕' : '🔔'} ${esc(L(K('Efeitos sonoros', 'Sound effects', 'Efectos de sonido')))}: <b>${esc(L(st.sfxOff ? 'DESLIGADO' : 'LIGADO'))}</b></button></div>
     <label class="field">Música <input type="range" min="0" max="1" step="0.05" value="${st.music}" data-set="music"></label>
     <label class="field">Efeitos <input type="range" min="0" max="1" step="0.05" value="${st.sfx}" data-set="sfx"></label>
-    <label class="check"><input type="checkbox" data-set="narration" ${st.narration ? 'checked' : ''}> Narração por voz (pt-BR)</label>
+    <label class="check"><input type="checkbox" data-set="narration" ${st.narration ? 'checked' : ''}> Narração por voz</label>
     <label class="field">${esc(L('Voz'))} <select data-set="voice"><option value="">${esc(L('Automática (a mais natural)'))}</option>${Narrator.voices().map(v => `<option value="${esc(v.name)}" ${(st.voices || {})[I18n.lang] === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}</select> <button class="btn small" data-ui="voiceTest">🔊</button></label>
     <label class="field">${esc(L('Velocidade da voz'))} <input type="range" min="0.7" max="1.3" step="0.05" value="${st.voiceRate || 1}" data-set="voiceRate"></label>
     <label class="check"><input type="checkbox" data-set="curios" ${st.curios !== false ? 'checked' : ''}> ${esc(L('Curiosidades do computador de bordo (texto e voz)'))}</label>
@@ -214,19 +225,20 @@ function drawAvatarPreviews() {
 }
 
 // ---------- lobby multiplayer ----------
-const arcaHint = n => K('Arca-' + n + ': quem entra primeiro nessa nave vira o Comandante dela; os próximos entram na tripulação. Cada Arca faz a sua própria jornada (até 28 pessoas no total).', 'Arca-' + n + ': whoever enters this ship first becomes its Commander; the next ones join the crew. Each Arca makes its own journey (up to 28 people in total).', 'Arca-' + n + ': quien entra primero en esta nave se vuelve su Comandante; los siguientes se unen a la tripulación. Cada Arca hace su propio viaje (hasta 28 personas en total).');
-const arcaJoinLabel = n => K('Entrar na Arca-' + n, 'Join Arca-' + n, 'Entrar en la Arca-' + n);
+const arcaHint = n => K('Nave-' + n + ': quem entra primeiro nessa nave vira o Comandante dela; os próximos entram na tripulação. Cada Nave faz a sua própria jornada (até 28 pessoas no total).', 'Spaceship ' + n + ': whoever enters this ship first becomes its Commander; the next ones join the crew. Each Spaceship makes its own journey (up to 28 people in total).', 'Nave-' + n + ': quien entra primero en esta nave se vuelve su Comandante; los siguientes se unen a la tripulación. Cada Nave hace su propio viaje (hasta 28 personas en total).');
+const shipLabel = n => L(K('Nave-' + n, 'Spaceship ' + n, 'Nave-' + n));
+const arcaJoinLabel = n => K('Entrar na Nave-' + n, 'Join Spaceship ' + n, 'Entrar en la Nave-' + n);
 const roleChips = LB => `<div class="grp"><b>${esc(L(K('Sua função', 'Your role', 'Su función')))}</b><button class="chip ${!LB.role ? 'on' : ''}" data-ui="netRole" data-arg="">${esc(L(K('Qualquer', 'Any', 'Cualquiera')))}</button>${ROLES.map(r => `<button class="chip ${LB.role === r.id ? 'on' : ''}" data-ui="netRole" data-arg="${r.id}">${esc(L(r.short))}</button>`).join('')}</div>`;
-const shipChips = LB => `<div class="grp"><b>${esc(L(K('Escolha sua Arca', 'Choose your Arca', 'Elija su Arca')))}</b>${[1, 2, 3, 4].map(n => `<button class="chip ${(LB.ship || 1) === n ? 'on' : ''}" data-ui="netShip" data-arg="${n}">Arca-${n}</button>`).join('')}</div><p class="small muted">${esc(L(arcaHint(LB.ship || 1)))}</p>`;
+const shipChips = LB => `<div class="grp"><b>${esc(L(K('Escolha sua Nave', 'Choose your Spaceship', 'Elija su Nave')))}</b>${[1, 2, 3, 4].map(n => `<button class="chip ${(LB.ship || 1) === n ? 'on' : ''}" data-ui="netShip" data-arg="${n}">${esc(shipLabel(n))}</button>`).join('')}</div><p class="small muted">${esc(L(arcaHint(LB.ship || 1)))}</p>`;
 function lobbyScreen() {
   const LB = U.lobby || {};
   if (Net.role === 'host' && Net.room) {
     return `<div class="panel center wide">
-      <h2>SALA <span class="code">${esc(Net.room)}</span> · Arca-${Net.mySh || 1}</h2>
-      <p class="small yellow">${esc(L(K('Você é o Comandante da Arca-' + (Net.mySh || 1) + '.', 'You are the Commander of Arca-' + (Net.mySh || 1) + '.', 'Usted es el Comandante de la Arca-' + (Net.mySh || 1) + '.')))}</p>
+      <h2>SALA <span class="code">${esc(Net.room)}</span> · ${esc(shipLabel(Net.mySh || 1))}</h2>
+      <p class="small yellow">${esc(L(K('Você é o Comandante da Nave-' + (Net.mySh || 1) + '.', 'You are the Commander of Spaceship ' + (Net.mySh || 1) + '.', 'Usted es el Comandante de la Nave-' + (Net.mySh || 1) + '.')))}</p>
       <p class="muted">Passe o código para até 6 amigos. Cada um assume um tripulante; os lugares vazios ficam com bots.</p>
-      ${!Net.relay ? `<p class="small cyan">${esc(L(K('Outras Arcas: quem entrar com este código escolhendo outra Arca vira o Comandante dela (jornada própria). Até 28 pessoas: 4 Arcas × (Comandante + 6).', 'Other Arcas: whoever joins with this code and picks another Arca becomes its Commander (own journey). Up to 28 people: 4 Arcas × (Commander + 6).', 'Otras Arcas: quien entre con este código eligiendo otra Arca se vuelve su Comandante (viaje propio). Hasta 28 personas: 4 Arcas × (Comandante + 6).')))}</p>
-      ${[1, 2, 3, 4].filter(n => n !== Net.hubShip).map(n => { const a = Net.arcas[n]; return `<div class="alert ${a ? 'good' : 'info'}"><b>Arca-${n}</b> — ${a ? '🎮 ' + esc(a.cmdName || '') + ' · ' + a.members.length + '/6 ' + esc(L(K('tripulantes', 'crew', 'tripulantes'))) : esc(L(K('livre (o 1º que entrar vira Comandante)', 'free (the first to join becomes Commander)', 'libre (el primero en entrar será Comandante)')))}</div>`; }).join('')}` : ''}
+      ${!Net.relay ? `<p class="small cyan">${esc(L(K('Outras Naves: quem entrar com este código escolhendo outra Nave vira o Comandante dela (jornada própria). Até 28 pessoas: 4 Naves × (Comandante + 6).', 'Other Spaceships: whoever joins with this code and picks another Spaceship becomes its Commander (own journey). Up to 28 people: 4 Spaceships × (Commander + 6).', 'Otras Naves: quien entre con este código eligiendo otra Nave se vuelve su Comandante (viaje propio). Hasta 28 personas: 4 Naves × (Comandante + 6).')))}</p>
+      ${[1, 2, 3, 4].filter(n => n !== Net.hubShip).map(n => { const a = Net.arcas[n]; return `<div class="alert ${a ? 'good' : 'info'}"><b>${esc(shipLabel(n))}</b> — ${a ? '🎮 ' + esc(a.cmdName || '') + ' · ' + a.members.length + '/6 ' + esc(L(K('tripulantes', 'crew', 'tripulantes'))) : esc(L(K('livre (o 1º que entrar vira Comandante)', 'free (the first to join becomes Commander)', 'libre (el primero en entrar será Comandante)')))}</div>`; }).join('')}` : ''}
       <p class="small cyan">${Net.mode === 'p2p' ? '🌐 Sala online (P2P): funciona pela internet, sem servidor e sem VPN. Mantenha esta aba aberta.' : '🖧 Servidor próprio'}</p>
       <div class="seats">${ROLES.map(r => { const p = Object.values(Net.players).find(x => x.role === r.id); return `<div class="seat ${p ? 'human' : ''}"><b>${r.name}</b><span>${p ? '🎮 ' + esc(p.name) : '🤖 Bot'}</span></div>`; }).join('')}</div>
       <div class="cards two">
@@ -237,14 +249,14 @@ function lobbyScreen() {
     </div>`;
   }
   if (Net.role === 'client') {
-    return `<div class="panel center"><h2>CONECTADO</h2><p>Sala <span class="code">${esc(Net.room || '')}</span>. Arca-${Net.mySh || 1}${Net.cmdName ? ' · ' + esc(L(K('Comandante: ', 'Commander: ', 'Comandante: '))) + esc(Net.cmdName) : ''}. Você será: <b>${esc(L(Net.myRoleName || '...'))}</b>.</p><p class="muted">Aguardando o Comandante iniciar a jornada e montar a nave...</p>${ROLE_DUTIES[U.me] ? `<p class="small cyan">${esc(L('Sua função:'))} ${esc(L(ROLE_DUTIES[U.me]))}</p><p class="small muted">${esc(L('Quando chamarem a sua função, aparece um aviso 📢: vá até a estação e pressione E. Se não for em 45 s, um bot assume.'))}</p>` : ''}<div class="row"><button class="btn" data-ui="netLeave">◀ Sair</button></div></div>`;
+    return `<div class="panel center"><h2>CONECTADO</h2><p>Sala <span class="code">${esc(Net.room || '')}</span>. ${esc(shipLabel(Net.mySh || 1))}${Net.cmdName ? ' · ' + esc(L(K('Comandante: ', 'Commander: ', 'Comandante: '))) + esc(Net.cmdName) : ''}. Você será: <b>${esc(L(Net.myRoleName || '...'))}</b>.</p><p class="muted">Aguardando o Comandante iniciar a jornada e montar a nave...</p>${ROLE_DUTIES[U.me] ? `<p class="small cyan">${esc(L('Sua função:'))} ${esc(L(ROLE_DUTIES[U.me]))}</p><p class="small muted">${esc(L('Quando chamarem a sua função, aparece um aviso 📢: vá até a estação e pressione E. Se não for em 45 s, um bot assume.'))}</p>` : ''}<div class="row"><button class="btn" data-ui="netLeave">◀ Sair</button></div></div>`;
   }
   return `<div class="panel center">
     <h2>MULTIPLAYER</h2>
-    <p class="muted">${esc(L(K('Até 28 jogadores: 4 Arcas, cada uma com um Comandante e 6 tripulantes. Quem cria a sala é o Comandante da Arca que escolher.', 'Up to 28 players: 4 Arcas, each with a Commander and 6 crew. Whoever creates the room is the Commander of the Arca they choose.', 'Hasta 28 jugadores: 4 Arcas, cada una con un Comandante y 6 tripulantes. Quien crea la sala es el Comandante de la Arca que elija.')))} ${esc(L('Funciona online direto pelo navegador: não precisa de servidor nem de VPN.'))}</p>
+    <p class="muted">${esc(L(K('Até 28 jogadores: 4 Naves, cada uma com um Comandante e 6 tripulantes. Quem cria a sala é o Comandante da Nave que escolher.', 'Up to 28 players: 4 Spaceships, each with a Commander and 6 crew. Whoever creates the room is the Commander of the Spaceship they choose.', 'Hasta 28 jugadores: 4 Naves, cada una con un Comandante y 6 tripulantes. Quien crea la sala es el Comandante de la Nave que elija.')))} ${esc(L('Funciona online direto pelo navegador: não precisa de servidor nem de VPN.'))}</p>
     ${shipChips(LB)}
     ${roleChips(LB)}
-    <div class="row"><button class="btn primary" data-ui="netHost" ${LB.busy ? 'disabled' : ''}>${esc(L(K('Criar sala (Comandante da Arca-' + (LB.ship || 1) + ')', 'Create room (Commander of Arca-' + (LB.ship || 1) + ')', 'Crear sala (Comandante de la Arca-' + (LB.ship || 1) + ')')))}</button></div>
+    <div class="row"><button class="btn primary" data-ui="netHost" ${LB.busy ? 'disabled' : ''}>${esc(L(K('Criar sala (Comandante da Nave-' + (LB.ship || 1) + ')', 'Create room (Commander of Spaceship ' + (LB.ship || 1) + ')', 'Crear sala (Comandante de la Nave-' + (LB.ship || 1) + ')')))}</button></div>
     <label class="field">Código da sala <input id="net-code" maxlength="5" value="${esc(LB.code || '')}" style="text-transform:uppercase" autocomplete="off"></label>
     <div class="row"><button class="btn" data-ui="netJoin" ${LB.busy ? 'disabled' : ''}>${esc(L(arcaJoinLabel(LB.ship || 1)))}</button></div>
     ${LB.busy ? `<p class="cyan">⏳ ${esc(LB.busy)}</p>` : ''}
@@ -644,7 +656,7 @@ function fundPanel() {
 }
 function menuPanel() {
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel center" data-stop="1"><h2>PAUSA</h2>
-    <div class="menu"><button class="mbtn" data-ui="closePanel">▶ Continuar</button><button class="mbtn" data-ui="panel" data-arg="settings">⚙ Configurações</button>${Net.role !== 'client' ? `<button class="mbtn" data-ui="saveNow">💾 ${esc(L('Salvar progresso'))}</button>` : ''}<button class="mbtn" data-ui="fullscreen">⛶ ${esc(L('Tela cheia'))}</button>
+    <div class="menu"><button class="mbtn" data-ui="closePanel">▶ Continuar</button><button class="mbtn" data-ui="qSettingsOpen">⚙ Configurações</button>${Net.role !== 'client' ? `<button class="mbtn" data-ui="saveNow">💾 ${esc(L('Salvar progresso'))}</button>` : ''}<button class="mbtn" data-ui="fullscreen">⛶ ${esc(L('Tela cheia'))}</button>
     ${U.confirmQuit ? '<button class="mbtn red" data-ui="quit">Confirmar: sair para o título</button>' : '<button class="mbtn" data-ui="quitAsk">⏏ Sair para o título</button>'}</div>
     <div class="row" style="justify-content:center">${LANGS.map(l => `<button class="chip ${I18n.lang === l.id ? 'on' : ''}" data-ui="setLang" data-arg="${l.id}">${l.label}</button>`).join('')}</div>
     <p class="small muted keyshelp">${esc(L('← → andar · ↑ ↓ escadas · Shift correr · E / Espaço interagir · J pular · H computador de bordo · R relatório · T tripulação · Esc menu'))}</p>
@@ -686,7 +698,7 @@ function stationScreen() {
       <div class="exos">${EXOPLANETS.map(e => {
         const an = S.explore.analyzed.includes(e.id); const vis = S.explore.visited && S.explore.visited[e.id];
         const dist = typeof e.dist === 'number' ? fmt(e.dist, 1) + ' ' + L('anos-luz') : L('na rota');
-        return `<div class="exo ${dest === e.id ? 'on' : ''} ${vis ? 'visited' : ''} ${S.explore.wrongOnce ? (e.id === 'pontes' ? 'guide' : 'locked') : ''}"><b>${e.name}</b>${vis ? ` <em class="red">✖ ${esc(L('visitado: inabitável'))}</em>` : ''}${an || vis ? `<div class="kv small"><span>${esc(L('Distância'))}</span><b>${dist}</b><span>${esc(L('Raio/massa'))}</span><b>${e.radius}</b><span>${esc(L('Gravidade'))}</span><b>${EXO_GRAV[e.id] ? (I18n.lang === 'en' ? EXO_GRAV[e.id].replace(',', '.') : EXO_GRAV[e.id]) : '—'}</b><span>${esc(L('Temp. de equilíbrio'))}</span><b>${e.teq} K</b><span>${esc(L('Ano'))}</span><b>${e.period} ${esc(L('dias'))}</b><span>${esc(L('Distância orbital'))}</span><b>${e.sma} UA</b><span>${esc(L('Descoberta'))}</span><b>${esc(T(e.disc))}</b><span>${esc(L('Estrela'))}</span><b>${esc(T(e.star))}</b><span>ESI</span><b>${e.esi}</b></div><p class="small muted">${esc(T(e.issues))}</p>` : `<button class="btn tiny" data-act="analyzeExo" data-p='${J({ id: e.id })}'>${esc(L('Analisar'))}</button>`}
+        return `<div class="exo ${dest === e.id ? 'on' : ''} ${vis ? 'visited' : ''} ${S.explore.wrongOnce ? (e.id === 'pontes' ? 'guide' : 'locked') : ''}">${planetImg(e.id, 96, 'thumb')}<b>${e.name}</b>${vis ? ` <em class="red">✖ ${esc(L('visitado: inabitável'))}</em>` : ''}${an || vis ? `<div class="kv small"><span>${esc(L('Distância'))}</span><b>${dist}</b><span>${esc(L('Raio/massa'))}</span><b>${I18n.lang === 'en' ? e.radius.replace(/(\d),(\d)/g, '$1.$2').replace('massa mín.', 'min. mass') : e.radius}</b><span>${esc(L('Gravidade'))}</span><b>${EXO_GRAV[e.id] ? (I18n.lang === 'en' ? EXO_GRAV[e.id].replace(',', '.') : EXO_GRAV[e.id]) : '—'}</b><span>${esc(L('Temp. de equilíbrio'))}</span><b>${e.teq} K</b><span>${esc(L('Ano'))}</span><b>${e.period} ${esc(L('dias'))}</b><span>${esc(L('Distância orbital'))}</span><b>${e.sma} ${I18n.lang === 'en' ? 'AU' : 'UA'}</b><span>${esc(L('Descoberta'))}</span><b>${esc(T(e.disc))}</b><span>${esc(L('Estrela'))}</span><b>${esc(T(e.star))}</b><span>ESI</span><b>${e.esi}</b></div><p class="small muted">${esc(T(e.issues))}</p>` : `<button class="btn tiny" data-act="analyzeExo" data-p='${J({ id: e.id })}'>${esc(L('Analisar'))}</button>`}
         ${S.explore.wrongOnce
           ? (e.id === 'pontes' ? `${S.explore.guideAt ? '<div class="bigarrow">⬇</div>' : ''}<button class="btn primary ${S.explore.guideAt ? 'must' : ''}" data-act="goPontes">🚀 ${esc(L('Ir para Pontes-01b'))}</button>` : '')
           : `<button class="btn tiny ${dest === e.id ? 'primary' : ''}" data-act="setDest" data-p='${J({ id: e.id })}'>${dest === e.id ? '✔ ' : ''}${esc(L('Destino'))}</button>`}</div>`;
@@ -708,7 +720,7 @@ function detourScreen() {
   const kv = (a, b) => `<span>${esc(L(a))}</span><b>${b}</b>`;
   return `<div class="stage-panel"><h2>${esc(L('DESVIO DE ROTA: '))}${exo.name}</h2>${miniRes()}<div class="scroll">
     <div class="alert bad">⚠ ${esc(L('Este não é Pontes-01b. A viagem custou combustível, oxigênio, comida e dias — e a moral caiu.'))}</div>
-    <h4>${esc(L('O que a tripulação encontrou'))}</h4><p>${esc(L(exo.trip.outcome))}</p>
+    <div class="phero">${planetImg(exo.id, 220, 'hero')}<div><h4>${esc(L('O que a tripulação encontrou'))}</h4><p>${esc(L(exo.trip.outcome))}</p></div></div>
     <h4>${esc(L('Dados'))}</h4>
     <div class="kv small">${kv('Distância', typeof exo.dist === 'number' ? fmt(exo.dist, 1) + ' ' + L('anos-luz') : '—')}${kv('Raio/massa', exo.radius)}${kv('Temp. de equilíbrio', exo.teq + ' K')}${kv('Ano', exo.period + ' ' + L('dias'))}${kv('Estrela', esc(T(exo.star)))}${kv('Descoberta', esc(T(exo.disc)))}${kv('ESI', exo.esi)}</div>
     <p class="green">+${d.dados} GB ${esc(L('de dados científicos coletados.'))}</p>
@@ -727,7 +739,7 @@ function planetScreen() {
   const ch = allC ? P.challenges.map(c => { const d = CHALLENGES.find(x => x.id === c.id); return `<div class="pres ${c.ok ? '' : 'bad'}">${c.ok ? '✔' : '✖'} <b>${esc(T(d.name))}</b>${c.ok ? '' : ` <span>${esc(T(c.txt))}</span>`}</div>`; }).join('')
     : `<button class="btn" data-act="prepCrew" ${nA < KEY_ANALYSES.length ? 'disabled' : ''}>🧑‍🚀 ${esc(L('Preparar a tripulação'))}</button>`;
   return `<div class="stage-panel"><h2>${esc(L('O NOVO MUNDO: PONTES-01b'))}</h2>${miniRes()}<div class="scroll">
-    <p class="lead">${esc(L('Antes de descer, descubra se o planeta é seguro e prepare a tripulação.'))}</p>
+    <div class="phero">${planetImg('pontes', 220, 'hero')}<p class="lead">${esc(L('Antes de descer, descubra se o planeta é seguro e prepare a tripulação.'))}</p></div>
     ${step(1, nA >= KEY_ANALYSES.length, 'Analise o planeta', `${nA}/${KEY_ANALYSES.length} · ` + L('cada análise gasta dados e energia'), `<div class="pbtns">${an}</div>`)}
     ${step(2, allC, 'Prepare a tripulação', 'aclimatação ao ar, primeira plantação e abrigo na superfície', `<div class="pbtns">${ch}</div>`)}
     ${step(3, false, 'Escolha onde pousar', 'o computador indica o melhor lugar', `<div class="pbtns"><button class="btn primary" data-act="toMigration" ${allC ? '' : 'disabled'}>🛬 ${esc(L('Escolher o local de pouso'))} ▶</button></div>`)}
@@ -836,7 +848,7 @@ function renderUI() {
   }
   if (S && U.screen === 'game' && !hud && !['intro', 'launch', 'end'].includes(S.scene) && !(S.scene === 'earth' && U.comms)) hud = assistMini() + lessonCard();
   if (U.help && S && U.screen === 'game') modal = helpPanel();
-  if (S && U.screen === 'game') hud += `<button class="gear" data-ui="gearOpen" title="${esc(L('Configurações'))}">⚙</button>`;
+  // a configuração fica na barra rápida da esquerda (sem botão ⚙ isolado)
   if (U.settingsOpen && S && U.screen === 'game') modal = `<div class="modal-bg">${settingsScreen(true).replace('data-ui="closePanel"', 'data-ui="gearClose"').replace('</h2>', '</h2><div class="row" style="justify-content:center">' + LANGS.map(l => `<button class="chip ${I18n.lang === l.id ? 'on' : ''}" data-ui="setLang" data-arg="${l.id}">${l.label}</button>`).join('') + '</div>')}</div>`;
   if (U.voicePick) modal = voicePickPanel();
   sitePlayMode();
@@ -1024,6 +1036,11 @@ function bindUI() {
   layer.addEventListener('pointercancel', () => { tap = null; });
   layer.addEventListener('pointerup', e => { if (tap && e.pointerId === tap.id) { const s = tap.sig; tap = null; runSig(s); e.preventDefault(); dropFocus(); } });
   layer.addEventListener('click', e => { if (e.detail === 0) handle(e); });
+  // controles deslizantes: marca o arraste e solta o foco no fim, para o painel voltar a se atualizar
+  document.addEventListener('pointerdown', e => { if (e.target && e.target.type === 'range') U.dragging = true; }, true);
+  const endDrag = () => { if (U.dragging) { U.dragging = false; const a = document.activeElement; if (a && a.type === 'range') a.blur(); } };
+  document.addEventListener('pointerup', endDrag, true); document.addEventListener('pointercancel', endDrag, true);
+  layer.addEventListener('change', e => { const t = e.target; if (t && t.tagName === 'SELECT' && t.dataset.set) setTimeout(() => t.blur(), 0); });
   layer.addEventListener('input', e => {
     const t = e.target;
     if (t.id === 'av-name' && U.avatarDraft) U.avatarDraft.name = t.value;

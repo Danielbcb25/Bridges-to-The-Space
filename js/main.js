@@ -174,8 +174,16 @@ function frame(now) {
 
 // ---------- entrada ----------
 const shiftOn = () => keys.ShiftLeft || keys.ShiftRight;
+// Esc: aperta o botão de fechar (✕) da caixa ou aba que estiver aberta, da mais de cima para a de baixo
+const ESC_CLOSE = ['#modal .x', '#modal [data-ui=closePanel]:not(.modal-bg)', '#modal [data-ui$=Close]', '#modal [data-act$=Close]', '#scr .x', '#scr [data-ui$=Close]', '#side .x', '#side [data-act=eventClose]', '#side [data-ui$=Close]', '#hud .x', '#hud [data-ui$=Close]', '[data-ui=lessonClose]'];
+function escClose() {
+  for (const sel of ESC_CLOSE) for (const el of document.querySelectorAll(sel)) if (el.offsetParent !== null && !el.disabled) { el.click(); return true; }
+  return false;
+}
 // Esc: fecha o que estiver aberto, desmarca seleções e volta
 function escAll() {
+  if (U.qset) { U.qset = false; return true; }
+  if (U.qmenu) { U.qmenu = false; return true; }
   if (U.settingsOpen) { U.settingsOpen = false; return true; }
   if (U.voicePick) { U.voicePick = false; return true; }
   if (S && U.screen === 'game' && S.scene === 'colony' && me() && me().csleep) { act('cWake'); return true; } // dormindo: Esc acorda
@@ -184,7 +192,8 @@ function escAll() {
   if (U.screen === 'story') { UIH.storySkip(); return true; }
   if (!S || U.screen !== 'game') { if (U.screen !== 'title') { UIH.title(); return true; } return false; }
   if (S.scene === 'intro') { UIH.introSkip(); return true; }
-  if (S.scene === 'earth') { const E = U.earth; if (E && (E.dialog || E.panel || E.diary)) { cityEsc(); return true; } if (E && E.target != null) { E.target = null; return true; } return false; }
+  if (S.scene === 'earth') { const E = U.earth; if (E && (E.dialog || E.panel || E.diary)) { cityEsc(); return true; } if (escClose()) return true; if (E && E.target != null) { E.target = null; return true; } return false; }
+  if (escClose()) return true; // qualquer caixa ou aba aberta com botão de fechar
   if (U.cook && U.cook.length) { U.cook = []; return true; }
   if (U.farmSel != null && U.panel === 'estufa') { U.farmSel = null; return true; }
   if (U.panel) { UIH.closePanel(); return true; }
@@ -221,7 +230,7 @@ window.addEventListener('keydown', e => {
   const inGame = S && U.screen === 'game';
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (inGame || U.screen === 'story')) e.preventDefault();
   if (inGame && ['Space', 'Enter', 'KeyE'].includes(e.code) && e.target && e.target.tagName === 'BUTTON') { e.preventDefault(); e.target.blur(); }
-  if (e.code === 'Escape') { escAll() || (inGame && ['ship', 'colony'].includes(S.scene) && UIH.panel('menu')); return; }
+  if (e.code === 'Escape') { escAll() || (inGame && ['ship', 'colony'].includes(S.scene) && (U.qmenu = true)); return; }
   if (U.screen === 'story') { if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) UIH.storyNext(); return; }
   if (!inGame) return;
   if (e.repeat && e.code === 'Space') return;
