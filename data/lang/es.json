@@ -2504,9 +2504,148 @@
   "! Mas uma colônia não se faz sozinha.": "Pero una colonia no se hace sola.",
   "jornada completada": "viaje completado",
   ");\n  P(/^Pouso de emergência: combustível curto \\((\\d+) de (\\d+) kg\\)\\. O casco sofreu e alguém se feriu\\.$/, ": "Aterrizaje de emergencia: combustible escaso. El casco sufrió y alguien se hizo daño.",
-  "Voltar": "Volver"
+  "Voltar": "Volver",
+  "+1 em reparo, radiadores e persianas": "+1 en reparaciones, radiadores y persianas",
+  "+1 em reparos": "+1 en reparaciones",
+  "+1 em rotação e manobras": "+1 en rotación y maniobras",
+  "+1 em rotação e recálculo de rota": "+1 en rotación y recálculo de ruta",
+  "+10 kWh iniciais": "+10 kWh iniciales",
+  "+10 kg de plantação": "+10 kg de cultivo",
+  "+100 GB de dados": "+100 GB de datos",
+  "+100 kg de combustível": "+100 kg de combustible",
+  "+150 L de água": "+150 L de agua",
+  "+20 GB de dados por fase": "+20 GB de datos por fase",
+  "+20 kWh": "+20 kWh",
+  "+20 kWh por dia, mas gera calor extra": "+20 kWh por día, pero genera calor extra",
+  "+20 kg de oxigênio": "+20 kg de oxígeno",
+  "+3 pontos de verba na montagem": "+3 puntos de presupuesto al armar",
+  "+3% de eficiência": "+3 % de eficiencia",
+  "+3% de moral": "+3 % de moral",
+  "+30 kg de ração": "+30 kg de ración",
+  "+4% de eficiência": "+4 % de eficiencia",
+  "+4% de moral": "+4 % de moral",
+  "+5% de eficiência": "+5 % de eficiencia",
+  "+5% de moral": "+5 % de moral",
+  "+5% de recuperação de água": "+5 % de recuperación de agua",
+  "+6% de eficiência": "+6 % de eficiencia",
+  "+6% de moral": "+6 % de moral",
+  "+8 kWh por dia, vulneráveis a asteroides": "+8 kWh por día, vulnerables a asteroides",
+  "+8% de eficiência": "+8 % de eficiencia",
+  "+8% de moral": "+8 % de moral",
+  "1 reparo sem gastar energia (+1 peça)": "1 reparación sin gastar energía (+1 pieza)",
+  "1 vez por fase, rola o d20 de novo e fica com o melhor": "una vez por fase, tira el d20 de nuevo y se queda con el mejor",
+  "1 vez por fase, uma pista aparece um nível mais clara": "una vez por fase, una pista aparece un nivel más clara",
+  "2 bandejas de cultivo mesmo sem estufa": "2 bandejas de cultivo aunque no haya invernadero",
+  "A moral cai 1 ponto a menos por evento": "La moral baja 1 punto menos por evento",
+  "A nave entra numa zona de calor extremo. Mantenha a temperatura interna entre 18 °C e 26 °C.": "La nave entra en una zona de calor extremo. Mantenga la temperatura interna entre 18 °C y 26 °C.",
+  "Alergia": "Alergia",
+  "Aquecedores gastam 9 kWh em vez de 12 kWh": "Los calentadores gastan 9 kWh en vez de 12 kWh",
+  "Cada falha tira 1 ponto de moral em vez de 2": "Cada fallo quita 1 punto de moral en vez de 2",
+  "Começa com +1 peça": "Empieza con +1 pieza",
+  "Começa com 3 receitas descobertas": "Empieza con 3 recetas descubiertas",
+  "Comida fresca dura 6 dias em vez de 3": "La comida fresca dura 6 días en vez de 3",
+  "Enjoo espacial": "Mareo espacial",
+  "Mais recursos clínicos (+6)": "Más recursos clínicos (+6)",
+  "O \"Pânico na tripulação\" só ativa com 3 falhas": "El \"pánico de la tripulación\" solo se activa con 3 fallos",
+  "O líder assume a função de um tripulante ocupado, ferido ou morto, com −1": "El líder asume la función de un tripulante ocupado, herido o muerto, con −1",
+  "Pico do lado do Sol cai de +120 °C para +100 °C": "El pico del lado del Sol baja de +120 °C a +100 °C",
+  "Radiadores +2 na regulação térmica": "Radiadores +2 en la regulación térmica",
+  "Reforço nível 1": "Refuerzo nivel 1",
+  "Reforço nível 2": "Refuerzo nivel 2",
+  "Reparo +1, rasgo menos frequente": "Reparación +1, rasgadura menos frecuente",
+  "Rotação +2": "Rotación +2",
+  "Scanner médico (gasta 1 recurso)": "Escáner médico (gasta 1 recurso)",
+  "Tripulante dedicado dá +3 em vez de +2": "El tripulante dedicado da +3 en vez de +2",
+  "Vazamento de 20% vira 10%": "Una fuga del 20 % pasa a ser del 10 %",
+  "−10 L de água e −2 kg de oxigênio de consumo por fase": "−10 L de agua y −2 kg de oxígeno de consumo por fase",
+  "55 Cancri e": "55 Cancri e",
+  "Kepler-442 b": "Kepler-442 b",
+  "Kepler-452 b": "Kepler-452 b",
+  "LHS 1140 b": "LHS 1140 b",
+  "Proxima Centauri b": "Próxima Centauri b",
+  "TRAPPIST-1 e": "TRAPPIST-1 e",
+  "Teegarden b": "Teegarden b",
+  "Um dos impactos furou o casco!": "¡Uno de los impactos perforó el casco!",
+  "A brecha não foi selada a tempo: perdemos ar, o casco piorou": "La brecha no se selló a tiempo: perdimos aire y el casco empeoró",
+  "50 GB de dados → 10 kg de ração": "50 GB de datos → 10 kg de ración",
+  "40 GB de dados → 100 L de água": "40 GB de datos → 100 L de agua",
+  "1 peça sobressalente → sementes (+8 kg de plantação)": "1 pieza de repuesto → semillas (+8 kg de cultivo)",
+  "30 GB de dados → 3 recursos médicos": "30 GB de datos → 3 recursos médicos",
+  "40 GB de dados → recarga de 30 kWh": "40 GB de datos → recarga de 30 kWh",
+  "100 GB de dados → receita rara": "100 GB de datos → receta rara",
+  "10 kg de ração → reparo completo da Aviônica": "10 kg de ración → reparación completa de la aviónica",
+  " (Sonda de reconhecimento: sem riscos para a tripulação.)": " (Sonda de reconocimiento: sin riesgo para la tripulación.)",
+  "Aclimatação ao ar de Pontes-01b": "Aclimatación al aire de Pontes-01b",
+  "O ar tem 19% de O₂ e pressão um pouco menor. A tripulação precisa se adaptar.": "El aire tiene 19 % de O₂ y una presión algo menor. La tripulación debe adaptarse.",
+  "↺ Recomeçando da missão: ": "↺ Reiniciando desde la misión: ",
+  "recomeçar": "reiniciar",
+  ", pouso: ": ", aterrizaje: ",
+  "pouso": "aterrizaje",
+  "Sem sonda nem nave de pouso: investigar Pontes-01b vai arriscar a nave principal.": "Sin sonda ni nave de aterrizaje: investigar Pontes-01b arriesga la nave principal.",
+  "−30% combustível · 15% mais lento": "−30 % combustible · 15 % más lento",
+  "+50% combustível · 20% mais rápido": "+50 % combustible · 20 % más rápido",
+  "Nenhum evento detectado.": "No se detectó ningún evento.",
+  "fase": "fase",
+  "Fundo": "Fondo",
+  "c:nave": "Nave",
+  "nave": "nave",
+  "dados": "datos",
+  "Narração: ": "Narración: ",
+  "Sem energia: ": "Sin energía: "
  },
  "patterns": [
+  [
+   "^🍴 (.+) comeu\\.$",
+   "🍴 $1 comió."
+  ],
+  [
+   "^(.+) pronta \\(2 refeições\\)\\.$",
+   "$1 lista (2 comidas)."
+  ],
+  [
+   "^(.+) kg de lixo ejetados\\. Sem reciclador, a chance de reaproveitar foi perdida\\.$",
+   "$1 kg de basura expulsados. Sin reciclador, se perdió la oportunidad de reaprovecharla."
+  ],
+  [
+   "^(.+) kg de lixo viraram (.+) kg de adubo para a horta\\.$",
+   "$1 kg de basura se convirtieron en $2 kg de abono para el huerto."
+  ],
+  [
+   "^\\+(.+) pontos \\((.+)\\)\\.$",
+   "+$1 puntos ($2)."
+  ],
+  [
+   "^Uma bandeja de (.+) passou do ponto e estragou\\.$",
+   "Una bandeja de $1 se pasó de punto y se estropeó."
+  ],
+  [
+   "^(.+): vá até a Eclusa e pressione E para trocar de lugar\\.$",
+   "$1: ve a la Esclusa y pulsa E para cambiar de lugar."
+  ],
+  [
+   "^Levar toda a tripulação ao abrigo \\((.+)/(.+) nos Dormitórios\\)$",
+   "Llevar a toda la tripulación al refugio ($1/$2 en los Dormitorios)"
+  ],
+  [
+   "^(.+) tripulante\\(s\\) ficaram expostos à radiação\\.$",
+   "$1 tripulante(s) quedaron expuestos a la radiación."
+  ],
+  [
+   "^A tempestade atingiu a nave\\. (.+) tripulante\\(s\\) fora do abrigo\\.$",
+   "La tormenta golpeó la nave. $1 tripulante(s) fuera del refugio."
+  ],
+  [
+   "^📢 (.+) foi chamado\\(a\\): (.+)$",
+   "📢 $1 fue llamado: $2"
+  ],
+  [
+   "^(.+) não atendeu o chamado; (.+) assumiu\\.$",
+   "$1 no atendió el llamado; $2 tomó el relevo."
+  ],
+  [
+   "^(.+) não atendeu o chamado\\.$",
+   "$1 no atendió el llamado."
+  ],
   [
    "^Pouso com a nave auxiliar \\(40 kg de combustível\\)\\.$",
    "Aterrizaje con la nave auxiliar (40 kg de combustible)."

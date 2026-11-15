@@ -2505,9 +2505,148 @@
   ");\n  P(/^Pouso de emergência: combustível curto \\((\\d+) de (\\d+) kg\\)\\. O casco sofreu e alguém se feriu\\.$/, ": "Emergency landing: short on propellant. The hull was damaged and someone was hurt.",
   "Próximo evento previsto": "Next expected event",
   "Próximo evento previsto:": "Next expected event:",
-  "Voltar": "Back"
+  "Voltar": "Back",
+  "+1 em reparo, radiadores e persianas": "+1 on repairs, radiators and shutters",
+  "+1 em reparos": "+1 on repairs",
+  "+1 em rotação e manobras": "+1 on rotation and maneuvers",
+  "+1 em rotação e recálculo de rota": "+1 on rotation and route recalculation",
+  "+10 kWh iniciais": "+10 kWh initial",
+  "+10 kg de plantação": "+10 kg of crops",
+  "+100 GB de dados": "+100 GB of data",
+  "+100 kg de combustível": "+100 kg of propellant",
+  "+150 L de água": "+150 L of water",
+  "+20 GB de dados por fase": "+20 GB of data per phase",
+  "+20 kWh": "+20 kWh",
+  "+20 kWh por dia, mas gera calor extra": "+20 kWh per day, but generates extra heat",
+  "+20 kg de oxigênio": "+20 kg of oxygen",
+  "+3 pontos de verba na montagem": "+3 budget points when building",
+  "+3% de eficiência": "+3% efficiency",
+  "+3% de moral": "+3% morale",
+  "+30 kg de ração": "+30 kg of rations",
+  "+4% de eficiência": "+4% efficiency",
+  "+4% de moral": "+4% morale",
+  "+5% de eficiência": "+5% efficiency",
+  "+5% de moral": "+5% morale",
+  "+5% de recuperação de água": "+5% water recovery",
+  "+6% de eficiência": "+6% efficiency",
+  "+6% de moral": "+6% morale",
+  "+8 kWh por dia, vulneráveis a asteroides": "+8 kWh per day, vulnerable to asteroids",
+  "+8% de eficiência": "+8% efficiency",
+  "+8% de moral": "+8% morale",
+  "1 reparo sem gastar energia (+1 peça)": "1 repair without spending energy (+1 part)",
+  "1 vez por fase, rola o d20 de novo e fica com o melhor": "once per phase, rolls the d20 again and keeps the best",
+  "1 vez por fase, uma pista aparece um nível mais clara": "once per phase, a clue appears one level clearer",
+  "2 bandejas de cultivo mesmo sem estufa": "2 growing trays even without a greenhouse",
+  "A moral cai 1 ponto a menos por evento": "Morale drops 1 point less per event",
+  "A nave entra numa zona de calor extremo. Mantenha a temperatura interna entre 18 °C e 26 °C.": "The ship enters an extreme heat zone. Keep the internal temperature between 18 °C and 26 °C.",
+  "Alergia": "Allergy",
+  "Aquecedores gastam 9 kWh em vez de 12 kWh": "Heaters use 9 kWh instead of 12 kWh",
+  "Cada falha tira 1 ponto de moral em vez de 2": "Each failure costs 1 morale point instead of 2",
+  "Começa com +1 peça": "Starts with +1 part",
+  "Começa com 3 receitas descobertas": "Starts with 3 recipes discovered",
+  "Comida fresca dura 6 dias em vez de 3": "Fresh food lasts 6 days instead of 3",
+  "Enjoo espacial": "Space sickness",
+  "Mais recursos clínicos (+6)": "More clinical supplies (+6)",
+  "O \"Pânico na tripulação\" só ativa com 3 falhas": "\"Crew panic\" only triggers after 3 failures",
+  "O líder assume a função de um tripulante ocupado, ferido ou morto, com −1": "The leader takes over the role of a busy, injured or dead crew member, with −1",
+  "Pico do lado do Sol cai de +120 °C para +100 °C": "Sun-side peak drops from +120 °C to +100 °C",
+  "Radiadores +2 na regulação térmica": "Radiators +2 in thermal regulation",
+  "Reforço nível 1": "Reinforcement level 1",
+  "Reforço nível 2": "Reinforcement level 2",
+  "Reparo +1, rasgo menos frequente": "Repair +1, tears less frequent",
+  "Rotação +2": "Rotation +2",
+  "Scanner médico (gasta 1 recurso)": "Medical scanner (uses 1 resource)",
+  "Tripulante dedicado dá +3 em vez de +2": "Dedicated crew member gives +3 instead of +2",
+  "Vazamento de 20% vira 10%": "20% leak becomes 10%",
+  "−10 L de água e −2 kg de oxigênio de consumo por fase": "−10 L of water and −2 kg of oxygen use per phase",
+  "55 Cancri e": "55 Cancri e",
+  "Kepler-442 b": "Kepler-442 b",
+  "Kepler-452 b": "Kepler-452 b",
+  "LHS 1140 b": "LHS 1140 b",
+  "Proxima Centauri b": "Proxima Centauri b",
+  "TRAPPIST-1 e": "TRAPPIST-1 e",
+  "Teegarden b": "Teegarden b",
+  "Um dos impactos furou o casco!": "One of the impacts punched through the hull!",
+  "A brecha não foi selada a tempo: perdemos ar, o casco piorou": "The breach was not sealed in time: we lost air, and the hull got worse",
+  "50 GB de dados → 10 kg de ração": "50 GB of data → 10 kg of rations",
+  "40 GB de dados → 100 L de água": "40 GB of data → 100 L of water",
+  "1 peça sobressalente → sementes (+8 kg de plantação)": "1 spare part → seeds (+8 kg of crops)",
+  "30 GB de dados → 3 recursos médicos": "30 GB of data → 3 medical supplies",
+  "40 GB de dados → recarga de 30 kWh": "40 GB of data → 30 kWh recharge",
+  "100 GB de dados → receita rara": "100 GB of data → rare recipe",
+  "10 kg de ração → reparo completo da Aviônica": "10 kg of rations → full avionics repair",
+  " (Sonda de reconhecimento: sem riscos para a tripulação.)": " (Recon probe: no risk to the crew.)",
+  "Aclimatação ao ar de Pontes-01b": "Adapting to Pontes-01b's air",
+  "O ar tem 19% de O₂ e pressão um pouco menor. A tripulação precisa se adaptar.": "The air has 19% O₂ and slightly lower pressure. The crew must adapt.",
+  "↺ Recomeçando da missão: ": "↺ Restarting from mission: ",
+  "recomeçar": "restart",
+  ", pouso: ": ", landing: ",
+  "pouso": "landing",
+  "Sem sonda nem nave de pouso: investigar Pontes-01b vai arriscar a nave principal.": "No probe or landing craft: investigating Pontes-01b will risk the main ship.",
+  "−30% combustível · 15% mais lento": "−30% propellant · 15% slower",
+  "+50% combustível · 20% mais rápido": "+50% propellant · 20% faster",
+  "Nenhum evento detectado.": "No event detected.",
+  "fase": "phase",
+  "Fundo": "Fund",
+  "c:nave": "Ship",
+  "nave": "ship",
+  "dados": "data",
+  "Narração: ": "Narration: ",
+  "Sem energia: ": "No power: "
  },
  "patterns": [
+  [
+   "^🍴 (.+) comeu\\.$",
+   "🍴 $1 ate."
+  ],
+  [
+   "^(.+) pronta \\(2 refeições\\)\\.$",
+   "$1 ready (2 meals)."
+  ],
+  [
+   "^(.+) kg de lixo ejetados\\. Sem reciclador, a chance de reaproveitar foi perdida\\.$",
+   "$1 kg of trash ejected. Without a recycler, the chance to reuse it was lost."
+  ],
+  [
+   "^(.+) kg de lixo viraram (.+) kg de adubo para a horta\\.$",
+   "$1 kg of trash became $2 kg of fertilizer for the garden."
+  ],
+  [
+   "^\\+(.+) pontos \\((.+)\\)\\.$",
+   "+$1 points ($2)."
+  ],
+  [
+   "^Uma bandeja de (.+) passou do ponto e estragou\\.$",
+   "A tray of $1 went past its prime and spoiled."
+  ],
+  [
+   "^(.+): vá até a Eclusa e pressione E para trocar de lugar\\.$",
+   "$1: go to the Airlock and press E to swap places."
+  ],
+  [
+   "^Levar toda a tripulação ao abrigo \\((.+)/(.+) nos Dormitórios\\)$",
+   "Bring the whole crew to shelter ($1/$2 in the Dormitories)"
+  ],
+  [
+   "^(.+) tripulante\\(s\\) ficaram expostos à radiação\\.$",
+   "$1 crew member(s) were exposed to radiation."
+  ],
+  [
+   "^A tempestade atingiu a nave\\. (.+) tripulante\\(s\\) fora do abrigo\\.$",
+   "The storm hit the ship. $1 crew member(s) outside the shelter."
+  ],
+  [
+   "^📢 (.+) foi chamado\\(a\\): (.+)$",
+   "📢 $1 was called: $2"
+  ],
+  [
+   "^(.+) não atendeu o chamado; (.+) assumiu\\.$",
+   "$1 did not answer the call; $2 took over."
+  ],
+  [
+   "^(.+) não atendeu o chamado\\.$",
+   "$1 did not answer the call."
+  ],
   [
    "^Pouso com a nave auxiliar \\(40 kg de combustível\\)\\.$",
    "Landing with the auxiliary ship (40 kg of propellant)."
