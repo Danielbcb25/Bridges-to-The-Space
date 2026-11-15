@@ -24,7 +24,9 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - **H** abre o **computador de bordo**: próximo passo, lista de tarefas e controles. A barra 💻 no topo mostra sempre o próximo passo.
 - **Shift+S** ou o botão ⏩: tempo 2x até o próximo evento.
 - HUD enxuto com 4 barras (oxigênio, fome, humor, armazenamento); ▾ mostra todos os recursos.
-- Falas do jogo (narração, moradores, tripulação, Controle da Missão e introduções de cada modo) ficam em `data/falas.json` — o jogo precisa ser aberto por um servidor (GitHub Pages, Vercel ou `node server/server.js`) para carregá-las.
+- **Traduções e falas em JSON, um arquivo por idioma**: `data/lang/pt.json` (textos do site e falas originais), `data/lang/en.json` e `data/lang/es.json` (`ui`: texto em português → tradução; `patterns`: mensagens com números; `falas`: textos falados). Mensagens que traduzem partes de uma frase ficam em `js/i18n-patterns.js`. O jogo precisa ser aberto por um servidor (GitHub Pages, Vercel ou `node server/server.js`) para carregar os JSON.
+- **Salvar progresso**: salvamento automático (a cada 15 s e ao trocar de cena) e “Salvar progresso” no menu de pausa; **Continuar** na tela de título.
+- **Tempo acelerado**: Shift+S alterna 2x → 5x → 10x → normal até o próximo evento.
 
 ## O que tem
 

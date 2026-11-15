@@ -451,3 +451,12 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .assist-mini .cnt { color: var(--muted); font-size: 0.85em; }
 .mbtn { justify-content: flex-start; gap: 0.5em; } .mbtn small { margin-left: auto; }
 .game[data-scene=setup] .assist-mini { top: auto !important; bottom: 0.45em !important; left: 50% !important; max-width: 36%; }
+.title-screen .menu { top: 45%; }
+
+/* ---------- casa da cidade: cartão no canto da tela ---------- */
+.house-card { position: absolute; right: 1.2%; bottom: 4.5em; display: flex; align-items: center; gap: 0.5em; background: rgba(8, 14, 44, 0.94); border: 2px solid var(--yellow); padding: 0.35em 0.6em; box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55); cursor: pointer; z-index: 4; }
+.house-card .hc-ic { font-size: 1.3em; } .house-card .hc-name { font-family: var(--sk); font-size: 0.9em; }
+.house-card.open { display: block; padding: 0; border: 0; background: none; box-shadow: none; cursor: default; width: min(42%, 30em); bottom: 4.2em; top: auto; }
+.house-card.open .panel { position: relative; max-height: 58vh; overflow: auto; padding: 0.6em 0.8em; }
+.house-card.open h2 { font-size: 0.8em; padding-right: 1.5em; }
+.house-card.open .citytxt { font-size: 0.95em; }

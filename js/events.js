@@ -297,7 +297,7 @@ EV.combFalta = {
 };
 
 EV.combVaz = {
-  time: 90, points: 30, tip: 'Vamos recalcular a rota. Mantenham o rádio aberto.', ai: 'pedir o recálculo da rota à Terra.',
+  time: 60, points: 30, tip: 'Vamos recalcular a rota. Mantenham o rádio aberto.', ai: 'pedir o recálculo da rota à Terra.',
   setup(ev) {
     ev.steps = [
       { id: 'pedir', label: 'Pedir à equipe em solo o recálculo da rota', station: 'antena', dur: (S.setup.origin === 'diplomata' || has('antena')) ? 2 : 4.5 },
@@ -317,7 +317,7 @@ EV.combVaz = {
 };
 
 EV.oxigenio = {
-  time: 80, points: 35, tip: 'Usem os cilindros. O filtro reserva está no compartimento do suporte à vida.', ai: 'inspecionar os filtros e trocar o entupido.',
+  time: 60, points: 35, tip: 'Usem os cilindros. O filtro reserva está no compartimento do suporte à vida.', ai: 'inspecionar os filtros e trocar o entupido.',
   setup(ev) {
     const quick = has('filtroReserva');
     ev.steps = [
@@ -332,7 +332,7 @@ EV.oxigenio = {
 };
 
 EV.painel = {
-  time: 75, points: 30, tip: 'Reiniciem o computador e recalibrem pelo mapa estelar.', ai: 'chamar o engenheiro para reiniciar e recalibrar.',
+  time: 55, points: 30, tip: 'Reiniciem o computador e recalibrem pelo mapa estelar.', ai: 'chamar o engenheiro para reiniciar e recalibrar.',
   setup(ev) {
     const backup = has('redundante') || has('analogicos');
     ev.steps = [
@@ -402,7 +402,7 @@ ACTIONS.pickTrash = (p, actor) => {
 };
 
 EV.radio = {
-  time: 120, points: 30, tip: '…ssshhh… (a dica também chegou cortada)', ai: 'girar o sintonizador até o chiado sumir.',
+  time: 75, points: 30, tip: '…ssshhh… (a dica também chegou cortada)', ai: 'girar o sintonizador até o chiado sumir.',
   setup(ev) {
     ev.steps = [
       { id: 'sintonizar', label: 'Sintonizar o rádio e decifrar a mensagem', station: 'antena', dur: 1, puzzle: 'radio', role: 'engenheiro', dc: 10 },
@@ -427,7 +427,7 @@ function applyRadioMsg(msg) {
 }
 
 EV.contaminacao = {
-  time: 100, points: 35, tip: 'Destilação, filtração, oxidação e desinfecção — nessa ordem.', ai: 'seguir as 4 etapas do ciclo fechado.',
+  time: 70, points: 35, tip: 'Destilação, filtração, oxidação e desinfecção — nessa ordem.', ai: 'seguir as 4 etapas do ciclo fechado.',
   setup(ev) {
     ev.steps = [
       { id: 'ordem', label: 'Montar a sequência de descontaminação', station: 'suporte', dur: 1, puzzle: 'agua', role: 'engenheiro', dc: 8 },
@@ -447,7 +447,7 @@ EV.traje = {
   time: 60, points: 40, tip: 'Mandem outro tripulante pela eclusa, rápido!', ai: 'escolher o outro engenheiro como substituto.',
   can() { return roleAlive('engenheiro'); },
   setup(ev) {
-    ev.time = has('trajes') ? 90 : 60; ev.t = ev.dur = ev.time;
+    ev.time = has('trajes') ? 75 : 55; ev.t = ev.dur = ev.time;
     ev.steps = [
       { id: 'escolher', label: 'Escolher quem vai substituir o engenheiro', station: 'eclusa', dur: 0.5, puzzle: 'substituto', dc: 5 },
       { id: 'troca', label: 'Substituto: trocar de lugar pela eclusa', station: 'eclusa', dur: 4 },
@@ -469,7 +469,7 @@ EV.traje = {
 };
 
 EV.doenca = {
-  time: 90, points: 30, tip: 'Usem os aparelhos para o diagnóstico antes do remédio.', ai: 'medir temperatura e oxigênio no sangue primeiro.',
+  time: 60, points: 30, tip: 'Usem os aparelhos para o diagnóstico antes do remédio.', ai: 'medir temperatura e oxigênio no sangue primeiro.',
   setup(ev) {
     ev.steps = [{ id: 'tratar', label: 'Diagnosticar e medicar o doente', station: 'enfermaria', dur: 1, puzzle: 'remedio', role: 'paramedico', dc: 8 }];
   },
@@ -538,10 +538,10 @@ const TH_ACTIONS = {
 function thHeatCost() { let c = has('aquecEf') ? 9 : 12; if (S.thermal && S.thermal.shutOk) c -= 3; return c; }
 
 EV.termico = {
-  time: 300, points: 0, noTimer: true, customEnd: true,
+  time: 60, points: 0, noTimer: true, customEnd: true,
   tip: 'Poucas soluções, bem combinadas. Preparem-se antes.', ai: 'girar a nave cedo e abrir radiadores no pico.',
   setup(ev) {
-    const D = S.journey === 'curta' ? 180 : 300;
+    const D = 60; // fase térmica de 1 minuto
     ev.t = ev.dur = D;
     ev.steps = [];
     S.thermal = {
@@ -566,6 +566,7 @@ function thMsg(t) { const th = S.thermal; if (!th) return; th.msgs.push(t); if (
 function thermalTick(ev, dt) {
   const th = S.thermal; if (!th) return;
   th.el += dt; ev.t = Math.max(0, th.D - th.el);
+  const dk = dt * (300 / th.D); // a física foi calibrada para 5 min: acelera na mesma proporção
   const p = th.el / th.D;
   const peak = has('pintura') ? 100 : 120;
   // cenas
@@ -594,11 +595,11 @@ function thermalTick(ev, dt) {
   // temperaturas externas
   let sunT = th.shadow ? -60 : (th.scene >= 2 ? peak : 60);
   let shadeT = th.shadow ? -150 : (th.scene >= 2 ? -120 : -100);
-  th.sun += (sunT - th.sun) * Math.min(1, dt * 0.08 * th.sunMult);
-  th.shade += (shadeT - th.shade) * Math.min(1, dt * 0.08);
+  th.sun += (sunT - th.sun) * Math.min(1, dk * 0.08 * th.sunMult);
+  th.shade += (shadeT - th.shade) * Math.min(1, dk * 0.08);
   // efeitos ativos
   for (const k in th.act) if (th.act[k] > 0) { th.act[k] -= dt; if (th.act[k] <= 0) { th.act[k] = 0; th.weak[k] = false; if (k === 'shut') th.shutMode = null; thMsg(`${TH_ACTIONS[k].name}: efeito terminou.`); } }
-  if (th.sunMult > 1) th.sunMult = Math.max(1, th.sunMult - dt * 0.02);
+  if (th.sunMult > 1) th.sunMult = Math.max(1, th.sunMult - dk * 0.02);
   const rot = th.act.rot > 0 ? (th.weak.rot ? 0.75 : 0.45) : 1;
   const ripF = th.rip && !th.repaired ? 1.6 : 1;
   const heatIn = Math.max(0, th.sun - 20) * 0.06 * rot * ripF * th.sunMult;
@@ -612,17 +613,17 @@ function thermalTick(ev, dt) {
   const heat = th.act.heat > 0 ? (th.weak.heat ? 5 : 10) * (conflict ? 0.5 : 1) : 0;
   const Teq = 22 + heatIn - coldLoss + equip - rad + heat - (shutOpen ? (th.weak.shut ? 2 : 4) : 0);
   th.Teq = Teq;
-  th.T += (Teq - th.T) * Math.min(1, dt * 0.05);
+  th.T += (Teq - th.T) * Math.min(1, dk * 0.05);
   // escudo perdendo espessura com o rasgo aberto
-  if (th.rip && !th.repaired && th.ripLoss < 7.5) { const l = Math.min(7.5 - th.ripLoss, dt * 0.06); th.ripLoss += l; addRes('escudo', -l, 'Rasgo no isolamento'); }
+  if (th.rip && !th.repaired && th.ripLoss < 7.5) { const l = Math.min(7.5 - th.ripLoss, dk * 0.06); th.ripLoss += l; addRes('escudo', -l, 'Rasgo no isolamento'); }
   // plantação sofre fora da faixa
   const out = th.T > 26 || th.T < 18;
   if (out) {
-    th.outT += dt; th.plantT += dt;
+    th.outT += dt; th.plantT += dk;
     const every = has('tAgr') ? 12 : 7;
     if (th.plantT >= every && th.plantsLost < 18) { th.plantT = 0; th.plantsLost += 1; addRes('plantacao', -1, 'Temperatura fora da faixa'); }
   }
-  if (th.T > 32 || th.T < 12) for (const c of alive()) c.humor = clamp(c.humor - dt * 0.15, 0, 100);
+  if (th.T > 32 || th.T < 12) for (const c of alive()) c.humor = clamp(c.humor - dk * 0.15, 0, 100);
   if (th.equipDelay > 0) { th.equipDelay -= dt; if (th.equipDelay <= 0) { th.equipOff = false; S.equipOff = false; thMsg('Equipamentos religados após o atraso.'); } }
   if (th.pendingReroll) { th.pendingReroll.t -= dt; if (th.pendingReroll.t <= 0) { const pr = th.pendingReroll; th.pendingReroll = null; thFailure(pr.k); } }
   if (th.el >= th.D) thermalEnd(ev);

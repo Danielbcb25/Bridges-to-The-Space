@@ -9,7 +9,7 @@ const ASSETS = {
   heroic: ['.claude/InteriorFaseHeroicMusic1.mp3', '.claude/InteriorFaseHeroicMusic2.mp3'],
 };
 
-const NARRATION_INTRO = []; // preenchido por data/falas.json (story)
+const NARRATION_INTRO = []; // preenchido por data/lang/<idioma>.json ("falas") (story)
 
 // ---------------- Tripulação ----------------
 const ROLES = [
@@ -25,12 +25,12 @@ const FEM_NAMES = ['Ana', 'Carla', 'Elisa', 'Gabi', 'Iara', 'Luana', 'Nina', 'Pa
 const FEM_ROLE = { 'Paramédico': 'Paramédica', 'Navegador': 'Navegadora', 'Agricultor / Eng. Genético': 'Agricultora / Eng. Genética', 'Engenheiro 1': 'Engenheira 1', 'Engenheiro 2': 'Engenheira 2', 'Pesquisador Chefe': 'Pesquisadora Chefe' };
 const roleForName = (role, name) => (FEM_NAMES.includes(name) && FEM_ROLE[role]) || role;
 const ROLE_FN = {
-  paramedico: K('Cura feridos e doentes', 'Heals the hurt and sick', 'Cura heridos y enfermos'),
-  navegador: K('Rota e manobras', 'Route and maneuvers', 'Ruta y maniobras'),
-  agricultor: K('Horta e comida', 'Garden and food', 'Huerta y comida'),
-  engenheiro1: K('Motores e reparos', 'Engines and repairs', 'Motores y reparaciones'),
-  engenheiro2: K('Suporte à vida e trajes', 'Life support and suits', 'Soporte vital y trajes'),
-  pesquisador: K('Ciência e dados', 'Science and data', 'Ciencia y datos'),
+  paramedico: 'Cura feridos e doentes',
+  navegador: 'Rota e manobras',
+  agricultor: 'Horta e comida',
+  engenheiro1: 'Motores e reparos',
+  engenheiro2: 'Suporte à vida e trajes',
+  pesquisador: 'Ciência e dados',
 };
 const CREW_NAMES = ['Ana', 'Bruno', 'Carla', 'Davi', 'Elisa', 'Felipe', 'Gabi', 'Heitor', 'Iara', 'João', 'Kaique', 'Luana', 'Marcos', 'Nina', 'Otávio', 'Paula', 'Rafa', 'Sofia', 'Tiago', 'Yara'];
 const FOOD_TAGS = ['sopa', 'apimentado', 'salada', 'carne', 'batata', 'pao', 'doce', 'diferente', 'algas', 'soja'];
@@ -299,22 +299,22 @@ function foodNutr(item) {
   r.ing.forEach(i => { const n = FOOD_NUTR[i] || FOOD_NUTR.racao; for (let k = 0; k < 3; k++) sum[k] += n[k]; });
   return sum.map(v => Math.min(40, Math.round(v * 0.75)));
 }
-const NUTR_NAMES = [K('Energia', 'Energy', 'Energía'), K('Proteína', 'Protein', 'Proteína'), K('Vitaminas', 'Vitamins', 'Vitaminas')];
+const NUTR_NAMES = ['Energia', 'Proteína', 'Vitaminas'];
 
 // nomes dos gostos/alergias da tripulação (traduzidos)
 const FOOD_TAG_NAMES = {
-  sopa: K('sopa', 'soup', 'sopa'), apimentado: K('apimentado', 'spicy', 'picante'), salada: K('salada', 'salad', 'ensalada'),
-  carne: K('carne', 'meat', 'carne'), batata: K('batata', 'potato', 'papa'), pao: K('pão', 'bread', 'pan'), doce: K('doce', 'sweets', 'dulces'),
-  diferente: K('pratos diferentes', 'new dishes', 'platos distintos'), algas: K('algas', 'algae', 'algas'), soja: K('soja', 'soy', 'soja'),
+  sopa: 'sopa', apimentado: 'apimentado', salada: 'salada',
+  carne: 'carne', batata: 'batata', pao: 'pão', doce: 'doce',
+  diferente: 'pratos diferentes', algas: 'algas', soja: 'soja',
 };
 const tagNames = list => list.map(t => L(FOOD_TAG_NAMES[t] || t)).join(', ');
 
 // o que cada função faz (mostrado ao jogador no multiplayer)
 const ROLE_DUTIES = {
-  paramedico: K('Trata feridos e doentes (gasta menos recursos), diagnostica na Enfermaria e cuida dos remédios.', 'Treats the injured and sick (uses fewer supplies), diagnoses at the Sickbay and manages medicines.', 'Trata heridos y enfermos (gasta menos recursos), diagnostica en la Enfermería y cuida los medicamentos.'),
-  navegador: K('Pilota na chuva de meteoros, gira a nave na fase térmica e confere o painel e o radar.', 'Pilots through meteor showers, spins the ship in the thermal phase and checks the panel and radar.', 'Pilota en la lluvia de meteoros, gira la nave en la fase térmica y revisa el panel y el radar.'),
-  agricultor: K('Cuida da horta e das colheitas e protege a plantação do frio e do calor.', 'Tends the garden and harvests, and protects the crops from cold and heat.', 'Cuida del huerto y las cosechas y protege el cultivo del frío y del calor.'),
-  engenheiro1: K('Faz os reparos: motores, tanques, filtros de ar, computador, radiadores, persianas e isolamento.', 'Does repairs: engines, tanks, air filters, computer, radiators, louvers and insulation.', 'Hace las reparaciones: motores, tanques, filtros de aire, computadora, radiadores, persianas y aislamiento.'),
-  engenheiro2: K('Faz os reparos: motores, tanques, filtros de ar, computador, radiadores, persianas e isolamento.', 'Does repairs: engines, tanks, air filters, computer, radiators, louvers and insulation.', 'Hace las reparaciones: motores, tanques, filtros de aire, computadora, radiadores, persianas y aislamiento.'),
-  pesquisador: K('Cuida dos equipamentos científicos e dos dados; decide o que desligar na sobrecarga.', 'Looks after the science equipment and data; decides what to switch off during an overload.', 'Cuida de los equipos científicos y los datos; decide qué apagar en la sobrecarga.'),
+  paramedico: 'Trata feridos e doentes (gasta menos recursos), diagnostica na Enfermaria e cuida dos remédios.',
+  navegador: 'Pilota na chuva de meteoros, gira a nave na fase térmica e confere o painel e o radar.',
+  agricultor: 'Cuida da horta e das colheitas e protege a plantação do frio e do calor.',
+  engenheiro1: 'Faz os reparos: motores, tanques, filtros de ar, computador, radiadores, persianas e isolamento.',
+  engenheiro2: 'Faz os reparos: motores, tanques, filtros de ar, computador, radiadores, persianas e isolamento.',
+  pesquisador: 'Cuida dos equipamentos científicos e dos dados; decide o que desligar na sobrecarga.',
 };

@@ -12,7 +12,7 @@ const LANGS = [
   { id: 'en', label: 'English', flag: '🇺🇸', speech: 'en-US' },
   { id: 'es', label: 'Español', flag: '🇪🇸', speech: 'es-ES' },
 ];
-const I18N_DICT = { en: {}, es: {} };      // chave = texto em PT (ou chave estática do index.html)
+const I18N_DICT = { pt: {}, en: {}, es: {} };      // chave = texto em PT (ou chave estática do index.html)
 const I18N_PATTERNS = { en: [], es: [] };  // [RegExp, 'substituição $1']
 
 const I18n = {
@@ -40,7 +40,7 @@ const I18n = {
     document.querySelectorAll('[data-i18n]').forEach(el => {
       if (el.dataset.pt == null) el.dataset.pt = el.innerHTML;
       const k = el.dataset.i18n;
-      const v = this.lang === 'pt' ? null : (I18N_DICT[this.lang][k]);
+      const v = (I18N_DICT[this.lang] || {})[k];
       el.innerHTML = v != null ? v : el.dataset.pt;
     });
     document.querySelectorAll('[data-i18n-attr]').forEach(el => {
@@ -109,3 +109,28 @@ const K = (pt, en, es) => ({ pt, en, es });
 // atalhos globais
 const L = o => (o == null ? '' : typeof o === 'string' ? I18n.t(o) : (o[I18n.lang] != null ? o[I18n.lang] : (o.pt != null ? o.pt : '')));
 const T = s => I18n.t(s);
+
+// ---------- traduções em JSON: data/lang/<idioma>.json ----------
+//  pt.json → "site" (textos da página) e "falas" (textos falados, original)
+//  en.json / es.json → "ui" (texto PT → tradução), "patterns" ([regex, troca]) e "falas"
+const FALAS_LANG = {};
+async function loadLangs() {
+  const get = async l => { try { const r = await fetch(`data/lang/${l}.json`, { cache: 'no-cache' }); return await r.json(); } catch (e) { console.warn(`Não foi possível carregar data/lang/${l}.json (abra o jogo por um servidor):`, e); return {}; } };
+  const [pt, en, es] = await Promise.all(['pt', 'en', 'es'].map(get));
+  I18N_DICT.pt = pt.site || {};
+  for (const [l, d] of [['en', en], ['es', es]]) {
+    I18N_DICT[l] = d.ui || {};
+    I18N_PATTERNS[l] = (d.patterns || []).map(([re, rep]) => [new RegExp(re), rep]);
+    FALAS_LANG[l] = d.falas || {};
+  }
+  FALAS_LANG.pt = pt.falas || {};
+  if (typeof registerFnPatterns === 'function') registerFnPatterns();
+  // reúne as falas no formato {pt, en, es} usado pelo jogo
+  const join = (a, b, c) => {
+    if (typeof a === 'string') { const en = typeof b === 'string' ? b : a, es = typeof c === 'string' ? c : a; return en === a && es === a ? a : { pt: a, en, es }; } // igual nos 3 idiomas (nomes, ids) = texto simples
+    if (Array.isArray(a)) return a.map((x, i) => join(x, (b || [])[i], (c || [])[i]));
+    if (a && typeof a === 'object') { const o = {}; for (const k in a) o[k] = join(a[k], (b || {})[k], (c || {})[k]); return o; }
+    return a;
+  };
+  return join(FALAS_LANG.pt, FALAS_LANG.en, FALAS_LANG.es);
+}

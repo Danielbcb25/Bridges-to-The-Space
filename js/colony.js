@@ -8,24 +8,24 @@
 const COLONY_W = 1900, CGROUND = 226;
 
 const CBUILD = {
-  nave: { x: 150, icon: '🚀', name: K('Nave pousada · Controle da Colônia', 'Landed ship · Colony Control', 'Nave aterrizada · Control de la Colonia'),
-    fact: K('O pouso em Marte da Perseverance (2021) usou o “guindaste aéreo” e levou cerca de 7 minutos da atmosfera ao solo, sem nenhum controle ao vivo: o sinal demora minutos para chegar da Terra.', 'The Perseverance Mars landing (2021) used the “sky crane” and took about 7 minutes from atmosphere to ground, with no live control: radio takes minutes to arrive from Earth.', 'El aterrizaje de Perseverance en Marte (2021) usó la “grúa aérea” y duró unos 7 minutos desde la atmósfera hasta el suelo, sin control en vivo: la señal tarda minutos en llegar desde la Tierra.') },
-  lab: { x: 360, icon: '🔬', name: K('Laboratório de campo e oficina', 'Field lab & workshop', 'Laboratorio de campo y taller'),
-    fact: K('O instrumento MOXIE, a bordo do rover Perseverance, produziu oxigênio a partir do CO₂ da atmosfera de Marte: 122 gramas no total, o suficiente para um cachorro pequeno respirar por cerca de 10 horas (NASA). É o princípio do uso de recursos locais (ISRU).', 'The MOXIE instrument on the Perseverance rover made oxygen from Mars\' CO₂ atmosphere: 122 grams in total, enough for a small dog to breathe about 10 hours (NASA). This is the idea of in-situ resource utilization (ISRU).', 'El instrumento MOXIE del rover Perseverance produjo oxígeno a partir del CO₂ de la atmósfera de Marte: 122 gramos en total, suficiente para que un perro pequeño respire unas 10 horas (NASA). Es la idea del uso de recursos locales (ISRU).') },
-  solar: { x: 580, icon: '☀', name: K('Campo solar', 'Solar field', 'Campo solar'),
-    fact: K('A Estação Espacial Internacional tem painéis solares com área maior que a de uma quadra de tênis e gera energia da ordem de 100 kW em plena luz do Sol. Mas ela passa pela sombra da Terra a cada órbita (~90 min): por isso tem baterias.', 'The International Space Station has solar arrays larger than a tennis court and produces on the order of 100 kW in full sunlight. But it passes through Earth\'s shadow every orbit (~90 min), so it needs batteries.', 'La Estación Espacial Internacional tiene paneles solares más grandes que una cancha de tenis y produce del orden de 100 kW a plena luz. Pero pasa por la sombra de la Tierra en cada órbita (~90 min), por eso tiene baterías.') },
-  agua: { x: 800, icon: '💧', name: K('Estação de água', 'Water station', 'Estación de agua'),
-    fact: K('Em 2023 a ISS alcançou 98% de recuperação de água: urina, suor e até a umidade da respiração viram água potável de novo (NASA). A sonda Phoenix confirmou gelo de água em Marte em 2008.', 'In 2023 the ISS reached 98% water recovery: urine, sweat and even breath moisture become drinkable again (NASA). The Phoenix lander confirmed water ice on Mars in 2008.', 'En 2023 la ISS alcanzó un 98% de recuperación de agua: la orina, el sudor y hasta la humedad de la respiración vuelven a ser potables (NASA). La sonda Phoenix confirmó hielo de agua en Marte en 2008.') },
-  estufa: { x: 1020, icon: '🌱', name: K('Estufa colonial', 'Colonial greenhouse', 'Invernadero colonial'),
-    fact: K('Astronautas da ISS já cultivaram e comeram alface (2015, experimento Veggie) e colheram pimentas Hatch (2021, Plant Habitat-04). Plantas também produzem O₂ e ajudam o psicológico da tripulação (NASA).', 'ISS astronauts have grown and eaten lettuce (2015, Veggie experiment) and harvested Hatch chile peppers (2021, Plant Habitat-04). Plants also make O₂ and help the crew\'s well-being (NASA).', 'Los astronautas de la ISS han cultivado y comido lechuga (2015, experimento Veggie) y cosechado chiles Hatch (2021, Plant Habitat-04). Las plantas también producen O₂ y ayudan al bienestar de la tripulación (NASA).') },
-  torre: { x: 1240, icon: '📡', name: K('Torre de comunicação', 'Communication tower', 'Torre de comunicación'),
-    fact: K('A Rede de Espaço Profundo da NASA (DSN) tem 3 complexos — Goldstone (EUA), Madri (Espanha) e Canberra (Austrália) — separados por cerca de 120°, para que sempre um deles enxergue a nave enquanto a Terra gira. Em 2023 o teste DSOC enviou dados por laser a 267 Mbps de 31 milhões de km.', 'NASA\'s Deep Space Network (DSN) has 3 complexes — Goldstone (USA), Madrid (Spain) and Canberra (Australia) — about 120° apart, so one always sees the spacecraft as Earth turns. In 2023 the DSOC test sent laser data at 267 Mbps from 31 million km.', 'La Red del Espacio Profundo de la NASA (DSN) tiene 3 complejos — Goldstone (EE. UU.), Madrid (España) y Canberra (Australia) — separados unos 120°, para que siempre uno vea la nave mientras la Tierra gira. En 2023 la prueba DSOC envió datos por láser a 267 Mbps desde 31 millones de km.') },
-  pista: { x: 1470, icon: '🛬', name: K('Pista de pouso e farol', 'Landing pad & beacon', 'Pista de aterrizaje y baliza'),
-    fact: K('Pousar exige um alvo conhecido: a NASA escolheu a cratera Jezero, em Marte, depois de anos de imagens de satélite. Sinais de rádio e faróis ajudam a guiar o pouso final.', 'Landing needs a known target: NASA picked Jezero crater on Mars after years of satellite imagery. Radio signals and beacons help guide the final descent.', 'Aterrizar exige un objetivo conocido: la NASA eligió el cráter Jezero en Marte tras años de imágenes satelitales. Las señales de radio y las balizas ayudan en el descenso final.') },
-  habitat: { x: 1720, icon: '🏠', name: K('Habitat e domos', 'Habitat & domes', 'Hábitat y domos'),
-    fact: K('Na simulação CHAPEA da NASA, quatro voluntários viveram 378 dias em um habitat impresso em 3D (“Mars Dune Alpha”, 2023–2024) para estudar o isolamento, a comida e o trabalho em equipe.', 'In NASA\'s CHAPEA simulation, four volunteers lived 378 days in a 3D-printed habitat (“Mars Dune Alpha”, 2023–2024) to study isolation, food and teamwork.', 'En la simulación CHAPEA de la NASA, cuatro voluntarios vivieron 378 días en un hábitat impreso en 3D (“Mars Dune Alpha”, 2023–2024) para estudiar el aislamiento, la comida y el trabajo en equipo.') },
+  nave: { x: 150, icon: '🚀', name: 'Nave pousada · Controle da Colônia',
+    fact: 'O pouso em Marte da Perseverance (2021) usou o “guindaste aéreo” e levou cerca de 7 minutos da atmosfera ao solo, sem nenhum controle ao vivo: o sinal demora minutos para chegar da Terra.' },
+  lab: { x: 360, icon: '🔬', name: 'Laboratório de campo e oficina',
+    fact: 'O instrumento MOXIE, a bordo do rover Perseverance, produziu oxigênio a partir do CO₂ da atmosfera de Marte: 122 gramas no total, o suficiente para um cachorro pequeno respirar por cerca de 10 horas (NASA). É o princípio do uso de recursos locais (ISRU).' },
+  solar: { x: 580, icon: '☀', name: 'Campo solar',
+    fact: 'A Estação Espacial Internacional tem painéis solares com área maior que a de uma quadra de tênis e gera energia da ordem de 100 kW em plena luz do Sol. Mas ela passa pela sombra da Terra a cada órbita (~90 min): por isso tem baterias.' },
+  agua: { x: 800, icon: '💧', name: 'Estação de água',
+    fact: 'Em 2023 a ISS alcançou 98% de recuperação de água: urina, suor e até a umidade da respiração viram água potável de novo (NASA). A sonda Phoenix confirmou gelo de água em Marte em 2008.' },
+  estufa: { x: 1020, icon: '🌱', name: 'Estufa colonial',
+    fact: 'Astronautas da ISS já cultivaram e comeram alface (2015, experimento Veggie) e colheram pimentas Hatch (2021, Plant Habitat-04). Plantas também produzem O₂ e ajudam o psicológico da tripulação (NASA).' },
+  torre: { x: 1240, icon: '📡', name: 'Torre de comunicação',
+    fact: 'A Rede de Espaço Profundo da NASA (DSN) tem 3 complexos — Goldstone (EUA), Madri (Espanha) e Canberra (Austrália) — separados por cerca de 120°, para que sempre um deles enxergue a nave enquanto a Terra gira. Em 2023 o teste DSOC enviou dados por laser a 267 Mbps de 31 milhões de km.' },
+  pista: { x: 1470, icon: '🛬', name: 'Pista de pouso e farol',
+    fact: 'Pousar exige um alvo conhecido: a NASA escolheu a cratera Jezero, em Marte, depois de anos de imagens de satélite. Sinais de rádio e faróis ajudam a guiar o pouso final.' },
+  habitat: { x: 1720, icon: '🏠', name: 'Habitat e domos',
+    fact: 'Na simulação CHAPEA da NASA, quatro voluntários viveram 378 dias em um habitat impresso em 3D (“Mars Dune Alpha”, 2023–2024) para estudar o isolamento, a comida e o trabalho em equipe.' },
 };
-const CSHORT = { nave: K('Nave', 'Ship', 'Nave'), lab: K('Laboratório', 'Lab', 'Laboratorio'), solar: K('Campo solar', 'Solar field', 'Campo solar'), agua: K('Água', 'Water', 'Agua'), estufa: K('Estufa', 'Greenhouse', 'Invernadero'), torre: K('Torre', 'Tower', 'Torre'), pista: K('Pista', 'Pad', 'Pista'), habitat: K('Habitat', 'Habitat', 'Hábitat') };
+const CSHORT = { nave: 'Nave', lab: 'Laboratório', solar: 'Campo solar', agua: 'Água', estufa: 'Estufa', torre: 'Torre', pista: 'Pista', habitat: 'Habitat' };
 const CORDER = ['nave', 'lab', 'solar', 'agua', 'estufa', 'torre', 'pista', 'habitat'];
 // custos por nível (kwh, água L, peças, sementes kg, duração s)
 const CCOST = {
@@ -41,20 +41,20 @@ const CREQ = { // pré-requisitos de construção (id → [[prédio, nível]])
   agua: [['solar', 1]], estufa: [['agua', 1]], torre: [['solar', 1]], pista: [['solar', 1]], habitat: [['solar', 1]],
 };
 const TX_PACKAGES = [
-  { id: 'atmosfera', gb: 20, name: K('Atmosfera', 'Atmosphere', 'Atmósfera'), need: 'atmosfera' },
-  { id: 'agua', gb: 20, name: K('Água', 'Water', 'Agua'), need: 'agua' },
-  { id: 'solo', gb: 25, name: K('Solo', 'Soil', 'Suelo'), need: 'solo' },
-  { id: 'radiacao', gb: 15, name: K('Radiação', 'Radiation', 'Radiación'), need: 'radiacao' },
-  { id: 'biologia', gb: 30, name: K('Biologia', 'Biology', 'Biología'), need: 'biologia' },
-  { id: 'diario', gb: 10, name: K('Diário de bordo da viagem', 'Voyage log', 'Diario de a bordo del viaje'), need: null },
-  { id: 'saude', gb: 10, name: K('Relatório médico da tripulação', 'Crew medical report', 'Informe médico de la tripulación'), need: null },
+  { id: 'atmosfera', gb: 20, name: 'Atmosfera', need: 'atmosfera' },
+  { id: 'agua', gb: 20, name: 'Água', need: 'agua' },
+  { id: 'solo', gb: 25, name: 'Solo', need: 'solo' },
+  { id: 'radiacao', gb: 15, name: 'Radiação', need: 'radiacao' },
+  { id: 'biologia', gb: 30, name: 'Biologia', need: 'biologia' },
+  { id: 'diario', gb: 10, name: 'Diário de bordo da viagem', need: null },
+  { id: 'saude', gb: 10, name: 'Relatório médico da tripulação', need: null },
 ];
 const CSHIPS = [
   { n: 1, name: 'Arca-2', size: 10, sup: { kwh: 10, agua: 80, comida: 20 } },
   { n: 2, name: 'Arca-3', size: 15, sup: { kwh: 12, agua: 100, comida: 30 } },
   { n: 3, name: 'Arca-4', size: 20, sup: { kwh: 15, agua: 120, comida: 40 } },
 ];
-const CFACTS = []; // preenchido por data/falas.json
+const CFACTS = []; // preenchido por data/lang/<idioma>.json ("falas")
 
 // ---------- estado ----------
 function startColony(site, score) {
@@ -79,12 +79,12 @@ const colonyBeds = () => S.colony.b.habitat * 20;
 function colonyObjectives() {
   const C = S.colony;
   return [
-    { id: 'solar', done: C.b.solar >= 1, t: K('Instalar o campo solar', 'Install the solar field', 'Instalar el campo solar') },
-    { id: 'agua', done: C.b.agua >= 1, t: K('Captar e purificar água', 'Collect and purify water', 'Captar y purificar agua') },
-    { id: 'estufa', done: C.b.estufa >= 1, t: K('Plantar a primeira estufa', 'Plant the first greenhouse', 'Plantar el primer invernadero') },
-    { id: 'torre', done: C.b.torre >= 1, t: K('Erguer a torre de comunicação', 'Raise the communication tower', 'Levantar la torre de comunicación') },
+    { id: 'solar', done: C.b.solar >= 1, t: 'Instalar o campo solar' },
+    { id: 'agua', done: C.b.agua >= 1, t: 'Captar e purificar água' },
+    { id: 'estufa', done: C.b.estufa >= 1, t: 'Plantar a primeira estufa' },
+    { id: 'torre', done: C.b.torre >= 1, t: 'Erguer a torre de comunicação' },
     { id: 'tx', done: C.txCount >= 3, t: K('Transmitir 3 pacotes de dados à Terra (' + Math.min(3, C.txCount) + '/3)', 'Send 3 data packages to Earth (' + Math.min(3, C.txCount) + '/3)', 'Transmitir 3 paquetes de datos a la Tierra (' + Math.min(3, C.txCount) + '/3)') },
-    { id: 'pista', done: C.b.pista >= 1, t: K('Preparar a pista de pouso e o farol', 'Prepare the landing pad and beacon', 'Preparar la pista y la baliza') },
+    { id: 'pista', done: C.b.pista >= 1, t: 'Preparar a pista de pouso e o farol' },
     { id: 'naves', done: C.shipsLanded >= 3, t: K('Receber 3 naves de tripulação (' + C.shipsLanded + '/3)', 'Receive 3 crew ships (' + C.shipsLanded + '/3)', 'Recibir 3 naves de tripulación (' + C.shipsLanded + '/3)') },
   ];
 }
@@ -106,16 +106,16 @@ function pickWorker(role, except) {
 }
 function costTxt(c) {
   const a = [];
-  if (c.kwh) a.push('⚡' + c.kwh + ' kWh'); if (c.agua) a.push('💧' + c.agua + ' L'); if (c.peca) a.push('⚙' + c.peca + ' ' + L(K('peça', 'part', 'pieza')) + (c.peca > 1 ? 's' : ''));
+  if (c.kwh) a.push('⚡' + c.kwh + ' kWh'); if (c.agua) a.push('💧' + c.agua + ' L'); if (c.peca) a.push('⚙' + c.peca + ' ' + L('peça') + (c.peca > 1 ? 's' : ''));
   if (c.plant) a.push('🌱' + c.plant + ' kg'); if (c.gb) a.push('💾' + c.gb + ' GB'); if (c.dur) a.push('⏱' + c.dur + 's');
   return a.join(' · ');
 }
 function canPay(c) {
-  if (c.kwh && S.res.energia < c.kwh) return K('Energia insuficiente.', 'Not enough energy.', 'Energía insuficiente.');
-  if (c.agua && S.res.agua < c.agua) return K('Água insuficiente.', 'Not enough water.', 'Agua insuficiente.');
-  if (c.peca && S.peças < c.peca) return K('Faltam peças. Fabrique no laboratório de campo.', 'Not enough parts. Build some at the field lab.', 'Faltan piezas. Fabríquelas en el laboratorio de campo.');
-  if (c.plant && S.res.plantacao < c.plant) return K('Faltam sementes/biomassa.', 'Not enough seeds/biomass.', 'Faltan semillas/biomasa.');
-  if (c.gb && S.res.dados < c.gb) return K('Dados insuficientes.', 'Not enough data.', 'Datos insuficientes.');
+  if (c.kwh && S.res.energia < c.kwh) return 'Energia insuficiente.';
+  if (c.agua && S.res.agua < c.agua) return 'Água insuficiente.';
+  if (c.peca && S.peças < c.peca) return 'Faltam peças. Fabrique no laboratório de campo.';
+  if (c.plant && S.res.plantacao < c.plant) return 'Faltam sementes/biomassa.';
+  if (c.gb && S.res.dados < c.gb) return 'Dados insuficientes.';
   return null;
 }
 function pay(c) {
@@ -135,7 +135,7 @@ function taskSpec(p) {
     const imp = buildReqErr(id, lvl);
     return { bid: id, cost: Object.assign({}, c), role: CROLE[id], err: imp, label: K('Construir: ' + L(CBUILD[id].name), 'Build: ' + L(CBUILD[id].name), 'Construir: ' + L(CBUILD[id].name)) };
   }
-  if (p.k === 'fab') { const c = { kwh: has('impressora') ? 5 : 8, agua: 15, dur: has('impressora') ? 5 : 8 }; return { bid: 'lab', cost: c, role: 'engenheiro', label: K('Fabricar uma peça (impressão 3D)', 'Make a part (3D printing)', 'Fabricar una pieza (impresión 3D)') }; }
+  if (p.k === 'fab') { const c = { kwh: has('impressora') ? 5 : 8, agua: 15, dur: has('impressora') ? 5 : 8 }; return { bid: 'lab', cost: c, role: 'engenheiro', label: 'Fabricar uma peça (impressão 3D)' }; }
   if (p.k === 'an') {
     const an = PLANET_ANALYSES.find(a => a.id === p.a); if (!an || S.planet.analyzed.includes(an.id)) return null;
     return { bid: 'lab', cost: { kwh: 4, dur: has('lab') ? 5 : 8 }, role: 'pesquisador', label: K('Analisar: ' + an.name, 'Analyze: ' + an.name, 'Analizar: ' + an.name) };
@@ -143,14 +143,14 @@ function taskSpec(p) {
   if (p.k === 'tx') {
     const pk = TX_PACKAGES.find(x => x.id === p.a); if (!pk || C.tx[pk.id]) return null;
     let err = null;
-    if (C.b.torre < 1) err = K('Construa a torre de comunicação primeiro.', 'Build the communication tower first.', 'Construya primero la torre de comunicación.');
-    else if (pk.need && !S.planet.analyzed.includes(pk.need)) err = K('Sem dados: faça a análise no laboratório de campo.', 'No data: run the analysis at the field lab.', 'Sin datos: haga el análisis en el laboratorio de campo.');
-    else if (pk.id === 'saude' && !roleAlive('paramedico')) err = K('Sem paramédico para o relatório médico.', 'No paramedic for the medical report.', 'Sin paramédico para el informe médico.');
+    if (C.b.torre < 1) err = 'Construa a torre de comunicação primeiro.';
+    else if (pk.need && !S.planet.analyzed.includes(pk.need)) err = 'Sem dados: faça a análise no laboratório de campo.';
+    else if (pk.id === 'saude' && !roleAlive('paramedico')) err = 'Sem paramédico para o relatório médico.';
     return { bid: 'torre', cost: { kwh: 6, gb: pk.gb, dur: 8 }, role: 'pesquisador', err, label: K('Transmitir: ' + L(pk.name), 'Transmit: ' + L(pk.name), 'Transmitir: ' + L(pk.name)) };
   }
   if (p.k === 'beacon') {
     const sh = C.ships.find(x => x.state === 'inbound');
-    return { bid: 'pista', cost: { kwh: 2, dur: 5 }, role: 'engenheiro', err: !sh ? K('Nenhuma nave a caminho.', 'No ship inbound.', 'Ninguna nave en camino.') : (sh.beacon ? K('O farol já está aceso.', 'The beacon is already lit.', 'La baliza ya está encendida.') : null), label: K('Acender o farol de pouso', 'Light the landing beacon', 'Encender la baliza de aterrizaje') };
+    return { bid: 'pista', cost: { kwh: 2, dur: 5 }, role: 'engenheiro', err: !sh ? 'Nenhuma nave a caminho.' : (sh.beacon ? 'O farol já está aceso.' : null), label: 'Acender o farol de pouso' };
   }
   return null;
 }
@@ -161,11 +161,11 @@ ACTIONS.cTask = (p, actor) => {
   if (sp.err) return toast(sp.err, 'warn');
   const pe = canPay(sp.cost); if (pe) return toast(pe, 'warn');
   let who = actor;
-  if (p.call) { who = pickWorker(sp.role, actor && actor.id); if (!who) return toast(K('Nenhum tripulante livre para ajudar.', 'No free crew member to help.', 'Ningún tripulante libre para ayudar.'), 'warn'); }
-  else if (Math.abs(who.x - CBUILD[sp.bid].x) > 90) return toast(K('Vá até o local para trabalhar.', 'Walk to the site to work.', 'Vaya al lugar para trabajar.'), 'warn');
+  if (p.call) { who = pickWorker(sp.role, actor && actor.id); if (!who) return toast('Nenhum tripulante livre para ajudar.', 'warn'); }
+  else if (Math.abs(who.x - CBUILD[sp.bid].x) > 90) return toast('Vá até o local para trabalhar.', 'warn');
   if (!who.alive) return;
-  if (who.ctask) return toast(K('Este tripulante já está ocupado.', 'This crew member is busy.', 'Este tripulante está ocupado.'), 'warn');
-  if (who.status === 'incapacitado') return toast(K('Tripulante incapacitado.', 'Crew member incapacitated.', 'Tripulante incapacitado.'), 'warn');
+  if (who.ctask) return toast('Este tripulante já está ocupado.', 'warn');
+  if (who.status === 'incapacitado') return toast('Tripulante incapacitado.', 'warn');
   pay(sp.cost);
   const mult = (roleMatch(who, sp.role) ? 1.4 : 1) * clamp(effIndex() / 82, 0.5, 1.3);
   who.ctask = { key: p.k, bid: sp.bid, dur: sp.cost.dur / mult, t: 0, label: sp.label, data: p, role: sp.role, called: !!p.call && isHumanCrew(who), wait: 0 };
@@ -182,7 +182,7 @@ const CTASK_DONE = {
     colonyMsg(K(c.name + ' concluiu: ' + L(CBUILD[id].name) + ' (nível ' + C.b[id] + ').', c.name + ' finished: ' + L(CBUILD[id].name) + ' (level ' + C.b[id] + ').', c.name + ' terminó: ' + L(CBUILD[id].name) + ' (nivel ' + C.b[id] + ').'), 'good');
     Sfx.ok();
   },
-  fab(c) { S.peças++; toast(K('Peça fabricada com materiais locais.', 'Part made from local materials.', 'Pieza fabricada con materiales locales.'), 'good'); },
+  fab(c) { S.peças++; toast('Peça fabricada com materiais locais.', 'good'); },
   an(c, t) {
     const an = PLANET_ANALYSES.find(a => a.id === t.data.a);
     if (!S.planet.analyzed.includes(an.id)) S.planet.analyzed.push(an.id);
@@ -209,12 +209,12 @@ ACTIONS.cShip = p => {
   const C = S.colony; if (!C || S.scene !== 'colony' || C.done) return;
   const def = CSHIPS.find(s => s.n === +p.n); if (!def) return;
   if (C.ships.some(s => s.n === def.n)) return;
-  const err = C.b.pista < 1 ? K('Prepare a pista de pouso.', 'Prepare the landing pad.', 'Prepare la pista.')
-    : C.b.torre < 1 || C.txCount < 1 ? K('Transmita ao menos um pacote de dados para a Terra antes de pedir a nave.', 'Send at least one data package to Earth before calling the ship.', 'Transmita al menos un paquete de datos a la Tierra antes de pedir la nave.')
-    : C.ships.some(s => s.state === 'inbound') ? K('Já há uma nave a caminho.', 'A ship is already inbound.', 'Ya hay una nave en camino.')
-    : def.n > 1 && !C.ships.some(s => s.n === def.n - 1 && s.state === 'landed') ? K('Receba a nave anterior primeiro.', 'Receive the previous ship first.', 'Reciba primero la nave anterior.')
+  const err = C.b.pista < 1 ? 'Prepare a pista de pouso.'
+    : C.b.torre < 1 || C.txCount < 1 ? 'Transmita ao menos um pacote de dados para a Terra antes de pedir a nave.'
+    : C.ships.some(s => s.state === 'inbound') ? 'Já há uma nave a caminho.'
+    : def.n > 1 && !C.ships.some(s => s.n === def.n - 1 && s.state === 'landed') ? 'Receba a nave anterior primeiro.'
     : C.colonists + def.size > colonyBeds() ? K('Camas insuficientes: amplie o habitat (' + colonyBeds() + ' camas; precisa de ' + (C.colonists + def.size) + ').', 'Not enough beds: expand the habitat (' + colonyBeds() + ' beds; needs ' + (C.colonists + def.size) + ').', 'Camas insuficientes: amplíe el hábitat (' + colonyBeds() + ' camas; necesita ' + (C.colonists + def.size) + ').')
-    : S.res.energia < 12 ? K('Energia insuficiente para o farol e o radar de guiagem (12 kWh).', 'Not enough energy for the beacon and guidance radar (12 kWh).', 'Energía insuficiente para la baliza y el radar de guía (12 kWh).')
+    : S.res.energia < 12 ? 'Energia insuficiente para o farol e o radar de guiagem (12 kWh).'
     : null;
   if (err) return toast(err, 'warn');
   addRes('energia', -12, 'Guiagem da nave');
@@ -256,7 +256,7 @@ function colonyNewDay() {
   if (C.short.comida >= 3 || C.short.agua >= 3) return fail(C.short.comida >= 3 ? 'A colônia ficou sem comida por 3 dias. Sem produção de alimentos local, a vida em outro planeta não se sustenta.' : 'A colônia ficou sem água por 3 dias. Sem água, não há colônia.');
   if (C.day > 3 && C.storm <= 0 && C.b.solar > 0 && Math.random() < 0.14) {
     C.storm = 2; S.fast = 0;
-    colonyMsg(K('Tempestade de poeira! A produção solar cai pela metade por 2 dias e pousos ficam mais difíceis. (Em Marte, tempestades de poeira já cobriram o planeta inteiro e silenciaram o rover Opportunity em 2018.)', 'Dust storm! Solar output drops by half for 2 days and landings get harder. (On Mars, dust storms have covered the whole planet and silenced the Opportunity rover in 2018.)', '¡Tormenta de polvo! La producción solar baja a la mitad por 2 días y los aterrizajes se complican. (En Marte, las tormentas de polvo han cubierto todo el planeta y silenciaron al rover Opportunity en 2018.)'), 'bad');
+    colonyMsg('Tempestade de poeira! A produção solar cai pela metade por 2 dias e pousos ficam mais difíceis. (Em Marte, tempestades de poeira já cobriram o planeta inteiro e silenciaram o rover Opportunity em 2018.)', 'bad');
   }
   for (const c of alive()) { c.humor = clamp(c.humor + (lack.length ? -2 : 1), 0, 100); }
   checkFail();
@@ -309,7 +309,7 @@ function tickColony(dt) {
   C.nextFact -= dt;
   if (C.nextFact <= 0) { C.nextFact = 80 + Math.random() * 40; const f = CFACTS[C.factN++ % CFACTS.length]; if (typeof Chat !== 'undefined') Chat.sysAll(f, 'fact'); }
   // fim?
-  if (colonyObjectives().every(o => o.done)) { C.done = true; C.finishT = 3; narrate(K('A colônia está de pé. Painéis, água, estufa, antena, pista e três naves de tripulação: a humanidade tem um novo lar.', 'The colony stands. Panels, water, greenhouse, antenna, pad and three crew ships: humanity has a new home.', 'La colonia está en pie. Paneles, agua, invernadero, antena, pista y tres naves de tripulación: la humanidad tiene un nuevo hogar.')); }
+  if (colonyObjectives().every(o => o.done)) { C.done = true; C.finishT = 3; narrate('A colônia está de pé. Painéis, água, estufa, antena, pista e três naves de tripulação: a humanidade tem um novo lar.'); }
   checkFail();
 }
 function finishColony() {
@@ -482,87 +482,87 @@ function colonyHud() {
     const v = S.res[m.id], cap = S.cap[m.id];
     return `<div class="rb" title="${esc(m.name)}: ${fmt(v)} ${m.unit}"><span class="ic">${m.icon}</span>${bar(v, cap)}<span class="v">${fmt(v, v < 10 ? 1 : 0)}<small>${m.unit}</small></span></div>`;
   });
-  items.push(`<div class="rb" title="${esc(L(K('Peças', 'Parts', 'Piezas')))}"><span class="ic">⚙</span><span class="v">${S.peças}<small>${esc(L(K('peças', 'parts', 'piezas')))}</small></span></div>`);
-  items.push(`<div class="rb" title="${esc(L(K('População', 'Population', 'Población')))}"><span class="ic">👥</span><span class="v">${colonyPop()}<small>${esc(L(K('pessoas', 'people', 'personas')))}</small></span></div>`);
+  items.push(`<div class="rb" title="${esc(L('Peças'))}"><span class="ic">⚙</span><span class="v">${S.peças}<small>${esc(L('peças'))}</small></span></div>`);
+  items.push(`<div class="rb" title="${esc(L('População'))}"><span class="ic">👥</span><span class="v">${colonyPop()}<small>${esc(L('pessoas'))}</small></span></div>`);
   items.push(`<div class="rb" title="Moral"><span class="ic">☺</span>${bar(moralIndex(), 100)}<span class="v">${fmt(moralIndex(), 0)}<small>pts</small></span></div>`);
   const f = C.dayT / C.dayLen, hh = Math.floor(f * 24), mm = Math.floor((f * 24 * 60) % 60);
   const obj = colonyObjectives(); const doneN = obj.filter(o => o.done).length;
   const m = me(); const nb = m && m.alive ? nearBuilding(m) : null;
   let prompt = '';
-  if (m && m.ctask) prompt = `⏳ ${esc(L(m.ctask.label))} — ${Math.abs(m.x - CBUILD[m.ctask.bid].x) < 70 ? esc(L(K('fique aqui', 'stay here', 'quédese aquí'))) : esc(L(K('volte ao local!', 'go back to the site!', '¡vuelva al lugar!')))}`;
+  if (m && m.ctask) prompt = `⏳ ${esc(L(m.ctask.label))} — ${Math.abs(m.x - CBUILD[m.ctask.bid].x) < 70 ? esc(L('fique aqui')) : esc(L('volte ao local!'))}`;
   else if (nb) prompt = `<b>E</b> — ${esc(L(CSHORT[nb]))}`;
   let call = '';
-  if (m && m.ctask && m.ctask.called && Math.abs(m.x - CBUILD[m.ctask.bid].x) >= 70) call = `<div class="callbar"><b class="blink">📢</b> ${esc(L(K('Você foi chamado(a):', 'You were called:', 'Lo llamaron:')))} <b>${esc(L(m.ctask.label))}</b> <button class="btn small primary" data-ui="gotoC" data-arg="${m.ctask.bid}">${esc(L(K('Ir até lá', 'Go there', 'Ir allí')))}</button></div>`;
-  return `<div class="hud-top"><div class="bars">${items.join('')}</div><div class="clock"><b>${esc(L(K('COLÔNIA · DIA', 'COLONY · DAY', 'COLONIA · DÍA')))} ${C.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}<br><small>${esc(C.site)}${C.storm > 0 ? ' · 🌪' : ''}</small></div></div>
-    <div class="objbox"><b>${esc(L(K('MISSÃO PONTES-01b', 'PONTES-01b MISSION', 'MISIÓN PONTES-01b')))} ${doneN}/${obj.length}</b>${obj.map(o => `<div class="${o.done ? 'done' : ''}">${o.done ? '✔' : '▫'} ${esc(L(o.t))}</div>`).join('')}</div>
+  if (m && m.ctask && m.ctask.called && Math.abs(m.x - CBUILD[m.ctask.bid].x) >= 70) call = `<div class="callbar"><b class="blink">📢</b> ${esc(L('Você foi chamado(a):'))} <b>${esc(L(m.ctask.label))}</b> <button class="btn small primary" data-ui="gotoC" data-arg="${m.ctask.bid}">${esc(L('Ir até lá'))}</button></div>`;
+  return `<div class="hud-top"><div class="bars">${items.join('')}</div><div class="clock"><b>${esc(L('COLÔNIA · DIA'))} ${C.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}<br><small>${esc(C.site)}${C.storm > 0 ? ' · 🌪' : ''}</small></div></div>
+    <div class="objbox"><b>${esc(L('MISSÃO PONTES-01b'))} ${doneN}/${obj.length}</b>${obj.map(o => `<div class="${o.done ? 'done' : ''}">${o.done ? '✔' : '▫'} ${esc(L(o.t))}</div>`).join('')}</div>
     ${call}<div class="hud-bottom"><div class="prompt">${prompt}</div>
-    <div class="btns"><button class="btn small" data-ui="panel" data-arg="c:nave">${esc(L(K('Controle', 'Control', 'Control')))}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div></div>`;
+    <div class="btns"><button class="btn small" data-ui="panel" data-arg="c:nave">${esc(L('Controle'))}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div></div>`;
 }
 function ctaskBar(bid) {
   const ws = S.crew.filter(c => c.alive && c.ctask && c.ctask.bid === bid);
-  return ws.map(c => `<div class="alert info">⏳ ${esc(c.name)}: ${esc(L(c.ctask.label))} ${bar(c.ctask.t, c.ctask.dur)} ${Math.abs(c.x - CBUILD[bid].x) < 70 ? '' : '<b class="orange">' + esc(L(K('(longe do local)', '(away from the site)', '(lejos del lugar)'))) + '</b>'}</div>`).join('');
+  return ws.map(c => `<div class="alert info">⏳ ${esc(c.name)}: ${esc(L(c.ctask.label))} ${bar(c.ctask.t, c.ctask.dur)} ${Math.abs(c.x - CBUILD[bid].x) < 70 ? '' : '<b class="orange">' + esc(L('(longe do local)')) + '</b>'}</div>`).join('');
 }
 function taskBtns(p) {
   const sp = taskSpec(p); if (!sp) return '';
   const err = sp.err || canPay(sp.cost);
   const bots_ = pickWorker(sp.role);
   const J_ = o => esc(JSON.stringify(o));
-  return `<div class="row"><button class="btn ${err ? '' : 'primary'}" data-act="cTask" data-p='${J_(Object.assign({}, p, { call: 0 }))}' ${err ? 'disabled' : ''}>${esc(L(K('Eu faço', 'I do it', 'Lo hago yo')))}</button>
-    <button class="btn" data-act="cTask" data-p='${J_(Object.assign({}, p, { call: 1 }))}' ${err || !bots_ ? 'disabled' : ''}>${esc(L(K('Chamar equipe', 'Call the crew', 'Llamar al equipo')))}</button>
+  return `<div class="row"><button class="btn ${err ? '' : 'primary'}" data-act="cTask" data-p='${J_(Object.assign({}, p, { call: 0 }))}' ${err ? 'disabled' : ''}>${esc(L('Eu faço'))}</button>
+    <button class="btn" data-act="cTask" data-p='${J_(Object.assign({}, p, { call: 1 }))}' ${err || !bots_ ? 'disabled' : ''}>${esc(L('Chamar equipe'))}</button>
     <span class="small ${err ? 'orange' : 'muted'}">${esc(costTxt(sp.cost))}${err ? ' · ' + esc(L(err)) : ''}</span></div>`;
 }
 function buildBlock(id) {
   const C = S.colony, lv = C.b[id], max = CCOST[id].length - 1;
-  const eff = { solar: K('+14 kWh por dia por nível e mais capacidade de bateria.', '+14 kWh per day per level and more battery capacity.', '+14 kWh por día por nivel y más capacidad de batería.'),
-    agua: K('+35 L por dia por nível (extração e filtragem do rio).', '+35 L per day per level (river extraction and filtering).', '+35 L por día por nivel (extracción y filtrado del río).'),
-    estufa: K('+5 kg de comida por dia por nível (mais com solo analisado e agricultor).', '+5 kg food per day per level (more with analyzed soil and a farmer).', '+5 kg de comida por día por nivel (más con suelo analizado y agricultor).'),
-    torre: K('Permite transmitir dados à Terra; níveis melhoram o sinal.', 'Lets you send data to Earth; levels improve the signal.', 'Permite enviar datos a la Tierra; los niveles mejoran la señal.'),
-    pista: K('Necessária para receber naves; níveis aumentam a chance de um pouso seguro.', 'Needed to receive ships; levels raise the chance of a safe landing.', 'Necesaria para recibir naves; los niveles aumentan la probabilidad de un aterrizaje seguro.'),
-    habitat: K('+20 camas por nível: é preciso ter cama para cada colono.', '+20 beds per level: every colonist needs a bed.', '+20 camas por nivel: cada colono necesita una cama.') }[id];
-  return `<p class="small">${esc(L(eff))}</p><p>${esc(L(K('Nível', 'Level', 'Nivel')))}: <b>${lv}/${max}</b> ${bar(lv, max)}</p>${lv < max ? taskBtns({ k: 'build', b: id }) : `<p class="green">✔ ${esc(L(K('Nível máximo', 'Max level', 'Nivel máximo')))}</p>`}`;
+  const eff = { solar: '+14 kWh por dia por nível e mais capacidade de bateria.',
+    agua: '+35 L por dia por nível (extração e filtragem do rio).',
+    estufa: '+5 kg de comida por dia por nível (mais com solo analisado e agricultor).',
+    torre: 'Permite transmitir dados à Terra; níveis melhoram o sinal.',
+    pista: 'Necessária para receber naves; níveis aumentam a chance de um pouso seguro.',
+    habitat: '+20 camas por nível: é preciso ter cama para cada colono.' }[id];
+  return `<p class="small">${esc(L(eff))}</p><p>${esc(L('Nível'))}: <b>${lv}/${max}</b> ${bar(lv, max)}</p>${lv < max ? taskBtns({ k: 'build', b: id }) : `<p class="green">✔ ${esc(L('Nível máximo'))}</p>`}`;
 }
 function colonyPanel(id) {
   const C = S.colony; const B = CBUILD[id]; let body = '';
   const sec = t => `<h4>${esc(L(t))}</h4>`;
   if (id === 'nave') {
     const obj = colonyObjectives();
-    body = sec(K('Objetivos da missão', 'Mission objectives', 'Objetivos de la misión')) + obj.map(o => `<div class="alert ${o.done ? 'good' : 'info'}">${o.done ? '✔' : '▫'} ${esc(L(o.t))}</div>`).join('') +
-      sec(K('Colônia', 'Colony', 'Colonia')) + `<div class="kv"><span>${esc(L(K('População', 'Population', 'Población')))}</span><b>${colonyPop()} (${alive().length} ${esc(L(K('tripulantes', 'crew', 'tripulantes')))} + ${C.colonists} ${esc(L(K('colonos', 'colonists', 'colonos')))})</b><span>${esc(L(K('Camas', 'Beds', 'Camas')))}</span><b>${C.colonists}/${colonyBeds()}</b><span>${esc(L(K('Pacotes enviados', 'Packages sent', 'Paquetes enviados')))}</span><b>${C.txCount}</b><span>${esc(L(K('Naves recebidas', 'Ships received', 'Naves recibidas')))}</span><b>${C.shipsLanded}/3</b><span>${esc(L(K('Local', 'Site', 'Lugar')))}</span><b>${esc(C.site)}</b></div>` +
-      sec(K('Mensagens da Terra', 'Messages from Earth', 'Mensajes de la Tierra')) + `<div class="evlog">${C.feed.slice(-6).map(f => `<div>${esc(L(f.t))}</div>`).join('') || '<i>—</i>'}</div>` +
-      sec(K('Tripulação', 'Crew', 'Tripulación')) + crewList();
+    body = sec('Objetivos da missão') + obj.map(o => `<div class="alert ${o.done ? 'good' : 'info'}">${o.done ? '✔' : '▫'} ${esc(L(o.t))}</div>`).join('') +
+      sec('Colônia') + `<div class="kv"><span>${esc(L('População'))}</span><b>${colonyPop()} (${alive().length} ${esc(L('tripulantes'))} + ${C.colonists} ${esc(L('colonos'))})</b><span>${esc(L('Camas'))}</span><b>${C.colonists}/${colonyBeds()}</b><span>${esc(L('Pacotes enviados'))}</span><b>${C.txCount}</b><span>${esc(L('Naves recebidas'))}</span><b>${C.shipsLanded}/3</b><span>${esc(L('Local'))}</span><b>${esc(C.site)}</b></div>` +
+      sec('Mensagens da Terra') + `<div class="evlog">${C.feed.slice(-6).map(f => `<div>${esc(L(f.t))}</div>`).join('') || '<i>—</i>'}</div>` +
+      sec('Tripulação') + crewList();
   } else if (id === 'lab') {
     const pending = PLANET_ANALYSES.filter(a => !S.planet.analyzed.includes(a.id));
-    body = sec(K('Oficina de impressão 3D', '3D-printing workshop', 'Taller de impresión 3D')) + `<p class="small">${esc(L(K('Peças podem ser fabricadas com o solo local (regolito) e plástico reciclado. Cada obra grande precisa de peças.', 'Parts can be made from local soil (regolith) and recycled plastic. Every big build needs parts.', 'Las piezas se pueden fabricar con suelo local (regolito) y plástico reciclado. Cada obra grande necesita piezas.')))}</p>` + `<p>⚙ ${S.peças} ${esc(L(K('peças em estoque', 'parts in stock', 'piezas en stock')))}</p>` + taskBtns({ k: 'fab' }) +
-      sec(K('Análises de campo (sem risco)', 'Field analyses (no risk)', 'Análisis de campo (sin riesgo)')) +
-      (pending.length ? pending.map(a => `<div class="opt"><b>${esc(T(a.name))}</b>${taskBtns({ k: 'an', a: a.id })}</div>`).join('') : `<p class="green">✔ ${esc(L(K('Todas as análises concluídas. Os resultados viram pacotes de dados para a Terra.', 'All analyses complete. The results become data packages for Earth.', 'Todos los análisis completados. Los resultados se convierten en paquetes de datos para la Tierra.')))}</p>`) +
-      sec(K('Resultados', 'Results', 'Resultados')) + S.planet.analyzed.map(a => `<p class="small">• <b>${esc(T(PLANET_ANALYSES.find(x => x.id === a).name))}:</b> ${esc(T(PLANET_ANALYSES.find(x => x.id === a).result))}</p>`).join('');
+    body = sec('Oficina de impressão 3D') + `<p class="small">${esc(L('Peças podem ser fabricadas com o solo local (regolito) e plástico reciclado. Cada obra grande precisa de peças.'))}</p>` + `<p>⚙ ${S.peças} ${esc(L('peças em estoque'))}</p>` + taskBtns({ k: 'fab' }) +
+      sec('Análises de campo (sem risco)') +
+      (pending.length ? pending.map(a => `<div class="opt"><b>${esc(T(a.name))}</b>${taskBtns({ k: 'an', a: a.id })}</div>`).join('') : `<p class="green">✔ ${esc(L('Todas as análises concluídas. Os resultados viram pacotes de dados para a Terra.'))}</p>`) +
+      sec('Resultados') + S.planet.analyzed.map(a => `<p class="small">• <b>${esc(T(PLANET_ANALYSES.find(x => x.id === a).name))}:</b> ${esc(T(PLANET_ANALYSES.find(x => x.id === a).result))}</p>`).join('');
   } else if (id === 'torre') {
     body = buildBlock(id);
-    if (C.b.torre >= 1) body += sec(K('Transmitir dados para a Terra', 'Send data to Earth', 'Enviar datos a la Tierra')) + `<p class="small">${esc(L(K('Cada pacote usa dados (GB) e energia. A qualidade do sinal depende da torre, da comunicação da nave e do pesquisador. Meta: 3 pacotes.', 'Each package uses data (GB) and energy. Signal quality depends on the tower, the ship comms and the researcher. Goal: 3 packages.', 'Cada paquete usa datos (GB) y energía. La calidad de la señal depende de la torre, las comunicaciones de la nave y el investigador. Meta: 3 paquetes.')))}</p>` +
-      TX_PACKAGES.map(pk => C.tx[pk.id] ? `<div class="opt on"><b>✔ ${esc(L(pk.name))}</b><span>${esc(L(K('Enviado à Terra', 'Sent to Earth', 'Enviado a la Tierra')))}</span></div>` : `<div class="opt"><b>${esc(L(pk.name))}</b>${taskBtns({ k: 'tx', a: pk.id })}</div>`).join('');
+    if (C.b.torre >= 1) body += sec('Transmitir dados para a Terra') + `<p class="small">${esc(L('Cada pacote usa dados (GB) e energia. A qualidade do sinal depende da torre, da comunicação da nave e do pesquisador. Meta: 3 pacotes.'))}</p>` +
+      TX_PACKAGES.map(pk => C.tx[pk.id] ? `<div class="opt on"><b>✔ ${esc(L(pk.name))}</b><span>${esc(L('Enviado à Terra'))}</span></div>` : `<div class="opt"><b>${esc(L(pk.name))}</b>${taskBtns({ k: 'tx', a: pk.id })}</div>`).join('');
   } else if (id === 'pista') {
     body = buildBlock(id);
     if (C.b.pista >= 1) {
-      body += sec(K('Naves de tripulação (colonos)', 'Crew ships (colonists)', 'Naves de tripulación (colonos)')) + `<p class="small">${esc(L(K('Peça a nave à Terra (exige 1+ pacote enviado, pista, energia e camas livres). Durante a descida, alguém deve ir à pista e acender o farol (+4 no pouso)!', 'Call the ship from Earth (needs 1+ package sent, a pad, energy and free beds). During descent, someone must go to the pad and light the beacon (+4 to landing)!', 'Pida la nave a la Tierra (exige 1+ paquete enviado, pista, energía y camas libres). ¡Durante el descenso alguien debe ir a la pista y encender la baliza (+4 al aterrizaje)!')))}</p>` + ctaskBar('pista');
+      body += sec('Naves de tripulação (colonos)') + `<p class="small">${esc(L('Peça a nave à Terra (exige 1+ pacote enviado, pista, energia e camas livres). Durante a descida, alguém deve ir à pista e acender o farol (+4 no pouso)!'))}</p>` + ctaskBar('pista');
       body += CSHIPS.map(def => {
         const sh = C.ships.find(s => s.n === def.n);
-        if (sh && sh.state === 'landed') return `<div class="opt on"><b>✔ ${def.name}</b><span>+${def.size} ${esc(L(K('colonos a bordo da colônia', 'colonists joined the colony', 'colonos se unieron a la colonia')))}</span></div>`;
-        if (sh && sh.state === 'inbound') return `<div class="opt"><b>🛬 ${def.name} — ${Math.max(0, Math.ceil(sh.eta - sh.t))}s</b>${bar(sh.t, sh.eta)}<span>${sh.beacon ? '💡 ' + esc(L(K('Farol aceso', 'Beacon lit', 'Baliza encendida'))) : esc(L(K('Acenda o farol!', 'Light the beacon!', '¡Encienda la baliza!')))}</span>${sh.beacon ? '' : taskBtns({ k: 'beacon' })}</div>`;
-        return `<div class="opt"><b>${def.name}</b><span>${def.size} ${esc(L(K('colonos', 'colonists', 'colonos')))} · ${esc(L(K('traz suprimentos', 'brings supplies', 'trae suministros')))}</span><button class="btn tiny" data-act="cShip" data-p='${esc(JSON.stringify({ n: def.n }))}'>${esc(L(K('Pedir à Terra', 'Request from Earth', 'Pedir a la Tierra')))} (⚡12)</button></div>`;
+        if (sh && sh.state === 'landed') return `<div class="opt on"><b>✔ ${def.name}</b><span>+${def.size} ${esc(L('colonos a bordo da colônia'))}</span></div>`;
+        if (sh && sh.state === 'inbound') return `<div class="opt"><b>🛬 ${def.name} — ${Math.max(0, Math.ceil(sh.eta - sh.t))}s</b>${bar(sh.t, sh.eta)}<span>${sh.beacon ? '💡 ' + esc(L('Farol aceso')) : esc(L('Acenda o farol!'))}</span>${sh.beacon ? '' : taskBtns({ k: 'beacon' })}</div>`;
+        return `<div class="opt"><b>${def.name}</b><span>${def.size} ${esc(L('colonos'))} · ${esc(L('traz suprimentos'))}</span><button class="btn tiny" data-act="cShip" data-p='${esc(JSON.stringify({ n: def.n }))}'>${esc(L('Pedir à Terra'))} (⚡12)</button></div>`;
       }).join('');
     }
   } else if (id === 'habitat') {
-    body = buildBlock(id) + `<p>${esc(L(K('Camas', 'Beds', 'Camas')))}: <b>${C.colonists}/${colonyBeds()}</b> · ${esc(L(K('Naves previstas', 'Planned ships', 'Naves previstas')))}: 10 + 15 + 20</p>`;
+    body = buildBlock(id) + `<p>${esc(L('Camas'))}: <b>${C.colonists}/${colonyBeds()}</b> · ${esc(L('Naves previstas'))}: 10 + 15 + 20</p>`;
   } else body = buildBlock(id);
   body = ctaskBar(id === 'nave' ? '__' : id) + body;
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>${B.icon} ${esc(L(B.name))}</h2>${body}<p class="quote small">🛰 ${esc(L(B.fact))}</p></div></div>`;
 }
 function colonyIntro() {
-  return `<div class="modal-bg"><div class="panel center wide scroll" data-stop="1"><div class="blink cyan">● ${esc(L(K('PONTES-01b · SUPERFÍCIE', 'PONTES-01b · SURFACE', 'PONTES-01b · SUPERFICIE')))}</div><h2>${esc(L(K('A MISSÃO CONTINUA', 'THE MISSION CONTINUES', 'LA MISIÓN CONTINÚA')))}</h2>
+  return `<div class="modal-bg"><div class="panel center wide scroll" data-stop="1"><div class="blink cyan">● ${esc(L('PONTES-01b · SUPERFÍCIE'))}</div><h2>${esc(L('A MISSÃO CONTINUA'))}</h2>
     <p class="big">${esc(L(K('Pousamos em ' + S.colony.site + '! Mas uma colônia não se faz sozinha.', 'We landed at ' + T(S.colony.site) + '! But a colony does not build itself.', '¡Aterrizamos en ' + T(S.colony.site) + '! Pero una colonia no se construye sola.')))}</p>
     ${colonyObjectives().map(o => `<div class="alert info">▫ ${esc(L(o.t))}</div>`).join('')}
-    <p class="small">${esc(L(K('Ande com ← → (A/D) e use E nas construções. Você pode trabalhar sozinho ou chamar a equipe (bots/jogadores). Fique perto do local enquanto trabalha. Nenhuma construção funciona sem energia: comece pelo campo solar. Se faltar comida ou água por 3 dias, a colônia falha.', 'Walk with ← → (A/D) and press E at buildings. You can work yourself or call the crew (bots/players). Stay near the site while you work. Nothing runs without power: start with the solar field. If food or water runs out for 3 days, the colony fails.', 'Camine con ← → (A/D) y pulse E en los edificios. Puede trabajar usted mismo o llamar al equipo (bots/jugadores). Quédese cerca del lugar mientras trabaja. Nada funciona sin energía: empiece por el campo solar. Si falta comida o agua por 3 días, la colonia fracasa.')))}</p>
-    <div class="row"><button class="btn primary big" data-act="cTut">${esc(L(K('Começar a construir ▶', 'Start building ▶', 'Empezar a construir ▶')))}</button></div></div></div>`;
+    <p class="small">${esc(L('Ande com ← → (A/D) e use E nas construções. Você pode trabalhar sozinho ou chamar a equipe (bots/jogadores). Fique perto do local enquanto trabalha. Nenhuma construção funciona sem energia: comece pelo campo solar. Se faltar comida ou água por 3 dias, a colônia falha.'))}</p>
+    <div class="row"><button class="btn primary big" data-act="cTut">${esc(L('Começar a construir ▶'))}</button></div></div></div>`;
 }
 
 // ---------- desvio de rota: planeta errado ----------

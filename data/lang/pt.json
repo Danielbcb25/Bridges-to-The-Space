@@ -1,0 +1,315 @@
+{
+ "_info": "Português (texto original). \"site\": textos da página; \"falas\": textos falados.",
+ "site": {
+  "nav.play": "Jogar",
+  "nav.mission": "A Missão",
+  "nav.systems": "Sistemas",
+  "nav.crew": "Tripulação",
+  "nav.how": "Como jogar",
+  "nav.multi": "Multiplayer",
+  "start.click": "▶ CLIQUE PARA INICIAR",
+  "start.sound": "som ligado · use fones para a narração",
+  "under.keys": "⌨ ←→ andar · Shift correr · Espaço interagir/pular · ↑↓ escadas · E interagir · H ajuda · Shift+S tempo 2x · Esc fechar · clique para andar",
+  "under.fs": "⛶ Tela cheia",
+  "s9": "A Missão",
+  "s10": "Em razão do iminente colapso terrestre, as lideranças do planeta se uniram pela sobrevivência humana. Observatórios do mundo todo localizaram o planeta habitável mais próximo: <b class=\"cyan\">Pontes-01b</b>, a única esperança da Terra.",
+  "s11": "Você gerencia uma das centenas de naves lançadas ao espaço: seus <b>recursos</b>, sua <b>tripulação</b> e a <b>rota</b>. No caminho: chuvas de meteoros, radiação, microgravidade, escassez e o psicológico de todos a bordo.",
+  "s12": "⚠ O jogo possui apenas um final. Se ele não for alcançado, a missão falha.",
+  "s13": "<b>Preparação</b> — 30 pontos de verba, 5 slots de módulo. Cada escolha é um sacrifício.",
+  "s14": "<b>Partida e viagem</b> — controle a nave e enfrente os primeiros problemas espaciais.",
+  "s15": "<b>Exploração científica</b> — compare dados reais de exoplanetas da NASA.",
+  "s16": "<b>O novo mundo</b> — investigue Pontes-01b e enfrente a adaptação.",
+  "s17": "<b>Migração</b> — decida onde a humanidade vai recomeçar.",
+  "n1": "<b>Colônia em Pontes-01b</b> — o jogo continua: construa a base, transmita dados à Terra e receba as naves de tripulação.",
+  "s18": "Sistemas da nave",
+  "s19": "Antes de cada desafio aparece um aviso com o tipo de problema, as partes envolvidas e o seu nível de dano. Os números do suporte à vida usam referências públicas da NASA (ISS): 0,84 kg de O₂ por pessoa/dia, reciclagem de água de até 98% e eletrólise de oxigênio. O nível de dano mostra a porcentagem de integridade descontada a cada ocorrência no item: Baixo −10%, Médio −20%, Alto −30%.",
+  "s20": "Casco e Blindagem",
+  "s21": "Proteção contra impactos e radiação cósmica",
+  "s22": "Dano Baixo (−10%)",
+  "s23": "Escudo Térmico",
+  "s24": "Suporta as temperaturas externas",
+  "s25": "Dano Médio (−20%)",
+  "s26": "Sistema de Propulsão",
+  "s27": "Motores e propulsores, manobras e órbitas",
+  "s28": "Dano Alto (−30%)",
+  "s29": "Tanques de Combustível e Oxidante",
+  "s30": "Propelentes líquidos e gasosos",
+  "s31": "Dano Alto (−30%)",
+  "s32": "Aviônica",
+  "s33": "Computadores, sensores, radares e navegação",
+  "s34": "Dano Médio (−20%)",
+  "s35": "Suporte à Vida",
+  "s36": "Pressão, temperatura, ar, água e dejetos",
+  "s37": "Dano Alto (−30%)",
+  "s38": "Sistema de Comunicação",
+  "s39": "Antenas e rádio com o Controle da Missão",
+  "s40": "Dano Médio (−20%)",
+  "s41": "Módulos de Acoplamento",
+  "s42": "Eclusa, portas e trajes",
+  "s43": "Dano Médio (−20%)",
+  "s44": "Tripulação",
+  "s45": "Seis tripulantes fixos + o Comandante (você). Tripulantes podem morrer: cada morte tira uma função e derruba a moral. Se o Comandante morrer, a missão falha.",
+  "s46": "Paramédico",
+  "s47": "Trata feridos e doentes, monitora o estresse.",
+  "s48": "Navegador",
+  "s49": "Rotação da nave e recálculo de rota.",
+  "s50": "Agricultor / Eng. Genético",
+  "s51": "Cuida da horta e da comida.",
+  "s52": "Engenheiro 1",
+  "s53": "Reparos, radiadores e persianas.",
+  "s54": "Engenheiro 2",
+  "s55": "Suporte à vida e atividades externas.",
+  "s56": "Pesquisador Chefe",
+  "s57": "Equipamentos científicos e dados.",
+  "s58": "Como jogar",
+  "s59": "<b>Ande pela nave</b> em corte lateral 2D e use as estações (E): ponte, motores, rádio, laboratório, enfermaria, aviônica, painel térmico, tanques, suporte à vida, estufa, cozinha, eclusa e dormitórios.",
+  "s60": "<b>Busca rápida</b> nas barras do topo; <b>busca aprofundada</b> no Relatório (R), com entradas e saídas de cada recurso.",
+  "s61": "<b>Desafios</b> aleatórios: regulação térmica, chuva de meteoros, falta e vazamento de combustível, falha de oxigênio, painel enlouquecido, lixo, rádio com interferência, água contaminada, vazamento de traje, doenças e tempestade solar.",
+  "s62": "Os sorteios ocultos usam <b>d20</b> e <b>d10</b>. Você recebe pistas (fala confiante, luz amarela, luz vermelha), não números.",
+  "s63": "<b>Alimentação</b>: horta 4×3, cozinha com receitas, cardápio, mesa, racionamento e desperdício.",
+  "s64": "<b>Pontos</b> de cada fase compram itens de lazer (moral) e produtividade (eficiência) na Loja.",
+  "n2": "<b>Explore a Terra</b>: entre nos 8 edifícios da cidade, leia os painéis com dados da NASA e converse com os moradores. O Diário do Explorador (J) rende verba extra para montar a nave.",
+  "n3": "<b>Escolha qualquer planeta</b> na Estação Ponte-Alfa — até os errados. Cada viagem gasta combustível, oxigênio, comida e dias, e ensina por que Pontes-01b é a melhor aposta.",
+  "n4": "<b>Depois do pouso o jogo continua</b>: instale painéis solares, água e estufa, erga a torre, transmita dados à Terra e acenda o farol para as naves de tripulação pousarem.",
+  "n5": "<b>Chat</b> (Enter): no multiplayer, converse com os outros jogadores; no solo, fale com a tripulação e com o Controle da Missão (curiosidades da NASA).",
+  "s65": "Sprites baseados em AstronautaComCapacete.png e variantes — personalize no Criador de Avatar.",
+  "s66": "Multiplayer (até 6 jogadores + Comandante)",
+  "s67b": "Funciona direto pelo navegador, inclusive hospedado na Vercel ou no GitHub Pages: o Comandante clica em <b>Multiplayer → Criar sala</b> e passa o código de 5 letras; os amigos entram com o código pela internet, sem servidor e sem VPN (conexão P2P via WebRTC).",
+  "s67c": "Opcional: para jogar numa rede local com servidor próprio, rode <code>node server/server.js</code> e informe ws://SEU-IP:8080/ws em “Avançado”.",
+  "s68": "Quem cria a sala é o Comandante; os outros entram com o código e assumem um tripulante. Lugares vazios ficam com bots.",
+  "n6": "Todos conversam pelo <b>chat da sala</b> e trabalham juntos na colônia: cada jogador anda pela superfície, constrói e acende o farol enquanto as naves descem.",
+  "s69": "“É mais fácil manter a Terra habitável do que habitar outro planeta.”",
+  "s70": "Bridges to the Space · Pontes01 · Trilha sonora e sprites do projeto."
+ },
+ "falas": {
+  "_info": "Falas do jogo Pontes01 (PT/EN/ES). Edite aqui os textos falados: narração, moradores, tripulação e Controle da Missão.",
+  "story": [
+   "Em razão do iminente colapso terrestre, há tempos, as principais lideranças do planeta se reuniam em prol da sobrevivência humana.",
+   "Em meio ao caos, observatórios do mundo todo se uniram com o objetivo de localizar o planeta habitável mais próximo da Terra. E assim o fizeram.",
+   "Nomeado de “Pontes-01b”, este passou a ser a única esperança de sobrevivência da Terra.",
+   "Você passará a gerenciar uma das centenas de estações e naves espaciais lançadas ao espaço: seus recursos, sua tripulação e a rota para Pontes-01b.",
+   "Durante a expedição, você enfrentará chuvas de asteroides, radiação, microgravidade, a escassez de recursos e o psicológico de todos a bordo.",
+   "Atenção! O jogo possui apenas um final. Caso este não seja alcançado, o jogador falha."
+  ],
+  "npc": {
+   "lia": {
+    "name": "Ms. Lia",
+    "role": "Vendedora de água",
+    "say": [
+     "Ei, você! Isso, você mesmo! Chegue mais perto, não tenha medo.",
+     "Olha esta cidade: lixo por todo lado, ar que arde, 46 °C… Dizem que estão alistando gente para Pontes-01b.",
+     "Racionamento nível 4… Cada gota conta. Você viu como os astronautas reciclam até o suor?",
+     "A NASA diz: “o café de ontem é o café de amanhã”. Brincadeira de quem recicla a água da ISS!",
+     "Leve água no coração, Comandante."
+    ]
+   },
+   "teo": {
+    "name": "Professor Théo",
+    "role": "Astrofísico",
+    "say": [
+     "Quando eu era criança contava estrelas. Hoje contamos planetas: já passam de 6.000 os exoplanetas confirmados!",
+     "Nem todo planeta “parecido com a Terra” é bom. Perto de anãs vermelhas, as erupções da estrela podem arrancar a atmosfera.",
+     "Se um dia na estação alguém lhe oferecer um planeta “perfeito”… confira os dados antes de acelerar!"
+    ]
+   },
+   "mari": {
+    "name": "Mari",
+    "role": "Estudante, 9 anos",
+    "say": [
+     "Meu professor disse que o astronauta Scott Kelly passou 340 dias na ISS e voltou ~5 cm mais alto!",
+     "Sem gravidade a coluna se estica. Mas depois volta ao normal. Eu queria ver estrelas sem poluição…",
+     "Promete que vai mandar uma foto de Pontes-01b?"
+    ]
+   },
+   "ramos": {
+    "name": "Mr. Ramos",
+    "role": "Engenheiro aposentado",
+    "say": [
+     "Vi o pouso do Perseverance em Marte, em 2021, pela TV: os “7 minutos de terror” da descida, tudo sozinho, sem ninguém na Terra poder ajudar.",
+     "Depois disso o helicóptero Ingenuity voou 72 vezes em Marte, bem mais que as 5 previstas. Quem projeta bem, sobra margem.",
+     "Conselho de velho: leve peças sobressalentes!"
+    ]
+   },
+   "bia": {
+    "name": "Bia",
+    "role": "Enfermeira",
+    "say": [
+     "No espaço os remédios também envelhecem mais rápido, por causa da radiação. A nave precisa renovar o estoque.",
+     "Se alguém ficar com enjoo, dor de cabeça ou febre: meça, compare os sintomas e só então escolha o remédio."
+    ]
+   },
+   "gui": {
+    "name": "Gui",
+    "role": "Programador",
+    "say": [
+     "Eu escrevo software de navegação. Um grau de erro na partida vira milhões de km de erro na chegada.",
+     "A sonda DSOC da NASA já mandou vídeo por laser de 31 milhões de km, a 267 Mbps. Rádio é o passado!"
+    ]
+   },
+   "nina": {
+    "name": "Professor Nina",
+    "role": "Professora de ciências",
+    "say": [
+     "Na Terra, a atmosfera regula a temperatura de graça. Numa nave tudo tem custo: calor só sai por radiação.",
+     "Por isso é mais fácil manter a Terra habitável do que habitar outro planeta. Lembre disso lá longe."
+    ]
+   },
+   "beto": {
+    "name": "Tio Beto",
+    "role": "Feirante de sementes",
+    "say": [
+     "Batata, soja, alface, pimenta… Alface cresce em 4 dias, batata demora mais, mas rende mais. Planejar a horta é planejar a viagem.",
+     "Ah! E não esqueça das alergias da tripulação. Soja para quem é alérgico? Nem pensar."
+    ]
+   }
+  },
+  "crew": {
+   "c2": "Não consegui de primeira, vou tentar de novo...",
+   "c3": "Vou no lugar dele!",
+   "c4": "A velocidade está caindo! O tanque principal não está alimentando o motor.",
+   "c5": "O painel enlouqueceu! O mapa mostra que estamos perto de Júpiter...",
+   "c6": "Tem lixo flutuando por toda a nave! E acho que algo entrou no motor.",
+   "c7": "O rádio só chia... estamos recebendo pedaços de mensagem da Terra.",
+   "c8": "Meu traje está vazando! Não vou aguentar muito tempo!",
+   "c9": "Se a nave ficar parada, um lado cozinha e o outro vira gelo. Posso girá-la devagar, mas isso gasta combustível.",
+   "c10": "Aqui o calor só sai por radiação. Se não abrirmos os radiadores, ele fica preso.",
+   "c11": "Os propulsores estão fazendo um ruído estranho... não sei se aguentam girar a nave por muito tempo.",
+   "c12": "Nossos instrumentos esquentam muito. Podemos desligar alguns, mas perdemos dados.",
+   "c13": "A tripulação está sentindo frio. Se continuar assim, o corpo perde energia e o raciocínio piora.",
+   "c14": "Rotação estável.",
+   "c15": "Conserto feito, voltando!",
+   "c16": "O propulsor travou! A nave parou de girar!",
+   "c17": "Estou melhor, voltando ao posto.",
+   "c18": "Estou com uma reação alérgica forte...",
+   "c19": "Acho que comi algo que me fez mal.",
+   "c20": "Estou fraco... vou desmaiar.",
+   "c21": "Comandante, o lote de remédios venceu. Precisamos trocar.",
+   "c22": "Bem melhor depois de uma pausa."
+  },
+  "nasa": [
+   "Controle da Missão: a atmosfera da Terra tem hoje mais de 420 ppm de CO₂, contra ≈ 280 ppm antes da era industrial (NASA/NOAA).",
+   "Controle da Missão: a temperatura média da Terra já subiu ≈ 1,2 °C desde o fim do século XIX; os 10 anos mais quentes da história são os 10 últimos (NASA GISS).",
+   "Controle da Missão: satélites da NASA medem que o nível do mar subiu cerca de 10 cm desde 1993, e o ritmo está acelerando.",
+   "Controle da Missão: a ISS dá uma volta na Terra a cada ~90 minutos, a 28.000 km/h. Os astronautas veem 16 nasceres do sol por dia!",
+   "Controle da Missão: um astronauta respira cerca de 0,84 kg de oxigênio por dia. Na ISS, o O₂ vem da eletrólise da água.",
+   "Controle da Missão: no espaço não há ar para espalhar o calor — a nave só se esfria irradiando. A diferença entre sol e sombra passa de 200 °C.",
+   "Controle da Missão: o sinal de rádio de Marte leva de 3 a 22 minutos para chegar à Terra. Conversas ao vivo são impossíveis!",
+   "Controle da Missão: o telescópio Kepler (2009–2018) descobriu mais de 2.600 planetas observando pequenas quedas no brilho das estrelas (método do trânsito)."
+  ],
+  "colonyFacts": [
+   "Controle da Missão: na ISS, os astronautas perdem 1% a 1,5% da massa óssea por mês sem gravidade e treinam cerca de 2 horas por dia para reduzir isso (NASA).",
+   "Controle da Missão: um astronauta na ISS recebe cerca de 80 mSv de radiação em 6 meses; na Terra, a média natural é ≈ 3 mSv por ano (NASA).",
+   "Controle da Missão: a Voyager 1, lançada em 1977, viaja a 17 km/s e já está a cerca de um dia-luz de nós. Mesmo assim, levaria ~75 mil anos para chegar à estrela mais próxima.",
+   "Controle da Missão: já são mais de 6.000 exoplanetas confirmados no NASA Exoplanet Archive. Poucos estão na zona habitável da estrela.",
+   "Controle da Missão: o telescópio James Webb observa a luz das estrelas atravessando atmosferas de exoplanetas para descobrir de que gases elas são feitas.",
+   "Controle da Missão: recicle tudo! Na ISS, o lixo vai embora em cargueiros que queimam na reentrada; numa colônia, o lixo é matéria-prima."
+  ],
+  "comms": {
+   "selected": "Você foi selecionado para uma missão espacial para salvar o futuro da humanidade.",
+   "next": "Próximo comunicado: você tem uma verba limitada para montar uma nave de exploração."
+  },
+  "modes": {
+   "completa": [
+    {
+     "node": "terra",
+     "t": "Jornada Completa: cerca de 30 dias de viagem e 9 desafios. Tudo começa na Terra: explore a cidade e aceite a missão."
+    },
+    {
+     "node": "montagem",
+     "t": "Monte a nave com 30 pontos de verba e 5 espaços de módulo. Não dá para ter tudo: cada escolha é um sacrifício."
+    },
+    {
+     "node": "viagem",
+     "t": "Na viagem, ande pela nave e use as estações. Cuide do oxigênio, da fome, do humor e do armazenamento. O computador de bordo (H) sempre mostra o próximo passo."
+    },
+    {
+     "node": "estacao",
+     "t": "Na metade do caminho fica a Estação Ponte-Alfa: analise exoplanetas reais da NASA e escolha o destino — até os errados."
+    },
+    {
+     "node": "orbita",
+     "t": "Em órbita de Pontes-01b: faça análises, enfrente a adaptação e escolha onde pousar."
+    },
+    {
+     "node": "colonia",
+     "t": "Na superfície, construa a colônia, envie dados à Terra e receba as naves de tripulação. Só existe um final!"
+    }
+   ],
+   "curta": [
+    {
+     "node": "terra",
+     "t": "Jornada Curta: cerca de 12 dias e 4 desafios — ideal para aulas. Comece pela cidade na Terra."
+    },
+    {
+     "node": "montagem",
+     "t": "Monte a nave com verba limitada: módulos de sobrevivência primeiro!"
+    },
+    {
+     "node": "viagem",
+     "t": "Viaje, resolva os desafios e use ⏩ (Shift+S) para acelerar o tempo até o próximo evento."
+    },
+    {
+     "node": "colonia",
+     "t": "Chegue a Pontes-01b e erga a colônia. Aperte H sempre que estiver em dúvida."
+    }
+   ],
+   "multi": [
+    {
+     "node": "terra",
+     "t": "Multiplayer: você é o Comandante. Os amigos que entrarem na sala viram tripulantes; os lugares vazios ficam com bots."
+    },
+    {
+     "node": "crew",
+     "t": "Cada jogador tem uma função: paramédico, navegador, agricultor, dois engenheiros e pesquisador. Quando um desafio chamar a sua função, vá até a estação!"
+    },
+    {
+     "node": "viagem",
+     "t": "Combinem tudo pelo chat da sala (Enter). Juntos vocês cuidam do oxigênio, da fome, do humor e do armazenamento."
+    },
+    {
+     "node": "colonia",
+     "t": "Em Pontes-01b, cada um anda pela superfície, constrói e acende o farol para as naves pousarem."
+    }
+   ]
+  },
+  "modeNames": {
+   "completa": "Jornada Completa",
+   "curta": "Jornada Curta",
+   "multi": "Multiplayer"
+  },
+  "nodes": {
+   "terra": "Terra",
+   "montagem": "Montagem",
+   "viagem": "Viagem",
+   "estacao": "Estação",
+   "orbita": "Órbita",
+   "colonia": "Colônia",
+   "crew": "Tripulação"
+  },
+  "crewChat": {
+   "paramedico": [
+    "Estou de olho na saúde de todos. Beba água e durma bem!",
+    "Na microgravidade os ossos perdem massa. Lembrem de se exercitar!"
+   ],
+   "navegador": [
+    "A rota está sob controle. Cada grau de desvio custa combustível.",
+    "As estrelas não mentem: Pontes-01b está logo ali."
+   ],
+   "agricultor": [
+    "As plantas estão firmes! Alface em 4 dias, batata demora mais.",
+    "Na ISS já colheram até pimenta. Aqui vai ter tempero!"
+   ],
+   "eng": [
+    "Posso consertar quase tudo com uma boa peça e um pouco de energia.",
+    "Os sistemas estão rodando. Se algo apitar, eu corro!"
+   ],
+   "pesquisador": [
+    "Os dados que coletamos valem ouro para a Terra.",
+    "Sabia que já são mais de 6.000 exoplanetas confirmados?"
+   ],
+   "comandante": [
+    "Aqui é o Comandante. Seguimos a missão."
+   ]
+  }
+ }
+}

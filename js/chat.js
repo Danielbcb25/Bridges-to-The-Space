@@ -8,7 +8,7 @@
 // ============================================================
 'use strict';
 
-const NASA_FACTS = []; // preenchido por data/falas.json
+const NASA_FACTS = []; // preenchido por data/lang/<idioma>.json ("falas")
 
 const Chat = {
   log: [], open: false, unread: 0, nid: 1, factT: 70, lastSend: 0, dirty: true, els: null, peekUntil: 0,
@@ -104,9 +104,9 @@ const Chat = {
     setTimeout(() => {
       if (!S) return;
       const intent = this.intent(low);
-      if (mc && !target) return this.reply({ name: L(K('Controle da Missão', 'Mission Control', 'Control de la Misión')), role: 'NASA', mc: true }, this.mcAnswer(low, intent));
+      if (mc && !target) return this.reply({ name: L('Controle da Missão'), role: 'NASA', mc: true }, this.mcAnswer(low, intent));
       if (!target) target = crew.length ? pick(crew) : null;
-      if (!target) return this.reply({ name: L(K('Controle da Missão', 'Mission Control', 'Control de la Misión')), role: 'NASA', mc: true }, this.mcAnswer(low, intent));
+      if (!target) return this.reply({ name: L('Controle da Missão'), role: 'NASA', mc: true }, this.mcAnswer(low, intent));
       this.reply({ name: target.name, role: target.roleName, rid: target.id }, this.crewAnswer(target, intent));
     }, delay);
   },
@@ -138,40 +138,40 @@ const Chat = {
     return `⚡ ${f('energia', 'kWh')} · 💧 ${f('agua', 'L')} · 🍱 ${f('comida', 'kg')} · ⛽ ${f('combustivel', 'kg')} · O₂ ${f('oxigenio', 'kg')} · ☺ ${fmt(moralIndex(), 0)}`;
   },
   goalLine() {
-    if (S.scene === 'colony' && S.colony) { const o = colonyObjectives().find(x => !x.done); return o ? L(K('Próximo objetivo: ', 'Next objective: ', 'Próximo objetivo: ')) + L(o.t) : L(K('Todos os objetivos cumpridos!', 'All objectives complete!', '¡Todos los objetivos cumplidos!')); }
-    if (S.scene === 'ship') return L(K('Cuide dos recursos, enfrente os desafios e leve a nave até Pontes-01b. Use as estações com E.', 'Look after resources, handle the challenges and bring the ship to Pontes-01b. Use stations with E.', 'Cuide los recursos, enfrente los desafíos y lleve la nave a Pontes-01b. Use las estaciones con E.'));
-    if (S.scene === 'station') return L(K('Analise os exoplanetas, escolha o destino com cuidado e parta da Estação Ponte-Alfa.', 'Analyze the exoplanets, choose your destination carefully and leave Ponte-Alfa Station.', 'Analice los exoplanetas, elija el destino con cuidado y parta de la Estación Ponte-Alfa.'));
-    return L(K('Siga as instruções na tela, Comandante.', 'Follow the on-screen instructions, Commander.', 'Siga las instrucciones en pantalla, Comandante.'));
+    if (S.scene === 'colony' && S.colony) { const o = colonyObjectives().find(x => !x.done); return o ? L('Próximo objetivo: ') + L(o.t) : L('Todos os objetivos cumpridos!'); }
+    if (S.scene === 'ship') return L('Cuide dos recursos, enfrente os desafios e leve a nave até Pontes-01b. Use as estações com E.');
+    if (S.scene === 'station') return L('Analise os exoplanetas, escolha o destino com cuidado e parta da Estação Ponte-Alfa.');
+    return L('Siga as instruções na tela, Comandante.');
   },
   fact() { Chat._fn = ((Chat._fn || 0) + 1); const all = NASA_FACTS.concat(CFACTS); return L(all[Math.floor(Math.random() * all.length)]); },
   mcAnswer(low, intent) {
-    if (['status', 'o2', 'agua', 'comida', 'energia', 'fuel', 'moral'].includes(intent)) return L(K('Controle da Missão: telemetria recebida — ', 'Mission Control: telemetry received — ', 'Control de la Misión: telemetría recibida — ')) + this.statusLine();
-    if (intent === 'goal') return L(K('Controle da Missão: ', 'Mission Control: ', 'Control de la Misión: ')) + this.goalLine();
-    if (intent === 'help') return L(K('Controle da Missão: pergunte “status”, “oxigênio”, “água”, “objetivo” ou “curiosidade”. Chame um tripulante pelo nome!', 'Mission Control: ask for “status”, “oxygen”, “water”, “goal” or “fact”. Call a crew member by name!', 'Control de la Misión: pregunte “estado”, “oxígeno”, “agua”, “objetivo” o “curiosidad”. ¡Llame a un tripulante por su nombre!'));
-    if (intent === 'hi') return L(K('Controle da Missão: aqui é a Terra, Comandante. Câmbio!', 'Mission Control: Earth here, Commander. Over!', 'Control de la Misión: aquí la Tierra, Comandante. ¡Cambio!'));
-    if (intent === 'thanks') return L(K('Controle da Missão: sempre às ordens. A Terra torce por vocês!', 'Mission Control: always at your service. Earth is rooting for you!', 'Control de la Misión: siempre a sus órdenes. ¡La Tierra los apoya!'));
+    if (['status', 'o2', 'agua', 'comida', 'energia', 'fuel', 'moral'].includes(intent)) return L('Controle da Missão: telemetria recebida — ') + this.statusLine();
+    if (intent === 'goal') return L('Controle da Missão: ') + this.goalLine();
+    if (intent === 'help') return L('Controle da Missão: pergunte “status”, “oxigênio”, “água”, “objetivo” ou “curiosidade”. Chame um tripulante pelo nome!');
+    if (intent === 'hi') return L('Controle da Missão: aqui é a Terra, Comandante. Câmbio!');
+    if (intent === 'thanks') return L('Controle da Missão: sempre às ordens. A Terra torce por vocês!');
     return this.fact();
   },
   crewAnswer(c, intent) {
     const role = c.role.startsWith('engenheiro') ? 'eng' : c.role;
     const r = S.res;
-    const flavor = (FALAS.crewChat || {})[role] || [K('Estou aqui para ajudar.', 'Here to help.', 'Estoy aquí para ayudar.')];
+    const flavor = (FALAS.crewChat || {})[role] || ['Estou aqui para ajudar.'];
     const pre = `${c.name}: `;
-    const resLine = (k, label) => pre + L(K('Temos ', 'We have ', 'Tenemos ')) + fmt(r[k], 0) + ' ' + label + '.';
+    const resLine = (k, label) => pre + L('Temos ') + fmt(r[k], 0) + ' ' + label + '.';
     switch (intent) {
       case 'status': return pre + this.statusLine();
       case 'o2': return resLine('oxigenio', 'kg de O₂');
-      case 'agua': return resLine('agua', L(K('litros de água', 'L of water', 'L de agua')));
-      case 'comida': return resLine('comida', L(K('kg de comida', 'kg of food', 'kg de comida')));
+      case 'agua': return resLine('agua', L('litros de água'));
+      case 'comida': return resLine('comida', L('kg de comida'));
       case 'energia': return resLine('energia', 'kWh');
-      case 'fuel': return resLine('combustivel', L(K('kg de combustível', 'kg of fuel', 'kg de combustible')));
-      case 'moral': return pre + L(K('A moral da equipe está em ', 'Team morale is ', 'La moral del equipo está en ')) + fmt(moralIndex(), 0) + '. ' + (c.humor < 40 ? L(K('Eu mesmo ando meio pra baixo…', 'I\'m feeling a bit down myself…', 'Yo mismo ando algo decaído…')) : L(K('Eu estou bem!', 'I\'m doing fine!', '¡Yo estoy bien!')));
+      case 'fuel': return resLine('combustivel', L('kg de combustível'));
+      case 'moral': return pre + L('A moral da equipe está em ') + fmt(moralIndex(), 0) + '. ' + (c.humor < 40 ? L('Eu mesmo ando meio pra baixo…') : L('Eu estou bem!'));
       case 'goal': return pre + this.goalLine();
-      case 'help': return pre + L(K('Pergunte “status”, “água”, “comida”, “moral”, “objetivo” ou fale com a “NASA” para curiosidades.', 'Ask for “status”, “water”, “food”, “morale”, “goal” or talk to “NASA” for facts.', 'Pregunte “estado”, “agua”, “comida”, “moral”, “objetivo” o hable con la “NASA” para curiosidades.'));
-      case 'joke': return pre + pick([L(K('Por que o astronauta terminou o namoro? Precisava de espaço!', 'Why did the astronaut end the relationship? He needed space!', '¿Por qué el astronauta terminó la relación? ¡Necesitaba espacio!')), L(K('Cuidado com o lixo espacial: é o único que gira em volta da gente!', 'Beware space junk: the only trash that orbits around us!', 'Cuidado con la basura espacial: ¡la única que gira a nuestro alrededor!'))]);
-      case 'thanks': return pre + L(K('De nada, Comandante!', 'You\'re welcome, Commander!', '¡De nada, Comandante!'));
-      case 'hi': return pre + L(K('Olá! Pronto para o que der e vier.', 'Hello! Ready for whatever comes.', '¡Hola! Listo para lo que venga.'));
-      case 'planet': return pre + L(K('Pontes-01b tem raio ≈ 1,04 R⊕, água líquida provável e uma estrela calma. A nossa melhor aposta!', 'Pontes-01b has radius ≈ 1.04 R⊕, probable liquid water and a calm star. Our best bet!', 'Pontes-01b tiene radio ≈ 1,04 R⊕, agua líquida probable y una estrella tranquila. ¡Nuestra mejor apuesta!'));
+      case 'help': return pre + L('Pergunte “status”, “água”, “comida”, “moral”, “objetivo” ou fale com a “NASA” para curiosidades.');
+      case 'joke': return pre + pick([L('Por que o astronauta terminou o namoro? Precisava de espaço!'), L('Cuidado com o lixo espacial: é o único que gira em volta da gente!')]);
+      case 'thanks': return pre + L('De nada, Comandante!');
+      case 'hi': return pre + L('Olá! Pronto para o que der e vier.');
+      case 'planet': return pre + L('Pontes-01b tem raio ≈ 1,04 R⊕, água líquida provável e uma estrela calma. A nossa melhor aposta!');
       default: return pre + L(pick(flavor));
     }
   },
@@ -202,12 +202,12 @@ const Chat = {
     const e = this.els; if (!e) return;
     const vis = this.visible(); e.host.style.display = vis ? '' : 'none';
     e.host.classList.toggle('open', this.open);
-    const label = L(K('Chat', 'Chat', 'Chat'));
+    const label = L('Chat');
     e.btn.textContent = '💬 ' + label + (this.unread ? ' (' + this.unread + ')' : '');
     e.btn.classList.toggle('new', this.unread > 0);
-    e.btn.title = L(K('Abrir o chat (Enter)', 'Open chat (Enter)', 'Abrir el chat (Enter)'));
-    e.title.textContent = Net.role ? '💬 ' + L(K('Chat da sala', 'Room chat', 'Chat de la sala')) + (Net.room ? ' ' + Net.room : '') : '💬 ' + L(K('Chat com a tripulação e a NASA', 'Chat with the crew & NASA', 'Chat con la tripulación y la NASA'));
-    e.inp.placeholder = Net.role ? L(K('Mensagem para a sala… (Enter envia)', 'Message the room… (Enter sends)', 'Mensaje a la sala… (Enter envía)')) : L(K('Fale com a tripulação ou “NASA”… (“ajuda”)', 'Talk to the crew or “NASA”… (“help”)', 'Hable con la tripulación o “NASA”… (“ayuda”)'));
+    e.btn.title = L('Abrir o chat (Enter)');
+    e.title.textContent = Net.role ? '💬 ' + L('Chat da sala') + (Net.room ? ' ' + Net.room : '') : '💬 ' + L('Chat com a tripulação e a NASA');
+    e.inp.placeholder = Net.role ? L('Mensagem para a sala… (Enter envia)') : L('Fale com a tripulação ou “NASA”… (“ajuda”)');
     if (!this.dirty && !force) { this.peekRender(); return; }
     this.dirty = false;
     e.list.textContent = '';

@@ -1,6 +1,6 @@
 // ============================================================
 //  ABERTURA ANIMADA (história) e INTRODUÇÃO INTERATIVA POR MODO
-//  Falas em data/falas.json (story, modes, nodes, modeNames).
+//  Falas em data/lang/<idioma>.json ("falas") (story, modes, nodes, modeNames).
 // ============================================================
 'use strict';
 
@@ -30,7 +30,7 @@ function storyScreen() {
   const shown = full.slice(0, Math.floor(s.t * 45));
   return `<div class="story"><div class="story-cap"><p>${esc(shown)}<span class="caret">▌</span></p>
     <div class="dots">${NARRATION_INTRO.map((_, i) => `<i class="${i === s.i ? 'on' : i < s.i ? 'done' : ''}"></i>`).join('')}</div></div>
-    <div class="row bottom"><button class="btn" data-ui="storySkip">${esc(L(K('Pular', 'Skip', 'Saltar')))} <kbd>Esc</kbd></button><button class="btn primary" data-ui="storyNext">${esc(L(K('Próximo', 'Next', 'Siguiente')))} <kbd>${esc(L(K('Espaço', 'Space', 'Espacio')))}</kbd></button></div></div>`;
+    <div class="row bottom"><button class="btn" data-ui="storySkip">${esc(L('Pular'))} <kbd>Esc</kbd></button><button class="btn primary" data-ui="storyNext">${esc(L('Próximo'))} <kbd>${esc(L('Espaço'))}</kbd></button></div></div>`;
 }
 function drawStory(dt) {
   const s = U.story; if (!s) return drawTitleBg(dt);
@@ -76,7 +76,7 @@ function drawStory(dt) {
     drawStars(1, dt);
     drawPlanet('pontes', 400, 135, 150, R.t * 0.4);
     const x = 40 + Math.min(1, t / 6) * 230; drawShipExterior(x, 140, 1, true);
-    if (t > 1.5) text(L(K('UM SÓ FINAL', 'ONLY ONE ENDING', 'UN SOLO FINAL')), 140, 40, '#ff4a5a', 16, 'center');
+    if (t > 1.5) text(L('UM SÓ FINAL'), 140, 40, '#ff4a5a', 16, 'center');
   }
   if (fade < 1) { cx.fillStyle = `rgba(0,0,0,${1 - fade})`; cx.fillRect(0, 0, VW, VH); }
 }
@@ -126,5 +126,5 @@ function introScreen() {
   const crew = cur.node === 'crew' ? `<div class="mcrew">${ROLES.map(r => { const c = S && S.crew.find(x => x.role === r.id); return `<div><img src="${spriteURL(c ? c.avatar : DEFAULT_AVATAR, 'suit', 'happy', 2)}" alt=""><b>${esc(T(c ? c.roleName : r.name))}</b></div>`; }).join('')}</div>` : '';
   return `<div class="mintro"><h2 class="mtitle">🎬 ${esc(L((FALAS.modeNames || {})[m.mode] || m.mode))}</h2>${btns}
     <div class="mcap">${crew}<p>${esc(shown)}<span class="caret">▌</span></p><div class="dots">${sl.map((_, j) => `<i class="${j === m.i ? 'on' : j < m.i ? 'done' : ''}"></i>`).join('')}</div>
-    <div class="row"><button class="btn" data-ui="introSkip">${esc(L(K('Pular', 'Skip', 'Saltar')))} <kbd>Esc</kbd></button>${m.i ? `<button class="btn" data-ui="mPrev">◀</button>` : ''}<button class="btn primary" data-ui="mNext">${m.i < sl.length - 1 ? esc(L(K('Próximo', 'Next', 'Siguiente'))) : esc(L(K('Começar', 'Start', 'Empezar')))} ▶ <kbd>${esc(L(K('Espaço', 'Space', 'Espacio')))}</kbd></button></div></div></div>`;
+    <div class="row"><button class="btn" data-ui="introSkip">${esc(L('Pular'))} <kbd>Esc</kbd></button>${m.i ? `<button class="btn" data-ui="mPrev">◀</button>` : ''}<button class="btn primary" data-ui="mNext">${m.i < sl.length - 1 ? esc(L('Próximo')) : esc(L('Começar'))} ▶ <kbd>${esc(L('Espaço'))}</kbd></button></div></div></div>`;
 }

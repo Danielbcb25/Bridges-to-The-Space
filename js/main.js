@@ -62,6 +62,7 @@ function update(dt) {
   R.t += dt;
   Net.tick(dt);
   if (U.screen === 'story') storyTick(dt);
+  GameSave.tick(dt);
   if (!S || U.screen !== 'game') return;
   const host = Net.role !== 'client';
   const k = timeScale();
@@ -69,7 +70,7 @@ function update(dt) {
   if (S.scene === 'earth' && host) tickCity(dt);
   if (S.scene === 'colony') {
     const c = me(); if (c) moveColonyHuman(c, dt);
-    if (host && !(U.panel === 'menu' && !Net.role) && !U.help) tickColony(dt * k); // no solo, o menu e a ajuda pausam a colônia
+    if (host && !(U.panel === 'menu' && !Net.role) && !U.help) stepScaled(tickColony, dt, k); // no solo, o menu e a ajuda pausam a colônia
   }
   if (S.scene === 'launch' && host) {
     U.launchT += dt;
@@ -81,7 +82,7 @@ function update(dt) {
   if (S.scene === 'ship') {
     const c = me();
     if (c) moveHuman(c, dt);
-    if (host && !(Net.role !== 'host' && U.panel === 'menu')) tickGame(dt * k);
+    if (host && !(Net.role !== 'host' && U.panel === 'menu')) stepScaled(tickGame, dt, k);
     if (S.event && S.event.phase !== 'result') S.fast = 0; // o ⏩ vale até o próximo evento
     // som de alerta em novos eventos
     if (S.event && S.event.id !== lastEventId) { lastEventId = S.event.id; Sfx.alarm(); }

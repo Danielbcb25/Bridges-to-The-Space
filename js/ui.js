@@ -90,7 +90,8 @@ function titleScreen() {
     <div class="tbox tr"><div class="lbl cyan">▣ MISSÃO ATUAL</div><div class="small">Explorar o planeta</div><div class="cyan">Pontes01</div></div>
     <div class="logo"><h1>PONTES<span>01</span></h1><div class="sub">— EXPLORAÇÃO ESPACIAL —</div></div>
     <div class="menu">
-      <button class="mbtn primary" data-ui="journey">▶ NOVA JORNADA</button>
+      ${(() => { const sv = GameSave.summary(); return sv ? `<button class="mbtn primary" data-ui="continueGame">▶ ${esc(L('CONTINUAR'))} <small>${esc(sv.scene)} · ${esc(L('dia'))} ${sv.day}</small></button>` : ''; })()}
+      <button class="mbtn ${GameSave.read() ? '' : 'primary'}" data-ui="journey">▶ NOVA JORNADA</button>
       <button class="mbtn" data-ui="lobby">👥 MULTIPLAYER</button>
       <button class="mbtn" data-ui="avatar">🧑‍🚀 CRIAR AVATAR</button>
       <button class="mbtn" data-ui="shop">✦ LOJA <small>${cr} créditos</small></button>
@@ -127,8 +128,8 @@ function settingsScreen(inGame) {
     <label class="field">Música <input type="range" min="0" max="1" step="0.05" value="${st.music}" data-set="music"></label>
     <label class="field">Efeitos <input type="range" min="0" max="1" step="0.05" value="${st.sfx}" data-set="sfx"></label>
     <label class="check"><input type="checkbox" data-set="narration" ${st.narration ? 'checked' : ''}> Narração por voz (pt-BR)</label>
-    <label class="field">${esc(L(K('Voz', 'Voice', 'Voz')))} <select data-set="voice"><option value="">${esc(L(K('Automática (a mais natural)', 'Automatic (most natural)', 'Automática (la más natural)')))}</option>${Narrator.voices().map(v => `<option value="${esc(v.name)}" ${st.voice === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}</select> <button class="btn small" data-ui="voiceTest">🔊</button></label>
-    <label class="field">${esc(L(K('Velocidade da voz', 'Voice speed', 'Velocidad de la voz')))} <input type="range" min="0.7" max="1.3" step="0.05" value="${st.voiceRate || 1}" data-set="voiceRate"></label>
+    <label class="field">${esc(L('Voz'))} <select data-set="voice"><option value="">${esc(L('Automática (a mais natural)'))}</option>${Narrator.voices().map(v => `<option value="${esc(v.name)}" ${st.voice === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}</select> <button class="btn small" data-ui="voiceTest">🔊</button></label>
+    <label class="field">${esc(L('Velocidade da voz'))} <input type="range" min="0.7" max="1.3" step="0.05" value="${st.voiceRate || 1}" data-set="voiceRate"></label>
     <label class="check"><input type="checkbox" data-set="showDice" ${st.showDice ? 'checked' : ''}> Modo professor: mostrar as rolagens dos dados</label>
     <label class="check"><input type="checkbox" data-set="fastEarth" ${st.fastEarth ? 'checked' : ''}> Abertura na Terra mais curta (30 s)</label>
     <div class="row"><button class="btn" data-ui="${inGame ? 'closePanel' : 'title'}">◀ Voltar</button></div>
@@ -160,8 +161,8 @@ function avatarScreen() {
     <div class="av-topbtns"><button class="btn" data-ui="avRandom">🎲 Aleatório</button><button class="btn primary" data-ui="avSave">✔ Salvar</button><button class="btn" data-ui="title">◀ Voltar <kbd>Esc</kbd></button></div>
     <div class="av-left">
       <h2>CRIADOR DE AVATAR</h2>
-      <div class="previews two"><div><canvas id="pv-civil" width="80" height="124"></canvas><small>${esc(L(K('Terra (sem traje)', 'Earth (no suit)', 'Tierra (sin traje)')))}</small></div><div><canvas id="pv-suit" width="80" height="124"></canvas><small>${esc(L(K('Nave (traje)', 'Ship (suit)', 'Nave (traje)')))}</small></div></div>
-      <p class="muted small">${esc(L(K('O capacete é padrão para toda a tripulação.', 'The helmet is standard for the whole crew.', 'El casco es estándar para toda la tripulación.')))}</p>
+      <div class="previews two"><div><canvas id="pv-civil" width="80" height="124"></canvas><small>${esc(L('Terra (sem traje)'))}</small></div><div><canvas id="pv-suit" width="80" height="124"></canvas><small>${esc(L('Nave (traje)'))}</small></div></div>
+      <p class="muted small">${esc(L('O capacete é padrão para toda a tripulação.'))}</p>
     </div>
     <div class="av-right scroll">
       <label class="field">Nome <input id="av-name" maxlength="14" value="${esc(a.name)}"></label>
@@ -219,7 +220,7 @@ function lobbyScreen() {
     </div>`;
   }
   if (Net.role === 'client') {
-    return `<div class="panel center"><h2>CONECTADO</h2><p>Sala <span class="code">${esc(Net.room || '')}</span>. Você será: <b>${esc(Net.myRoleName || '...')}</b>.</p><p class="muted">Aguardando o Comandante iniciar a jornada e montar a nave...</p>${ROLE_DUTIES[U.me] ? `<p class="small cyan">${esc(L(K('Sua função:', 'Your role:', 'Su función:')))} ${esc(L(ROLE_DUTIES[U.me]))}</p><p class="small muted">${esc(L(K('Quando chamarem a sua função, aparece um aviso 📢: vá até a estação e pressione E. Se não for em 45 s, um bot assume.', 'When your role is called, a 📢 notice appears: go to the station and press E. If you don\'t go within 45 s, a bot takes over.', 'Cuando llamen a su función aparece un aviso 📢: vaya a la estación y presione E. Si no va en 45 s, un bot toma el relevo.')))}</p>` : ''}<div class="row"><button class="btn" data-ui="netLeave">◀ Sair</button></div></div>`;
+    return `<div class="panel center"><h2>CONECTADO</h2><p>Sala <span class="code">${esc(Net.room || '')}</span>. Você será: <b>${esc(Net.myRoleName || '...')}</b>.</p><p class="muted">Aguardando o Comandante iniciar a jornada e montar a nave...</p>${ROLE_DUTIES[U.me] ? `<p class="small cyan">${esc(L('Sua função:'))} ${esc(L(ROLE_DUTIES[U.me]))}</p><p class="small muted">${esc(L('Quando chamarem a sua função, aparece um aviso 📢: vá até a estação e pressione E. Se não for em 45 s, um bot assume.'))}</p>` : ''}<div class="row"><button class="btn" data-ui="netLeave">◀ Sair</button></div></div>`;
   }
   return `<div class="panel center">
     <h2>MULTIPLAYER</h2>
@@ -243,7 +244,7 @@ function commsScreen() {
   if (U.comms === 1) return `<div class="modal-bg"><div class="panel center comm"><div class="blink red">● TRANSMISSÃO PRIORITÁRIA</div><h2>COMUNICADO</h2><p class="big">Você foi selecionado para uma missão espacial para salvar o futuro da humanidade.</p><div class="row"><button class="btn primary" data-ui="comms2">Continuar ▶</button></div></div></div>`;
   return `<div class="modal-bg"><div class="panel center comm wide"><div class="blink red">● PRÓXIMO COMUNICADO</div>
     <p>${L(K(`Você tem uma <b>verba limitada (${setupBudget()} pontos)</b> e <b>5 espaços de módulo</b> para montar uma nave de exploração. Não é possível comprar tudo: cada escolha é um sacrifício. Pontos não gastos viram um <b>fundo de contingência</b>.`, `You have a <b>limited budget (${setupBudget()} points)</b> and <b>5 module slots</b> to build an exploration ship. You cannot buy everything: every choice is a sacrifice. Unspent points become a <b>contingency fund</b>.`, `Tiene un <b>presupuesto limitado (${setupBudget()} puntos)</b> y <b>5 espacios de módulo</b> para armar una nave de exploración. No se puede comprar todo: cada elección es un sacrificio. Los puntos sin gastar se convierten en un <b>fondo de contingencia</b>.`))}</p>
-    <p class="muted">${L(K('A nave precisa cuidar de: sanidade dos 6 tripulantes, plantações e estoque de alimentos, medicamentos e recursos clínicos, combustível, água, oxigênio, descarte de lixo e reciclagem, comunicação e equipamentos científicos.', 'The ship must look after: the sanity of the 6 crew members, crops and food stock, medicines and clinical supplies, fuel, water, oxygen, waste disposal and recycling, communication and scientific equipment.', 'La nave debe cuidar: la cordura de los 6 tripulantes, los cultivos y la reserva de alimentos, medicinas y recursos clínicos, combustible, agua, oxígeno, eliminación de basura y reciclaje, comunicación y equipos científicos.'))}</p>
+    <p class="muted">${L('A nave precisa cuidar de: sanidade dos 6 tripulantes, plantações e estoque de alimentos, medicamentos e recursos clínicos, combustível, água, oxigênio, descarte de lixo e reciclagem, comunicação e equipamentos científicos.')}</p>
     <div class="seats sprites">${ROLES.map(r => { const c = S.crew.find(x => x.role === r.id); return `<div class="seat"><img src="${spriteURL(c ? c.avatar : DEFAULT_AVATAR, 'suit', 'happy', 2)}" alt=""><b>${esc(c ? c.roleName : r.name)}</b><span>${esc(L(ROLE_FN[r.id] || ''))}</span></div>`; }).join('')}</div>
     <div class="row"><button class="btn primary" data-ui="toSetup">Montar a nave ▶</button></div></div></div>`;
 }
@@ -264,9 +265,9 @@ function setupScreen() {
   switch (step.id) {
     case 'mission': body = `<h4>${esc(T('Origem do Comandante'))}</h4><div class="opts">${ORIGINS.map(o => `<button class="opt ${st.origin === o.id ? 'on' : ''}" data-ui="setOrigin" data-arg="${o.id}"><b>${o.name}</b><span>${o.bonus}</span></button>`).join('')}</div>
       <h4>${esc(T('Rota'))}</h4><div class="opts">${ROUTES.map(r => `<button class="opt ${st.route === r.id ? 'on' : ''}" data-ui="setRoute" data-arg="${r.id}"><b>${r.name}</b><span>${r.desc}</span></button>`).join('')}</div>`; break;
-    case 'modules': body = `<p class="muted small">${esc(L(K('5 slots · o reator de fusão ocupa 2', '5 slots · the fusion reactor takes 2', '5 ranuras · el reactor de fusión ocupa 2')))}</p><div class="opts">${MODULES.map(m => item(m, 'modules')).join('')}</div>`; break;
+    case 'modules': body = `<p class="muted small">${esc(L('5 slots · o reator de fusão ocupa 2'))}</p><div class="opts">${MODULES.map(m => item(m, 'modules')).join('')}</div>`; break;
     case 'supplies': body = `<div class="opts">${RESERVES.map(r => item(r, 'reserves')).join('')}${ESSENTIALS.map(([list, id]) => { const cat = list === 'pantry' ? PANTRY : UPGRADES; const it = cat.find(x => x.id === id); return it ? item(it, list) : ''; }).join('')}</div>`; break;
-    case 'report': body = `<div class="fund"><div class="bignum">${left}</div><p class="small">${L(K('pontos sobrando viram <b>fundo de contingência</b> para emergências na viagem.', 'leftover points become a <b>contingency fund</b> for emergencies on the trip.', 'los puntos sobrantes se convierten en un <b>fondo de contingencia</b> para emergencias en el viaje.'))}</p></div><div class="report-list">${readinessAlerts().map(a => `<div class="alert ${a[0]}">${esc(a[1])}</div>`).join('')}</div><div class="row"><button class="btn primary big" data-ui="launch">🚀 DECOLAR</button></div>`; break;
+    case 'report': body = `<div class="fund"><div class="bignum">${left}</div><p class="small">${L('pontos sobrando viram <b>fundo de contingência</b> para emergências na viagem.')}</p></div><div class="report-list">${readinessAlerts().map(a => `<div class="alert ${a[0]}">${esc(a[1])}</div>`).join('')}</div><div class="row"><button class="btn primary big" data-ui="launch">🚀 DECOLAR</button></div>`; break;
   }
   return `<div class="setup">
     <div class="setup-side">
@@ -325,16 +326,16 @@ function hudTop() {
   const big = (ic, name, v, max, txt, title, extra) => `<div class="rb big" title="${esc(title)}"><span class="ic">${ic}</span><span class="nm">${esc(L(name))}</span>${bar(v, max)}<span class="v">${txt}</span>${extra || ''}</div>`;
   const low = st.low.map(k => RES_META.find(m => m.id === k).icon).join('');
   let items = [
-    big('🫁', K('Oxigênio', 'Oxygen', 'Oxígeno'), r.oxigenio, c.oxigenio, `${fmt(r.oxigenio, 0)}<small>kg</small>`, `O₂: ${fmt(r.oxigenio)} kg`),
-    big('🍱', K('Fome', 'Hunger', 'Hambre'), fome, 100, `${fmt(fome, 0)}<small>%</small>`, L(K('Saciedade média da tripulação · comida: ', 'Average crew fullness · food: ', 'Saciedad media de la tripulación · comida: ')) + fmt(r.comida) + ' kg'),
-    big('☺', K('Humor', 'Mood', 'Ánimo'), mo, 100, `${fmt(mo, 0)}`, L(K('Moral (média do humor + bônus)', 'Morale (average mood + bonus)', 'Moral (promedio del ánimo + bono)'))),
-    big('📦', K('Armazenamento', 'Storage', 'Almacenamiento'), st.avg, 100, `${fmt(st.avg, 0)}<small>%</small>`, ['agua', 'comida', 'energia', 'combustivel', 'medicos'].map(k => { const m = RES_META.find(x => x.id === k); return `${T(m.name)}: ${fmt(r[k], 0)} ${m.unit}`; }).join(' · '), low ? `<b class="lowres blink">${low}</b>` : ''),
+    big('🫁', 'Oxigênio', r.oxigenio, c.oxigenio, `${fmt(r.oxigenio, 0)}<small>kg</small>`, `O₂: ${fmt(r.oxigenio)} kg`),
+    big('🍱', 'Fome', fome, 100, `${fmt(fome, 0)}<small>%</small>`, L('Saciedade média da tripulação · comida: ') + fmt(r.comida) + ' kg'),
+    big('☺', 'Humor', mo, 100, `${fmt(mo, 0)}`, L('Moral (média do humor + bônus)')),
+    big('📦', 'Armazenamento', st.avg, 100, `${fmt(st.avg, 0)}<small>%</small>`, ['agua', 'comida', 'energia', 'combustivel', 'medicos'].map(k => { const m = RES_META.find(x => x.id === k); return `${T(m.name)}: ${fmt(r[k], 0)} ${m.unit}`; }).join(' · '), low ? `<b class="lowres blink">${low}</b>` : ''),
   ].join('');
   if (U.hudFull) items += '<div class="hudfull">' + RES_META.map(m => { const v = r[m.id], cap = m.id === 'lixo' ? 30 : c[m.id]; return `<div class="rb" title="${m.name}: ${fmt(v)} ${m.unit}"><span class="ic">${m.icon}</span>${bar(v, cap, '', m.inverse)}<span class="v">${fmt(v, v < 10 ? 1 : 0)}<small>${m.unit}</small></span></div>`; }).join('') + '</div>';
   const hh = Math.floor(S.dayT / S.dayLen * 24), mm = Math.floor((S.dayT / S.dayLen * 24 * 60) % 60);
   const stageNames = ['Preparação', 'Partida e viagem', 'Exploração científica', 'O novo mundo', 'Migração'];
-  const fastBtn = `<button class="btn tiny ${S.fast ? 'on' : ''}" data-ui="fast" title="Shift+S">${S.fast ? '⏩ 2x' : '⏩'}</button>`;
-  return `<div class="hud-top slim"><div class="bars">${items}<button class="btn tiny more" data-ui="hudFull" title="${esc(L(K('Todos os recursos', 'All resources', 'Todos los recursos')))}">${U.hudFull ? '▴' : '▾'}</button></div><div class="clock"><b>DIA ${S.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${fastBtn}<br><small>${stageNames[Math.min(S.stage, 4)]}</small>${S.commDown > 0 ? '<br><small class="red">📡 sem comunicação</small>' : ''}${S.cylinders ? '<br><small class="orange">🫁 cilindros de O₂</small>' : ''}</div></div>`;
+  const fastBtn = `<button class="btn tiny ${S.fast ? 'on' : ''}" data-ui="fast" title="Shift+S">${S.fast ? '⏩ ' + S.fast + 'x' : '⏩'}</button>`;
+  return `<div class="hud-top slim"><div class="bars">${items}<button class="btn tiny more" data-ui="hudFull" title="${esc(L('Todos os recursos'))}">${U.hudFull ? '▴' : '▾'}</button></div><div class="clock"><b>DIA ${S.day}</b> ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')} ${fastBtn}<br><small>${stageNames[Math.min(S.stage, 4)]}</small>${S.commDown > 0 ? '<br><small class="red">📡 sem comunicação</small>' : ''}${S.cylinders ? '<br><small class="orange">🫁 cilindros de O₂</small>' : ''}</div></div>`;
 }
 function hudBottom() {
   const m = me(); const near = m && m.alive ? stationNear(m) : null;
@@ -350,7 +351,7 @@ function hudBottom() {
   let call = '';
   if (m && m.task && m.task.called && !atStation(m, m.task.station, 20)) {
     const left = Math.max(0, Math.ceil(CALL_TIMEOUT - (m.task.wait || 0)));
-    call = `<div class="callbar"><b class="blink">📢</b> ${esc(L(K('Você foi chamado(a):', 'You were called:', 'Lo llamaron:')))} <b>${esc(T(m.task.label))}</b> → ${esc(T(STATIONS[m.task.station].name))} <button class="btn small primary" data-ui="goto" data-arg="${m.task.station}">${esc(L(K('Ir até lá', 'Go there', 'Ir allí')))}</button></div>`;
+    call = `<div class="callbar"><b class="blink">📢</b> ${esc(L('Você foi chamado(a):'))} <b>${esc(T(m.task.label))}</b> → ${esc(T(STATIONS[m.task.station].name))} <button class="btn small primary" data-ui="goto" data-arg="${m.task.station}">${esc(L('Ir até lá'))}</button></div>`;
   }
   const p = S.progress;
   return call + `<div class="hud-bottom">
@@ -361,13 +362,13 @@ function hudBottom() {
 }
 function tutorialBox() {
   const steps = [
-    K('Use ←/→ (A/D) para andar e ↑/↓ (W/S) nas escadas. Vá até a <b>Ponte de comando</b> (à direita, andar de cima) e pressione <b>E</b> no painel.', 'Use ←/→ (A/D) to walk and ↑/↓ (W/S) on the ladders. Go to the <b>Command bridge</b> (to the right, upper deck) and press <b>E</b> at the panel.', 'Use ←/→ (A/D) para caminar y ↑/↓ (W/S) en las escaleras. Vaya al <b>Puente de mando</b> (a la derecha, cubierta superior) y pulse <b>E</b> en el panel.'),
-    K('Configure a navegação: escolha o <b>modo de cruzeiro</b>.', 'Set up navigation: choose the <b>cruise mode</b>.', 'Configure la navegación: elija el <b>modo de crucero</b>.'),
-    K('Pressione <b>R</b> para abrir o relatório de recursos (busca aprofundada).', 'Press <b>R</b> to open the resource report (deep search).', 'Pulse <b>R</b> para abrir el informe de recursos (búsqueda profunda).'),
-    K('Visite a <b>Cozinha e mesa</b> (andar de baixo) e defina o cardápio do dia.', 'Visit the <b>Kitchen & table</b> (lower deck) and set the day\'s menu.', 'Visite la <b>Cocina y mesa</b> (cubierta inferior) y defina el menú del día.'),
+    'Use ←/→ (A/D) para andar e ↑/↓ (W/S) nas escadas. Vá até a <b>Ponte de comando</b> (à direita, andar de cima) e pressione <b>E</b> no painel.',
+    'Configure a navegação: escolha o <b>modo de cruzeiro</b>.',
+    'Pressione <b>R</b> para abrir o relatório de recursos (busca aprofundada).',
+    'Visite a <b>Cozinha e mesa</b> (andar de baixo) e defina o cardápio do dia.',
   ];
   if (S.tutorial >= steps.length || Net.role === 'client') return '';
-  return `<div class="tut"><b>${esc(L(K('OBJETIVO', 'GOAL', 'OBJETIVO')))}</b> ${L(steps[S.tutorial])}</div>`;
+  return `<div class="tut"><b>${esc(L('OBJETIVO'))}</b> ${L(steps[S.tutorial])}</div>`;
 }
 
 // ---------- painel de evento ----------
@@ -377,17 +378,17 @@ function eventPanel() {
   const ev = S.event; if (!ev) return '';
   const info = EVENT_INFO[ev.type];
   const sysChips = info.systems.map(s => `<div class="schip" title="${esc(T(SYSTEMS[s].name))}"><span>${SYS_IC[s] || '⚙'}</span>${bar(sysHp(s), 100)}<em class="dmg ${SYSTEMS[s].dmg}">−${DMG_PCT[SYSTEMS[s].dmg]}%</em></div>`).join('');
-  const head = (cls) => `<div class="evhead ${cls || ''}"><span class="evic">${info.icon}</span><div>${cls === 'warn' ? `<div class="blink red small">⚠ ${esc(L(K('ALERTA', 'ALERT', 'ALERTA')))}</div>` : ''}<h2>${info.title}</h2></div></div>`;
+  const head = (cls) => `<div class="evhead ${cls || ''}"><span class="evic">${info.icon}</span><div>${cls === 'warn' ? `<div class="blink red small">⚠ ${esc(L('ALERTA'))}</div>` : ''}<h2>${info.title}</h2></div></div>`;
   if (ev.phase === 'warn') {
     return `<div class="evp warn compact">${head('warn')}<div class="schips">${sysChips}${info.energy ? `<div class="schip"><span>⚡</span>${bar(S.res.energia, S.cap.energia)}</div>` : ''}</div>
-      <details class="evinfo"><summary>ℹ ${esc(L(K('O que está acontecendo?', 'What is happening?', '¿Qué está pasando?')))}</summary><p class="small">${info.desc}</p></details>
-      <div class="row"><button class="btn primary big" data-act="eventGo">${esc(L(K('Enfrentar', 'Face it', 'Enfrentar')))} ▶ <small>${Math.ceil(ev.warnT)}s</small></button></div></div>`;
+      <details class="evinfo"><summary>ℹ ${esc(L('O que está acontecendo?'))}</summary><p class="small">${info.desc}</p></details>
+      <div class="row"><button class="btn primary big" data-act="eventGo">${esc(L('Enfrentar'))} ▶ <small>${Math.ceil(ev.warnT)}s</small></button></div></div>`;
   }
   if (ev.phase === 'result') {
     const r = ev.result;
     return `<div class="evp result compact ${r.ok ? 'ok' : 'bad'}">${head()}<div class="bigres ${r.ok ? 'green' : 'red'}">${r.ok ? '✔' : '✖'} ${r.grade || (r.ok ? 'SUCESSO' : 'FALHA')}</div>
       ${r.points > 0 ? `<p class="cyan">+${r.points} pontos</p>` : ''}
-      ${r.text ? `<details class="evinfo"><summary>ℹ ${esc(L(K('Detalhes', 'Details', 'Detalles')))}</summary><p class="small">${esc(r.text)}</p></details>` : ''}
+      ${r.text ? `<details class="evinfo"><summary>ℹ ${esc(L('Detalhes'))}</summary><p class="small">${esc(r.text)}</p></details>` : ''}
       <div class="row"><button class="btn primary" data-act="eventClose">Continuar ▶</button></div></div>`;
   }
   if (ev.type === 'termico') return thermalPanel();
@@ -397,15 +398,15 @@ function eventPanel() {
     let btns = '';
     if (s.station) {
       btns = `<button class="btn tiny primary" data-ui="goto" data-arg="${s.station}">📍 ${esc(T(STATIONS[s.station].name))}</button>`;
-      if (s.role || s.optional) { const rn = s.role === 'engenheiro' ? 'engenheiro' : (ROLES.find(r => r.id === s.role) || {}).short || 'tripulante'; const who = pickForRole(s.role || 'engenheiro') || pickBotForRole(s.role || 'engenheiro'); btns += `<button class="btn tiny" data-act="callRole" data-p='${J({ step: s.id, role: s.role || 'engenheiro' })}'>${who ? `<img class="mini" src="${spriteURL(who.avatar, 'suit', 'happy', 1)}" alt="">` : ''}${esc(L(K('Chamar', 'Call', 'Llamar')))} ${esc(T(rn).toLowerCase())}${who && isHumanCrew(who) ? ' 🎮' : ''}</button>`; }
+      if (s.role || s.optional) { const rn = s.role === 'engenheiro' ? 'engenheiro' : (ROLES.find(r => r.id === s.role) || {}).short || 'tripulante'; const who = pickForRole(s.role || 'engenheiro') || pickBotForRole(s.role || 'engenheiro'); btns += `<button class="btn tiny" data-act="callRole" data-p='${J({ step: s.id, role: s.role || 'engenheiro' })}'>${who ? `<img class="mini" src="${spriteURL(who.avatar, 'suit', 'happy', 1)}" alt="">` : ''}${esc(L('Chamar'))} ${esc(T(rn).toLowerCase())}${who && isHumanCrew(who) ? ' 🎮' : ''}</button>`; }
       if (s.claimed) { const c = crewById(s.claimed); btns = `<em class="small">${esc(c ? c.name : '')} ⏳</em>`; }
     }
     return `<div class="stepcard ${s === cs ? 'cur' : ''}"><b>▶ ${esc(s.label)}</b>${s.optional ? ' <small>(opcional)</small>' : ''}<div class="row">${btns}</div></div>`;
   };
   const chips = ev.steps.map((s, i) => `<span class="dot ${s.done ? 'done' : s === cs ? 'cur' : ''}" title="${esc(T(s.label))}">${s.done ? '✔' : i + 1}</span>`).join('');
   let extra = '';
-  if (ev.type === 'tempestade') extra = `<div class="row"><button class="btn primary" data-act="shelter">🛏 ${esc(L(K('Todos ao abrigo', 'Everyone to shelter', 'Todos al refugio')))}</button><b class="${ev.data.storm ? 'red' : 'orange'}">☀ ${ev.data.storm ? '!!!' : Math.max(0, Math.ceil(ev.t - ev.data.stormAt)) + 's'}</b></div>`;
-  if (ev.type === 'lixo') extra = `<p class="small">🗑 <b>E</b> / ${esc(L(K('Espaço', 'Space', 'Espacio')))} ${esc(L(K('perto do lixo flutuante', 'near floating trash', 'cerca de la basura flotante')))}</p>`;
+  if (ev.type === 'tempestade') extra = `<div class="row"><button class="btn primary" data-act="shelter">🛏 ${esc(L('Todos ao abrigo'))}</button><b class="${ev.data.storm ? 'red' : 'orange'}">☀ ${ev.data.storm ? '!!!' : Math.max(0, Math.ceil(ev.t - ev.data.stormAt)) + 's'}</b></div>`;
+  if (ev.type === 'lixo') extra = `<p class="small">🗑 <b>E</b> / ${esc(L('Espaço'))} ${esc(L('perto do lixo flutuante'))}</p>`;
   if (ev.type === 'traje' && ev.data.victim) { const v = crewById(ev.data.victim); extra = `<p class="small red"><img class="mini" src="${spriteURL(v.avatar, 'broken', 'sad', 1)}" alt=""> ${esc(v.name)} 🫁!</p>`; }
   if (ev.type === 'doenca' && ev.data.victim) { const v = crewById(ev.data.victim); extra = `<p class="small"><img class="mini" src="${spriteURL(v.avatar, 'suit', 'sick', 1)}" alt=""> 🤒 <b>${esc(v.name)}</b> · 💊 ${S.day > S.meds.validUntil ? '<span class="red">✖</span>' : '✔'}</p>`; }
   return `<div class="evp run compact">${head()}
@@ -431,7 +432,7 @@ function puzzleHTML(ev) {
     const dist = Math.abs(pz.freq - pz.target);
     const q = clamp(1 - dist / (fixed ? 40 : 28), 0, 1);
     let s = pz.seed;
-    const shown = [...msg.full].map(ch => { s = (s * 9301 + 49297) % 233280; return (ch === ' ' || s / 233280 < q) ? ch : (s % 3 ? '█' : '~'); }).join('');
+    const shown = [...T(msg.full)].map(ch => { s = (s * 9301 + 49297) % 233280; return (ch === ' ' || s / 233280 < q) ? ch : (s % 3 ? '█' : '~'); }).join('');
     return `<div class="puzzle"><h4>Rádio — ${fmt(100 + pz.freq * 0.5, 1)} MHz</h4><div class="signal">${bar(q, 1)}<b>${q > 0.85 ? 'sinal limpo' : q > 0.4 ? 'chiado' : 'só ruído'}</b></div>
       <div class="radiomsg">${esc(shown)}</div>
       <div class="row"><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'tune', d: -10 })}'>◀◀</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'tune', d: -1 })}'>◀</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'tune', d: 1 })}'>▶</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'tune', d: 10 })}'>▶▶</button></div>
@@ -489,7 +490,7 @@ function thermalPanel() {
     <div class="timer">${bar(S.event.t, th.D, 'time')}<b>${Math.floor(S.event.t / 60)}:${String(Math.floor(S.event.t % 60)).padStart(2, '0')}</b></div>
     <div class="thermos">${thermo('Sol', th.sun, -160, 130, 'hot')}${thermo('Sombra', th.shade, -160, 130, 'cold')}<div class="thermo main"><div class="tube"><i class="${tcol}" style="height:${clamp((th.T - 0) / 50, 0, 1) * 100}%"></i><span class="band-safe"></span></div><b class="${tcol}">${fmt(th.T, 1)}°</b><small>Interior</small></div>
       <div class="thres">${res.map(([k, u]) => `<div><span>${RES_META.find(m => m.id === k).name}</span>${bar(S.res[k], S.cap[k])}<b>${fmt(S.res[k], 1)} ${u}</b></div>`).join('')}<div><span>Moral</span>${bar(moralIndex(), 100)}<b>${fmt(moralIndex(), 0)} pts</b></div></div></div>
-    <p class="small">${L(K('Meta: manter o interior entre <b>18 °C e 26 °C</b>.', 'Goal: keep the interior between <b>18 °C and 26 °C</b>.', 'Meta: mantener el interior entre <b>18 °C y 26 °C</b>.'))} ${th.rip && !th.repaired ? '<span class="red">' + L(K('Rasgo no isolamento aberto!', 'Tear in the insulation!', '¡Rasgadura en el aislamiento!')) + '</span>' : ''} ${th.equipOff ? '<span class="orange">' + L(K('Equipamentos desligados (sem pesquisa).', 'Equipment off (no research).', 'Equipos apagados (sin investigación).')) + '</span>' : ''}</p>
+    <p class="small">${L('Meta: manter o interior entre <b>18 °C e 26 °C</b>.')} ${th.rip && !th.repaired ? '<span class="red">' + L('Rasgo no isolamento aberto!') + '</span>' : ''} ${th.equipOff ? '<span class="orange">' + L('Equipamentos desligados (sem pesquisa).') + '</span>' : ''}</p>
     ${th.pendingReroll ? `<div class="reroll"><b>${TH_ACTIONS[th.pendingReroll.k].name} falhou!</b> Usar Sangue-frio? <button class="btn tiny primary" data-act="thReroll">Rolar de novo</button><button class="btn tiny" data-act="thAcceptFail">Aceitar</button></div>` : ''}
     <div class="tacts">${acts}</div>
     <div class="evlog">${th.msgs.slice(-5).map(m => `<div>${esc(m)}</div>`).join('')}</div>
@@ -539,8 +540,8 @@ function stationPanel(id) {
       body = `<div class="kv"><span>Lixo a bordo</span><b>${fmt(S.res.lixo, 1)} kg</b><span>Reciclador</span><b>${rec ? 'instalado' : 'não'}</b><span>Oficina 3D</span><b>${imp ? 'instalada' : 'não'}</b><span>Adubo</span><b>${fmt(S.adubo, 1)} kg</b><span>Peças</span><b>${S.peças}</b></div>
       <h4>Destino do lixo</h4><div class="opts">${opts.map(([k, n, d, off]) => `<button class="opt ${tm === k ? 'on' : ''} ${off ? 'cant' : ''}" ${off ? '' : `data-act="trashMode" data-p='${J({ mode: k })}'`}><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div class="row"><button class="btn small" data-act="processTrash">Processar agora (3 kg · 2 kWh)</button></div>
-      <h4>Como o lixo é reaproveitado</h4><p class="small">${esc(L(K('Lixo', 'Trash', 'Basura')))} → <b>${esc(L(K('adubo', 'fertilizer', 'abono')))}</b> ${esc(L(K('(use na Estufa: nutrientes a 100% e mais colheita)', '(use it in the Greenhouse: nutrients at 100% and a bigger harvest)', '(úselo en el Invernadero: nutrientes al 100% y más cosecha)')))} ${rec && imp ? '→ <b>' + esc(L(K('peças de reparo', 'repair parts', 'piezas de reparación'))) + '</b> (' + esc(L(K('Oficina 3D', '3D workshop', 'Taller 3D'))) + ')' : ''}. ${esc(L(K('Restos de comida, cascas e plantas estragadas também viram lixo. Sem reaproveitar, o lixo vira peso e tira humor da tripulação.', 'Food scraps, peels and spoiled plants also become trash. If it isn\'t reused, trash becomes dead weight and lowers the crew\'s mood.', 'Restos de comida, cáscaras y plantas estropeadas también se vuelven basura. Si no se reaprovecha, la basura es peso muerto y baja el ánimo de la tripulación.')))}</p>
-      <p class="small">${esc(L(K('O lixo é o espelho da poluição que expulsou a humanidade da Terra. Acima de 15 kg ele tira humor da tripulação.', 'Trash mirrors the pollution that drove humanity off Earth. Above 15 kg it lowers the crew\'s mood.', 'La basura es el reflejo de la contaminación que expulsó a la humanidad de la Tierra. Por encima de 15 kg baja el ánimo de la tripulación.')))}</p>`;
+      <h4>Como o lixo é reaproveitado</h4><p class="small">${esc(L('Lixo'))} → <b>${esc(L('adubo'))}</b> ${esc(L('(use na Estufa: nutrientes a 100% e mais colheita)'))} ${rec && imp ? '→ <b>' + esc(L('peças de reparo')) + '</b> (' + esc(L('Oficina 3D')) + ')' : ''}. ${esc(L('Restos de comida, cascas e plantas estragadas também viram lixo. Sem reaproveitar, o lixo vira peso e tira humor da tripulação.'))}</p>
+      <p class="small">${esc(L('O lixo é o espelho da poluição que expulsou a humanidade da Terra. Acima de 15 kg ele tira humor da tripulação.'))}</p>`;
       break;
     }
     case 'eclusa': body = repairRow('acoplamento') + `<div class="row"><button class="btn small" data-act="ejectTrash">Ejetar lixo (${fmt(S.res.lixo, 1)} kg)</button></div>`; break;
@@ -561,7 +562,7 @@ function farmPanel() {
   if (!t.crop) detail = `<h4>Plantar na bandeja ${sel + 1}</h4><div class="opts">${Object.entries(CROPS).map(([k, c]) => `<button class="opt" data-act="plant" data-p='${J({ i: sel, crop: k })}'><b>${c.name}</b><span>${c.days} dias · ${c.yield} kg · ${c.water} L${c.needs ? ' · requer biorreator' : ''}</span></button>`).join('')}</div>`;
   else if (t.state === 'crescendo') detail = `<h4>${CROPS[t.crop].name} — ${Math.floor(t.g * 100)}%</h4>${['luz', 'agua', 'nutr'].map(w => `<div class="sysline"><span>${{ luz: 'Luz', agua: 'Água', nutr: 'Nutrientes' }[w]}</span>${bar(t[w], 100)}<button class="btn tiny" data-act="care" data-p='${J({ i: sel, what: w })}'>+</button></div>`).join('')}<div class="row"><button class="btn tiny" data-act="sacrificeTray" data-p='${J({ i: sel })}'>Sacrificar bandeja (economiza água)</button></div>`;
   else detail = `<div class="row"><button class="btn primary" data-act="harvest" data-p='${J({ i: sel })}'>${t.state === 'pronto' ? 'Colher agora' : 'Limpar bandeja'}</button></div>`;
-  return `<p class="small">${L(K('Mantenha luz, água e nutrientes no verde. A janela de colheita dura 1 minuto: colher tarde estraga. Diversificar protege contra pragas.', 'Keep light, water and nutrients in the green. The harvest window lasts 1 minute: harvesting late spoils it. Diversifying protects against pests.', 'Mantenga luz, agua y nutrientes en verde. La ventana de cosecha dura 1 minuto: cosechar tarde la estropea. Diversificar protege contra las plagas.'))} ${roleAlive('agricultor') ? L(K('O agricultor cuida das plantas quando pode.', 'The farmer tends the plants when possible.', 'El agricultor cuida las plantas cuando puede.')) : ''}</p>
+  return `<p class="small">${L('Mantenha luz, água e nutrientes no verde. A janela de colheita dura 1 minuto: colher tarde estraga. Diversificar protege contra pragas.')} ${roleAlive('agricultor') ? L('O agricultor cuida das plantas quando pode.') : ''}</p>
     <div class="trays">${grid}</div><div class="row"><button class="btn tiny" data-act="careAll">Cuidar de todas</button></div>${detail}
     <div class="kv"><span>Plantação (biomassa)</span><b>${fmt(S.res.plantacao, 1)} kg</b><span>Adubo</span><b>${fmt(S.adubo, 1)} kg</b></div>`;
 }
@@ -578,10 +579,10 @@ function kitchenPanel() {
     }
     return tabs + `<h4>Refeições do dia</h4>${meals.map((m, i) => `<div class="sysline"><span>${m}</span><select data-actsel="menu" data-slot="${i}">${avail.map(([k, n]) => `<option value="${k}" ${fd.menu[i] === k ? 'selected' : ''}>${esc(n)}</option>`).join('')}${avail.find(a => a[0] === fd.menu[i]) ? '' : `<option selected value="${fd.menu[i]}">${esc(fd.menu[i])} (acabou → ração)</option>`}</select></div>`).join('')}
       ${warn.length && roleAlive('paramedico') ? `<div class="alert bad">Paramédico: ${esc([...new Set(warn)].join(' '))}</div>` : ''}
-      <p class="small muted">${esc(L(K('Cada alimento dá energia (E), proteína (P) e vitaminas (V). Só ração deixa a tripulação sem vitaminas.', 'Each food gives energy (E), protein (P) and vitamins (V). Rations alone leave the crew short on vitamins.', 'Cada alimento da energía (E), proteína (P) y vitaminas (V). Solo ración deja a la tripulación sin vitaminas.')))} ${avail.map(([k, n]) => { const v = foodNutr(k); return `<span class="nchip">${esc(T(n.split(' (')[0]))}: E${v[0]} P${v[1]} V${v[2]}</span>`; }).join(' ')}</p>
+      <p class="small muted">${esc(L('Cada alimento dá energia (E), proteína (P) e vitaminas (V). Só ração deixa a tripulação sem vitaminas.'))} ${avail.map(([k, n]) => { const v = foodNutr(k); return `<span class="nchip">${esc(T(n.split(' (')[0]))}: E${v[0]} P${v[1]} V${v[2]}</span>`; }).join(' ')}</p>
       <h4>Racionamento</h4><div class="opts">${[['pleno', 'Pleno', '0,6 kg/pessoa/dia'], ['reduzido', 'Reduzido', '0,4 kg · humor −2/dia · −1 nas rolagens'], ['minimo', 'Mínimo', '0,2 kg · humor −5/dia · −2 · risco de desmaio']].map(([k, n, d]) => `<button class="opt ${fd.racionamento === k ? 'on' : ''}" data-act="ration" data-p='${J({ level: k })}'><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <h4>A Mesa (refeição da noite)</h4><div class="opts">${[['completa', 'Mesa completa', 'todos param · humor +3 · sorteio de convivência'], ['revezamento', 'Revezamento', 'sistemas cobertos · humor +1'], ['posto', 'Comer no posto', 'sem tempo perdido · humor −1']].map(([k, n, d]) => `<button class="opt ${fd.mesa === k ? 'on' : ''}" data-act="mesa" data-p='${J({ mode: k })}'><b>${n}</b><span>${d}</span></button>`).join('')}</div>
-      <h4>Gostos da tripulação</h4><div class="prefs">${alive().map(c => `<div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small><br>❤ ${esc(tagNames(c.likes)) || '—'} ${c.avoid.length ? '· ✖ ' + esc(tagNames(c.avoid)) : ''} ${c.allergy.length ? '· <span class="red">' + esc(L(K('alergia', 'allergy', 'alergia'))) + ': ' + esc(tagNames(c.allergy)) + '</span>' : ''}</div>`).join('')}</div>
+      <h4>Gostos da tripulação</h4><div class="prefs">${alive().map(c => `<div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small><br>❤ ${esc(tagNames(c.likes)) || '—'} ${c.avoid.length ? '· ✖ ' + esc(tagNames(c.avoid)) : ''} ${c.allergy.length ? '· <span class="red">' + esc(L('alergia')) + ': ' + esc(tagNames(c.allergy)) + '</span>' : ''}</div>`).join('')}</div>
       ${!fd.banquete ? `<div class="row"><button class="btn small" data-act="banquete">🎉 Banquete do Dia da Terra (4 kg, uma vez)</button></div>` : ''}`;
   }
   if (tab === 'cozinhar') {
@@ -617,7 +618,7 @@ function reportPanel() {
 }
 function crewList() {
   return `<div class="crewlist">${S.crew.map(c => `<div class="crew ${c.alive ? '' : 'dead'}"><img src="${spriteURL(c.avatar, 'suit', c.alive && c.humor >= 40 ? 'happy' : 'sad', 2)}" alt=""><div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small> ${c.owner && c.owner !== 'bot' ? '<span class="tag">🎮 jogador</span>' : '<span class="tag">🤖 bot</span>'}<br>
-    ${c.alive ? `<div class="meters"><span>Humor</span>${bar(c.humor, 100)}<span>Saciedade</span>${bar(c.saciedade, 100)}<span>Nutrição</span>${bar(c.nutricao, 100)}<span class="nutr" title="${esc(L(NUTR_NAMES[0]))} / ${esc(L(NUTR_NAMES[1]))} / ${esc(L(NUTR_NAMES[2]))}">${(c.nut || [80, 80, 80]).map((v, i) => `<i class="n${i} ${v < 25 ? 'low' : ''}" style="height:${Math.round(v)}%"></i>`).join('')}</span></div>${c.nut && c.nut[2] < 25 ? `<small class="orange">${esc(L(K('Faltam vitaminas: sirva comida fresca.', 'Low on vitamins: serve fresh food.', 'Faltan vitaminas: sirva comida fresca.')))}</small><br>` : ''}<small><span>${c.hibernating ? '💤 ' + esc(L(K('hibernando', 'hibernating', 'hibernando'))) : c.sickness ? '🤒 ' + esc(L(K('doente', 'sick', 'enfermo/a'))) : c.status === 'ok' ? '✔ ok' : '✚ ' + esc(T(c.status))}</span>${c.task ? ' · <span>' + esc(T(c.task.label)) + '</span>' : ''} · ❤ ${esc(tagNames(c.likes))}${c.allergy.length ? ' · ' + esc(L(K('alergia', 'allergy', 'alergia'))) + ': ' + esc(tagNames(c.allergy)) : ''}</small>` : '☠ morto'}</div></div>`).join('')}</div>`;
+    ${c.alive ? `<div class="meters"><span>Humor</span>${bar(c.humor, 100)}<span>Saciedade</span>${bar(c.saciedade, 100)}<span>Nutrição</span>${bar(c.nutricao, 100)}<span class="nutr" title="${esc(L(NUTR_NAMES[0]))} / ${esc(L(NUTR_NAMES[1]))} / ${esc(L(NUTR_NAMES[2]))}">${(c.nut || [80, 80, 80]).map((v, i) => `<i class="n${i} ${v < 25 ? 'low' : ''}" style="height:${Math.round(v)}%"></i>`).join('')}</span></div>${c.nut && c.nut[2] < 25 ? `<small class="orange">${esc(L('Faltam vitaminas: sirva comida fresca.'))}</small><br>` : ''}<small><span>${c.hibernating ? '💤 ' + esc(L('hibernando')) : c.sickness ? '🤒 ' + esc(L('doente')) : c.status === 'ok' ? '✔ ok' : '✚ ' + esc(T(c.status))}</span>${c.task ? ' · <span>' + esc(T(c.task.label)) + '</span>' : ''} · ❤ ${esc(tagNames(c.likes))}${c.allergy.length ? ' · ' + esc(L('alergia')) + ': ' + esc(tagNames(c.allergy)) : ''}</small>` : '☠ morto'}</div></div>`).join('')}</div>`;
 }
 function fundPanel() {
   const o = [['peca', 'Peça de reposição', 2], ['medico', 'Tratamento médico urgente (todos)', 3], ['energia', 'Baterias de emergência (+20 kWh)', 2], ['oxigenio', 'Oxigênio de emergência (+15 kg)', 2]];
@@ -625,10 +626,10 @@ function fundPanel() {
 }
 function menuPanel() {
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel center" data-stop="1"><h2>PAUSA</h2>
-    <div class="menu"><button class="mbtn" data-ui="closePanel">▶ Continuar</button><button class="mbtn" data-ui="panel" data-arg="settings">⚙ Configurações</button><button class="mbtn" data-ui="fullscreen">⛶ ${esc(L(K('Tela cheia', 'Fullscreen', 'Pantalla completa')))}</button>
+    <div class="menu"><button class="mbtn" data-ui="closePanel">▶ Continuar</button><button class="mbtn" data-ui="panel" data-arg="settings">⚙ Configurações</button>${Net.role !== 'client' ? `<button class="mbtn" data-ui="saveNow">💾 ${esc(L('Salvar progresso'))}</button>` : ''}<button class="mbtn" data-ui="fullscreen">⛶ ${esc(L('Tela cheia'))}</button>
     ${U.confirmQuit ? '<button class="mbtn red" data-ui="quit">Confirmar: sair para o título</button>' : '<button class="mbtn" data-ui="quitAsk">⏏ Sair para o título</button>'}</div>
     <div class="row" style="justify-content:center">${LANGS.map(l => `<button class="chip ${I18n.lang === l.id ? 'on' : ''}" data-ui="setLang" data-arg="${l.id}">${l.label}</button>`).join('')}</div>
-    <p class="small muted keyshelp">${esc(L(K('← → andar · ↑ ↓ escadas · Shift correr · E / Espaço interagir · H computador de bordo · R relatório · T tripulação · Esc menu', '← → walk · ↑ ↓ ladders · Shift run · E / Space interact · H onboard computer · R report · T crew · Esc menu', '← → caminar · ↑ ↓ escaleras · Shift correr · E / Espacio interactuar · H computadora de a bordo · R informe · T tripulación · Esc menú')))}</p>
+    <p class="small muted keyshelp">${esc(L('← → andar · ↑ ↓ escadas · Shift correr · E / Espaço interagir · H computador de bordo · R relatório · T tripulação · Esc menu'))}</p>
     <p class="small muted">Pontos desta jornada: ${S.points} · Créditos: ${Save.data.credits}</p></div></div>`;
 }
 
@@ -642,33 +643,33 @@ function stationScreen() {
     body = `<p class="small">${esc(L(K('Dados reais do NASA Exoplanet Archive (aproximados): já são mais de 6.000 exoplanetas confirmados. Critérios de habitabilidade: raio parecido com o da Terra (0,8–1,5 R⊕), temperatura de equilíbrio entre 200 e 300 K, estrela calma e distância alcançável. Cada análise custa ' + (has('lab') ? 5 : 10) + ' GB. Você pode escolher QUALQUER destino — até os errados — mas cada viagem gasta combustível, oxigênio, comida e dias.', 'Real data from the NASA Exoplanet Archive (approximate): over 6,000 confirmed exoplanets so far. Habitability criteria: radius close to Earth\'s (0.8–1.5 R⊕), equilibrium temperature between 200 and 300 K, a calm star and a reachable distance. Each analysis costs ' + (has('lab') ? 5 : 10) + ' GB. You can pick ANY destination — even wrong ones — but every trip burns fuel, oxygen, food and days.', 'Datos reales del NASA Exoplanet Archive (aproximados): ya hay más de 6.000 exoplanetas confirmados. Criterios de habitabilidad: radio parecido al de la Tierra (0,8–1,5 R⊕), temperatura de equilibrio entre 200 y 300 K, estrella tranquila y distancia alcanzable. Cada análisis cuesta ' + (has('lab') ? 5 : 10) + ' GB. Puede elegir CUALQUIER destino, incluso los equivocados, pero cada viaje gasta combustible, oxígeno, comida y días.')))}</p>
       <div class="exos">${EXOPLANETS.map(e => {
         const an = S.explore.analyzed.includes(e.id); const vis = S.explore.visited && S.explore.visited[e.id];
-        const dist = typeof e.dist === 'number' ? fmt(e.dist, 1) + ' ' + L(K('anos-luz', 'light-years', 'años luz')) : L(K('na rota', 'on route', 'en la ruta'));
-        return `<div class="exo ${dest === e.id ? 'on' : ''} ${vis ? 'visited' : ''}"><b>${e.name}</b>${vis ? ` <em class="red">✖ ${esc(L(K('visitado: inabitável', 'visited: not habitable', 'visitado: inhabitable')))}</em>` : ''}${an || vis ? `<div class="kv small"><span>${esc(L(K('Distância', 'Distance', 'Distancia')))}</span><b>${dist}</b><span>${esc(L(K('Raio/massa', 'Radius/mass', 'Radio/masa')))}</span><b>${e.radius}</b><span>${esc(L(K('Temp. de equilíbrio', 'Equilibrium temp.', 'Temp. de equilibrio')))}</span><b>${e.teq} K</b><span>${esc(L(K('Ano', 'Year', 'Año')))}</span><b>${e.period} ${esc(L(K('dias', 'days', 'días')))}</b><span>${esc(L(K('Distância orbital', 'Orbital distance', 'Distancia orbital')))}</span><b>${e.sma} UA</b><span>${esc(L(K('Descoberta', 'Discovered', 'Descubrimiento')))}</span><b>${esc(T(e.disc))}</b><span>${esc(L(K('Estrela', 'Star', 'Estrella')))}</span><b>${esc(T(e.star))}</b><span>ESI</span><b>${e.esi}</b></div><p class="small muted">${esc(T(e.issues))}</p>` : `<button class="btn tiny" data-act="analyzeExo" data-p='${J({ id: e.id })}'>${esc(L(K('Analisar', 'Analyze', 'Analizar')))}</button>`}
-        <button class="btn tiny ${dest === e.id ? 'primary' : ''}" data-act="setDest" data-p='${J({ id: e.id })}'>${dest === e.id ? '✔ ' : ''}${esc(L(K('Destino', 'Destination', 'Destino')))}</button></div>`;
+        const dist = typeof e.dist === 'number' ? fmt(e.dist, 1) + ' ' + L('anos-luz') : L('na rota');
+        return `<div class="exo ${dest === e.id ? 'on' : ''} ${vis ? 'visited' : ''}"><b>${e.name}</b>${vis ? ` <em class="red">✖ ${esc(L('visitado: inabitável'))}</em>` : ''}${an || vis ? `<div class="kv small"><span>${esc(L('Distância'))}</span><b>${dist}</b><span>${esc(L('Raio/massa'))}</span><b>${e.radius}</b><span>${esc(L('Temp. de equilíbrio'))}</span><b>${e.teq} K</b><span>${esc(L('Ano'))}</span><b>${e.period} ${esc(L('dias'))}</b><span>${esc(L('Distância orbital'))}</span><b>${e.sma} UA</b><span>${esc(L('Descoberta'))}</span><b>${esc(T(e.disc))}</b><span>${esc(L('Estrela'))}</span><b>${esc(T(e.star))}</b><span>ESI</span><b>${e.esi}</b></div><p class="small muted">${esc(T(e.issues))}</p>` : `<button class="btn tiny" data-act="analyzeExo" data-p='${J({ id: e.id })}'>${esc(L('Analisar'))}</button>`}
+        <button class="btn tiny ${dest === e.id ? 'primary' : ''}" data-act="setDest" data-p='${J({ id: e.id })}'>${dest === e.id ? '✔ ' : ''}${esc(L('Destino'))}</button></div>`;
       }).join('')}</div>`;
   } else body = `<p class="small">Troque dados científicos e peças por recursos. Dados valem pontos de ciência, mas comida mantém a tripulação viva.</p><div class="opts">${TRADES.map(t => `<button class="opt ${t.can() ? '' : 'cant'}" data-act="trade" data-p='${J({ id: t.id })}'><b>${t.name}</b></button>`).join('')}</div>`;
   let foot = '';
   if (dexo && dexo.id !== 'pontes') {
     const c = tripCost(dexo);
     const short = S.res.combustivel < c.fuel;
-    foot = `<div class="alert ${short ? 'bad' : 'warn'}">${esc(L(K('Destino', 'Destination', 'Destino')))}: <b>${dexo.name}</b> — ⛽ ${c.fuel} kg · O₂ ${c.o2} kg · 🍱 ${c.food} kg · ${c.days} ${esc(L(K('dias', 'days', 'días')))}${short ? ' — ' + esc(L(K('COMBUSTÍVEL INSUFICIENTE: a nave ficará à deriva!', 'NOT ENOUGH FUEL: the ship will drift!', '¡COMBUSTIBLE INSUFICIENTE: la nave quedará a la deriva!'))) : ' — ' + esc(L(K('este não é o planeta planejado. Tem certeza?', 'this is not the planned planet. Are you sure?', 'este no es el planeta planificado. ¿Está seguro?')))}</div>`;
-  } else if (dexo) foot = `<div class="alert good">${esc(L(K('Destino', 'Destination', 'Destino')))}: <b>Pontes-01b</b> — ${esc(L(K('na rota, sem custo extra', 'on route, no extra cost', 'en la ruta, sin costo extra')))}</div>`;
-  else foot = `<div class="alert info">${esc(L(K('Escolha um planeta de destino para partir.', 'Pick a destination planet to depart.', 'Elija un planeta de destino para partir.')))}</div>`;
+    foot = `<div class="alert ${short ? 'bad' : 'warn'}">${esc(L('Destino'))}: <b>${dexo.name}</b> — ⛽ ${c.fuel} kg · O₂ ${c.o2} kg · 🍱 ${c.food} kg · ${c.days} ${esc(L('dias'))}${short ? ' — ' + esc(L('COMBUSTÍVEL INSUFICIENTE: a nave ficará à deriva!')) : ' — ' + esc(L('este não é o planeta planejado. Tem certeza?'))}</div>`;
+  } else if (dexo) foot = `<div class="alert good">${esc(L('Destino'))}: <b>Pontes-01b</b> — ${esc(L('na rota, sem custo extra'))}</div>`;
+  else foot = `<div class="alert info">${esc(L('Escolha um planeta de destino para partir.'))}</div>`;
   return `<div class="stage-panel"><h2>ESTAÇÃO PONTE-ALFA</h2>${miniRes()}${tabs}<div class="scroll">${body}</div>${foot}
-    <div class="row"><button class="btn primary" data-act="leaveStation" ${dest ? '' : 'disabled'}>${esc(L(K('Partir ▶', 'Depart ▶', 'Partir ▶')))}</button></div></div>`;
+    <div class="row"><button class="btn primary" data-act="leaveStation" ${dest ? '' : 'disabled'}>${esc(L('Partir ▶'))}</button></div></div>`;
 }
 function detourScreen() {
   const d = S.detour; const exo = EXOPLANETS.find(e => e.id === d.id); const c = tripCost(exo, true);
   const short = S.res.combustivel < c.fuel;
   const kv = (a, b) => `<span>${esc(L(a))}</span><b>${b}</b>`;
-  return `<div class="stage-panel"><h2>${esc(L(K('DESVIO DE ROTA: ', 'ROUTE DETOUR: ', 'DESVÍO DE RUTA: ')))}${exo.name}</h2>${miniRes()}<div class="scroll">
-    <div class="alert bad">⚠ ${esc(L(K('Este não é Pontes-01b. A viagem custou combustível, oxigênio, comida e dias — e a moral caiu.', 'This is not Pontes-01b. The trip cost fuel, oxygen, food and days — and morale fell.', 'Este no es Pontes-01b. El viaje costó combustible, oxígeno, comida y días, y la moral cayó.')))}</div>
-    <h4>${esc(L(K('O que a tripulação encontrou', 'What the crew found', 'Lo que encontró la tripulación')))}</h4><p>${esc(L(exo.trip.outcome))}</p>
-    <h4>${esc(L(K('Dados (NASA Exoplanet Archive, aproximados)', 'Data (NASA Exoplanet Archive, approximate)', 'Datos (NASA Exoplanet Archive, aproximados)')))}</h4>
-    <div class="kv small">${kv(K('Distância', 'Distance', 'Distancia'), typeof exo.dist === 'number' ? fmt(exo.dist, 1) + ' ' + L(K('anos-luz', 'light-years', 'años luz')) : '—')}${kv(K('Raio/massa', 'Radius/mass', 'Radio/masa'), exo.radius)}${kv(K('Temp. de equilíbrio', 'Equilibrium temp.', 'Temp. de equilibrio'), exo.teq + ' K')}${kv(K('Ano', 'Year', 'Año'), exo.period + ' ' + L(K('dias', 'days', 'días')))}${kv(K('Estrela', 'Star', 'Estrella'), esc(T(exo.star)))}${kv(K('Descoberta', 'Discovered', 'Descubrimiento'), esc(T(exo.disc)))}${kv('ESI', exo.esi)}</div>
-    <p class="green">+${d.dados} GB ${esc(L(K('de dados científicos coletados.', 'of science data collected.', 'de datos científicos recogidos.')))}</p>
-    </div><div class="alert ${short ? 'bad' : 'warn'}">${esc(L(K('Voltar à Estação Ponte-Alfa custa', 'Returning to Ponte-Alfa Station costs', 'Volver a la Estación Ponte-Alfa cuesta')))}: ⛽ ${c.fuel} kg · O₂ ${c.o2} kg · 🍱 ${c.food} kg · ${c.days} ${esc(L(K('dias', 'days', 'días')))}${short ? ' — ' + esc(L(K('combustível insuficiente!', 'not enough fuel!', '¡combustible insuficiente!'))) : ''}</div>
-    <div class="row"><button class="btn primary big" data-act="detourReturn">↩ ${esc(L(K('Voltar à Estação Ponte-Alfa', 'Return to Ponte-Alfa Station', 'Volver a la Estación Ponte-Alfa')))}</button></div></div>`;
+  return `<div class="stage-panel"><h2>${esc(L('DESVIO DE ROTA: '))}${exo.name}</h2>${miniRes()}<div class="scroll">
+    <div class="alert bad">⚠ ${esc(L('Este não é Pontes-01b. A viagem custou combustível, oxigênio, comida e dias — e a moral caiu.'))}</div>
+    <h4>${esc(L('O que a tripulação encontrou'))}</h4><p>${esc(L(exo.trip.outcome))}</p>
+    <h4>${esc(L('Dados (NASA Exoplanet Archive, aproximados)'))}</h4>
+    <div class="kv small">${kv('Distância', typeof exo.dist === 'number' ? fmt(exo.dist, 1) + ' ' + L('anos-luz') : '—')}${kv('Raio/massa', exo.radius)}${kv('Temp. de equilíbrio', exo.teq + ' K')}${kv('Ano', exo.period + ' ' + L('dias'))}${kv('Estrela', esc(T(exo.star)))}${kv('Descoberta', esc(T(exo.disc)))}${kv('ESI', exo.esi)}</div>
+    <p class="green">+${d.dados} GB ${esc(L('de dados científicos coletados.'))}</p>
+    </div><div class="alert ${short ? 'bad' : 'warn'}">${esc(L('Voltar à Estação Ponte-Alfa custa'))}: ⛽ ${c.fuel} kg · O₂ ${c.o2} kg · 🍱 ${c.food} kg · ${c.days} ${esc(L('dias'))}${short ? ' — ' + esc(L('combustível insuficiente!')) : ''}</div>
+    <div class="row"><button class="btn primary big" data-act="detourReturn">↩ ${esc(L('Voltar à Estação Ponte-Alfa'))}</button></div></div>`;
 }
 function miniRes() { return `<div class="minires">${['energia', 'combustivel', 'agua', 'oxigenio', 'comida', 'dados'].map(k => { const m = RES_META.find(x => x.id === k); return `<span>${m.icon} ${fmt(S.res[k], 0)} ${m.unit}</span>`; }).join('')}<span>✚ ${fmt(S.res.medicos, 0)}</span><span>⚙ ${S.peças} peças</span></div>`; }
 function planetScreen() {
@@ -692,9 +693,9 @@ function endScreen() {
   const fd = S.food;
   const humorAvg = alive().length ? alive().reduce((s, c) => s + c.humor, 0) / alive().length : 0;
   return `<div class="panel center wide scroll end ${e.ok ? 'ok' : 'bad'}">
-    <h1>${e.ok ? (e.colony ? esc(L(K('PONTES-01b: A COLÔNIA ESTÁ DE PÉ', 'PONTES-01b: THE COLONY STANDS', 'PONTES-01b: LA COLONIA ESTÁ EN PIE'))) : 'CHEGAMOS A PONTES-01b') : 'MISSÃO FRACASSADA'}</h1>
+    <h1>${e.ok ? (e.colony ? esc(L('PONTES-01b: A COLÔNIA ESTÁ DE PÉ')) : 'CHEGAMOS A PONTES-01b') : 'MISSÃO FRACASSADA'}</h1>
     <p class="big">${e.ok ? (e.colony ? esc(L(K('Em ' + e.site + ', a base cresceu, a Terra recebeu os dados e três naves trouxeram os primeiros colonos. A humanidade tem um novo começo — que custou caro.', 'At ' + e.site + ' the base grew, Earth received the data and three ships brought the first colonists. Humanity has a new beginning — and it came at a high cost.', 'En ' + e.site + ' la base creció, la Tierra recibió los datos y tres naves trajeron a los primeros colonos. La humanidad tiene un nuevo comienzo, que costó caro.'))) : `A expedição pousou no ${esc(e.site)}. A humanidade tem um novo começo — que custou caro.`) : esc(e.reason)}</p>
-    ${e.ok && e.colony && S.colony ? `<div class="kv"><span>${esc(L(K('População final', 'Final population', 'Población final')))}</span><b>${colonyPop()}</b><span>${esc(L(K('Dias na colônia', 'Days on the colony', 'Días en la colonia')))}</span><b>${S.colony.day}</b><span>${esc(L(K('Construções', 'Buildings', 'Construcciones')))}</span><b>${S.colony.built}</b><span>${esc(L(K('Pacotes de dados enviados à Terra', 'Data packages sent to Earth', 'Paquetes de datos enviados a la Tierra')))}</span><b>${S.colony.txCount}</b><span>${esc(L(K('Exoplanetas visitados por engano', 'Exoplanets visited by mistake', 'Exoplanetas visitados por error')))}</span><b>${(S.explore && S.explore.wrong) || 0}</b></div>` : ''}
+    ${e.ok && e.colony && S.colony ? `<div class="kv"><span>${esc(L('População final'))}</span><b>${colonyPop()}</b><span>${esc(L('Dias na colônia'))}</span><b>${S.colony.day}</b><span>${esc(L('Construções'))}</span><b>${S.colony.built}</b><span>${esc(L('Pacotes de dados enviados à Terra'))}</span><b>${S.colony.txCount}</b><span>${esc(L('Exoplanetas visitados por engano'))}</span><b>${(S.explore && S.explore.wrong) || 0}</b></div>` : ''}
     <div class="kv"><span>Dias de viagem</span><b>${S.day}</b><span>Tripulantes vivos</span><b>${alive().length} de 7</b><span>Pontos</span><b>${S.points}</b><span>Energia gasta</span><b>${fmt(spent('energia'), 0)} kWh</b><span>Combustível gasto</span><b>${fmt(spent('combustivel'), 0)} kg</b><span>Água consumida</span><b>${fmt(spent('agua'), 0)} L</b><span>Oxigênio respirado</span><b>${fmt(spent('oxigenio'), 0)} kg</b>
       <span>Comida produzida / desperdiçada</span><b>${fmt(fd.produced, 1)} / ${fmt(fd.wasted, 1)} kg</b><span>kWh e litros por kg de comida</span><b>${fd.produced > 0 ? fmt(S.stats.kwhFood / fd.produced, 1) + ' kWh · ' + fmt(S.stats.waterFood / fd.produced, 1) + ' L' : '—'}</b><span>Receitas descobertas</span><b>${fd.recipes.length}/${RECIPES.length}</b><span>Dias de mesa completa</span><b>${fd.mesaDays}</b><span>Humor médio</span><b>${fmt(humorAvg, 0)}</b>
       <span>Custo da regulação térmica</span><b>${fmt(S.stats.thermalKwh, 1)} kWh · ${fmt(S.stats.thermalFuel, 0)} kg</b></div>
@@ -760,7 +761,7 @@ function renderUI() {
 
 // =============== HANDLERS ===============
 const UIH = {};
-UIH.voiceTest = () => { Narrator.voice = null; Narrator.say(K('Olá, Comandante. Esta é a voz da missão Pontes-01b.', 'Hello, Commander. This is the voice of the Pontes-01b mission.', 'Hola, Comandante. Esta es la voz de la misión Pontes-01b.')); };
+UIH.voiceTest = () => { Narrator.voice = null; Narrator.say('Olá, Comandante. Esta é a voz da missão Pontes-01b.'); };
 UIH.hudFull = () => { U.hudFull = !U.hudFull; };
 UIH.title = () => { U.screen = 'title'; Music.play('intro'); };
 UIH.journey = () => { U.screen = 'journey'; S = null; };
