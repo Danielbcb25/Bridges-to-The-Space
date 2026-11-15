@@ -21,14 +21,29 @@ const CHORES = {
   pesquisa: { st: 'lab', icon: '🔬', t: 'Ligar a pesquisa no Laboratório', how: 'No Laboratório, aperte E e marque "Pesquisa ligada".', on: ['research'], need: () => !S.researchOn },
   dormir:   { st: 'dormitorio', icon: '😴', t: 'Descansar', how: 'Nos Dormitórios (andar de baixo, à direita), aperte E e clique em Dormir.', on: ['sleep', 'rest'], need: () => { const m = me(); return m && m.humor < 70; } },
 };
+// o que acontece se a tarefa não for feita até o fim do dia
+const CHORE_MISS = {
+  rota: () => { S.progress = Math.max(0, S.progress - 0.005); }, suporte: () => damageSys('suporte', 6),
+  horta: () => (S.trays || []).forEach(t => { if (t.crop) t.agua = Math.max(0, (t.agua || 0) - 25); }), lixo: () => { addRes('lixo', 1, 'Lixo acumulado'); moral(-2); },
+  cardapio: () => moral(-2), tanques: () => damageSys('tanques', 6), radio: () => damageSys('comunicacao', 5), motor: () => damageSys('propulsao', 6),
+  saude: () => moral(-3), pesquisa: () => addRes('dados', -5, 'Pesquisa parada'), dormir: () => { const m = me(); if (m) m.humor = clamp(m.humor - 6, 0, 100); },
+};
+const CHORE_MISS_TXT = { rota: 'a nave desviou um pouco', suporte: 'o Suporte à vida desgastou', horta: 'as plantas ficaram sem água', lixo: 'o lixo acumulou', cardapio: 'a tripulação reclamou da comida', tanques: 'os tanques desgastaram', radio: 'a comunicação desgastou', motor: 'o motor desgastou', saude: 'a moral caiu', pesquisa: 'perdemos dados', dormir: 'você está mais cansado' };
+function routinePenalty() {
+  const r = S && S.routine; if (!r || r.day !== S.day || S.scene !== 'ship' || S.tutorial < 4 || Net.role === 'client') return;
+  const miss = r.items.filter(x => !x.done);
+  miss.forEach(x => CHORE_MISS[x.id] && CHORE_MISS[x.id]());
+  if (miss.length) toast('⚠ Rotina incompleta: ' + miss.map(x => CHORE_MISS_TXT[x.id]).join(' · '), 'warn');
+}
+{ const _nd = newDay; newDay = function () { routinePenalty(); _nd(); }; }
 const ROUTINE_DAY1 = ['suporte', 'horta', 'lixo', 'radio'];
-const ROUTINE_SIZE = 4;
+const ROUTINE_SIZE = 3;
 
 function routineNew() {
   if (!S || Net.role === 'client') return;
   const ok = id => !CHORES[id].need || CHORES[id].need();
   let ids;
-  if (S.day <= 1) ids = ROUTINE_DAY1.filter(ok);
+  if (S.day <= 1) ids = ROUTINE_DAY1.filter(ok).slice(0, ROUTINE_SIZE);
   else {
     // o que está precisando entra primeiro; o resto é sorteado
     const urgent = [];
@@ -91,6 +106,7 @@ function routineBox() {
   return `<div class="goals routine ${ev ? 'paused' : ''}"><b>${ev ? '⚠ ' + esc(L('EMERGÊNCIA')) : esc(L('ROTINA')) + ' · ' + esc(L('DIA')) + ' ' + S.day} <small>${done}/${r.items.length}</small></b>
     ${ev ? `<div class="evline">${esc(T((EVENT_INFO[ev.type] || {}).title || ''))}</div><div class="muted small">${esc(L('Rotina pausada: resolva o desafio primeiro.'))}</div>` : ''}
     ${rows.map(x => `<div class="${x.done ? 'done' : x === cur ? 'cur' : ''}">${x.done ? '☑' : x === cur ? '▶' : '☐'} ${x.icon} ${esc(L(x.t))}${x === cur && x.how ? `<div class="how">${esc(L(x.how))}</div>` : ''}</div>`).join('')}
+    ${!ev && !r.bonus && S.tutorial >= 4 ? `<div class="muted small">⏳ ${Math.max(0, Math.floor(24 - S.dayT / S.dayLen * 24))}h · ${esc(L('o que não for feito hoje tem consequência'))}</div>` : ''}
     ${!ev && r.bonus ? `<div class="green small">✔ ${esc(L('Rotina completa. Acelere o tempo (Shift+S) até o próximo desafio.'))}</div>` : ''}</div>`;
 }
 const TUT_HOW = { ponte: 'Suba a escada e vá até a Ponte, à direita. Aperte E no painel.', cozinha: 'Desça até a Cozinha e aperte E para montar o cardápio.' };

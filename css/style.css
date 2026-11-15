@@ -531,3 +531,7 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .goals .how { color: var(--cyan); font-size: 0.85em; padding: 0.1em 0 0.25em 1.3em; }
 .goals.paused { border-color: var(--red); } .goals.paused b { color: var(--red); } .goals.paused > div:not(.evline):not(.muted) { opacity: 0.45; }
 .goals .evline { color: #fff; }
+.meal { display: flex; align-items: center; gap: 0.5em; padding: 0.15em 0; border-bottom: 1px dashed #2a3a7a; }
+.meal > span { min-width: 4.5em; color: var(--cyan); }
+.mchips { display: flex; flex-wrap: wrap; gap: 0.25em; align-items: center; }
+.mchips .chip small { color: var(--muted); }

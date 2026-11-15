@@ -90,8 +90,8 @@ function titleScreen() {
     <div class="tbox tr"><div class="lbl cyan">▣ MISSÃO ATUAL</div><div class="small">Explorar o planeta</div><div class="cyan">Pontes01</div></div>
     <div class="logo"><h1>PONTES<span>01</span></h1><div class="sub">— EXPLORAÇÃO ESPACIAL —</div></div>
     <div class="menu">
-      ${U.playMenu ? `${(() => { const sv = GameSave.summary(); return sv ? `<button class="mbtn primary" data-ui="continueGame">▶ ${esc(L('CONTINUAR'))} <small>${esc(sv.scene)} · ${esc(L('dia'))} ${sv.day}</small></button>` : ''; })()}
-      <button class="mbtn ${GameSave.summary() ? '' : 'primary'}" data-ui="journey">✦ NOVA JORNADA</button>
+      ${U.playMenu ? `${(() => { const sv = GameSave.summary(); return sv ? `<button class="mbtn" data-ui="continueGame">▶ ${esc(L('CONTINUAR'))}</button>` : ''; })()}
+      <button class="mbtn" data-ui="journey">✦ NOVA JORNADA</button>
       ${GameSave.list().length ? `<button class="mbtn" data-ui="saves">📂 ${esc(L(K('JOGOS SALVOS', 'SAVED GAMES', 'PARTIDAS GUARDADAS')))} <small>${GameSave.list().length}</small></button>` : ''}
       <button class="mbtn" data-ui="playMenu">◀ ${esc(L('VOLTAR'))}</button>` : `<button class="mbtn primary" data-ui="playMenu">▶ ${esc(L('JOGAR'))}</button>
       <button class="mbtn" data-ui="lobby">👥 MULTIPLAYER</button>
@@ -391,7 +391,7 @@ function eventPanel() {
     const r = ev.result;
     return `<div class="evp result compact ${r.ok ? 'ok' : 'bad'}">${head()}<div class="bigres ${r.ok ? 'green' : 'red'}">${r.ok ? '✔' : '✖'} ${r.grade || (r.ok ? 'SUCESSO' : 'FALHA')}</div>
       ${r.points > 0 ? `<p class="cyan">+${r.points} pontos</p>` : ''}
-      ${r.text ? `<details class="evinfo"><summary>ℹ ${esc(L('Detalhes'))}</summary><p class="small">${esc(r.text)}</p></details>` : ''}
+      ${r.ok ? (r.text ? `<details class="evinfo"><summary>ℹ ${esc(L('Detalhes'))}</summary><p class="small">${esc(r.text)}</p></details>` : '') : `<div class="alert bad small"><b>⚠ ${esc(L('Consequência'))}:</b> <span>${esc(r.text || L('a nave sofreu danos.'))}</span>${r.delay ? `<br><span>⏳ ${esc(L('A missão atrasou.'))}</span>` : ''}</div>`}
       <div class="row"><button class="btn primary" data-act="eventClose">Continuar ▶</button></div></div>`;
   }
   if (ev.type === 'termico') return thermalPanel();
@@ -503,7 +503,7 @@ function thermalPanel() {
 // ---------- painéis das estações ----------
 function repairRow(sys) {
   const hp = sysHp(sys);
-  return `<div class="sysline"><span>${SYSTEMS[sys].name}</span><em class="dmg ${SYSTEMS[sys].dmg}">Dano ${SYSTEMS[sys].dmg} (−${DMG_PCT[SYSTEMS[sys].dmg]}%)</em>${bar(hp, 100)}<b>${fmt(hp, 0)}%</b>
+  return `<div class="sysline"><span>${SYSTEMS[sys].name}</span>${bar(hp, 100)}<b>${fmt(hp, 0)}%</b>
     ${hp < 100 ? `<button class="btn tiny" data-act="repair" data-p='${J({ sys })}'>Reparar</button><button class="btn tiny" data-act="repair" data-p='${J({ sys, call: true })}'>Chamar eng.</button>` : ''}</div>`;
 }
 function stationPanel(id) {
@@ -581,7 +581,16 @@ function kitchenPanel() {
       const tags = RECIPES.find(r => r.id === slot) ? RECIPES.find(r => r.id === slot).tags : CROPS[slot] ? CROPS[slot].tags : [];
       if (tags.some(t => c.allergy.includes(t))) warn.push(L(K(`${c.name} tem alergia a ${tagNames(c.allergy)}!`, `${c.name} is allergic to ${tagNames(c.allergy)}!`, `¡${c.name} es alérgico/a a ${tagNames(c.allergy)}!`)));
     }
-    return tabs + `<h4>Refeições do dia</h4>${meals.map((m, i) => `<div class="sysline"><span>${m}</span><select data-actsel="menu" data-slot="${i}">${avail.map(([k, n]) => `<option value="${k}" ${fd.menu[i] === k ? 'selected' : ''}>${esc(n)}</option>`).join('')}${avail.find(a => a[0] === fd.menu[i]) ? '' : `<option selected value="${fd.menu[i]}">${esc(fd.menu[i])} (acabou → ração)</option>`}</select></div>`).join('')}
+    const per = { pleno: 0.2, reduzido: 0.133, minimo: 0.067 }[fd.racionamento] || 0.2;
+    const nEat = alive().filter(c => !c.hibernating).length || 1;
+    // tudo o que poderia ir ao prato: disponível agora ou com a dica de como conseguir
+    const foods = [{ k: 'racao', n: 'Ração liofilizada', ic: '🍱', ok: true, q: fmt(S.res.comida, 0) + ' kg' }]
+      .concat(Object.keys(CROPS).filter(k => !CROPS[k].needs || has(CROPS[k].needs)).map(k => { const hv = fd.fresh[k] || 0; const ok = hv >= per * nEat * 1.5; return { k, n: CROPS[k].name, ic: '🥬', ok, q: fmt(hv, 1) + ' kg', how: has('estufa') ? K(`Plante na Estufa (${CROPS[k].days} dias) e colha.`, `Plant it in the Greenhouse (${CROPS[k].days} days) and harvest.`, `Plántalo en el Invernadero (${CROPS[k].days} días) y cosecha.`) : 'Precisa do módulo Estufa.' }; }))
+      .concat(RECIPES.filter(r => fd.recipes.includes(r.id)).map(r => ({ k: r.id, n: r.name, ic: '🍲', ok: (fd.dishes[r.id] || 0) >= 1, q: (fd.dishes[r.id] || 0) + ' ' + L('porções'), how: 'Cozinhe na aba Cozinhar.' })));
+    const okF = foods.filter(f => f.ok), noF = foods.filter(f => !f.ok);
+    const hidden = RECIPES.length - fd.recipes.length;
+    return tabs + `<h4>Refeições do dia</h4><p class="small muted">${esc(L('Clique no que servir em cada refeição.'))}</p>${meals.map((m, i) => `<div class="meal"><span>${m}</span><div class="mchips">${okF.map(f => `<button class="chip ${fd.menu[i] === f.k ? 'on' : ''}" data-act="menu" data-p='${J({ slot: i, item: f.k })}'>${f.ic} ${esc(T(f.n))} <small>${f.q}</small></button>`).join('')}${okF.length <= 1 ? `<small class="muted">${esc(L('só ração disponível: veja abaixo como variar'))}</small>` : ''}${fd.menu[i] !== 'racao' && !okF.find(f => f.k === fd.menu[i]) ? `<small class="orange">${esc(L('acabou → ração'))}</small>` : ''}</div></div>`).join('')}
+      ${noF.length || hidden ? `<details class="evinfo" ${okF.length <= 1 ? 'open' : ''}><summary>🌱 ${esc(L('Como variar o cardápio'))}</summary><div class="prefs">${noF.map(f => `<div class="muted">${f.ic} <b>${esc(T(f.n))}</b> — ${esc(L(f.how))}</div>`).join('')}${hidden ? `<div class="muted">🍲 ${hidden} ${esc(L('receitas por descobrir: combine ingredientes na aba Cozinhar.'))}</div>` : ''}</div></details>` : ''}
       ${warn.length && roleAlive('paramedico') ? `<div class="alert bad">Paramédico: ${esc([...new Set(warn)].join(' '))}</div>` : ''}
       <p class="small muted">${esc(L('Cada alimento dá energia (E), proteína (P) e vitaminas (V). Só ração deixa a tripulação sem vitaminas.'))} ${avail.map(([k, n]) => { const v = foodNutr(k); return `<span class="nchip">${esc(T(n.split(' (')[0]))}: E${v[0]} P${v[1]} V${v[2]}</span>`; }).join(' ')}</p>
       <h4>Racionamento</h4><div class="opts">${[['pleno', 'Pleno', '0,6 kg/pessoa/dia'], ['reduzido', 'Reduzido', '0,4 kg · humor −2/dia · −1 nas rolagens'], ['minimo', 'Mínimo', '0,2 kg · humor −5/dia · −2 · risco de desmaio']].map(([k, n, d]) => `<button class="opt ${fd.racionamento === k ? 'on' : ''}" data-act="ration" data-p='${J({ level: k })}'><b>${n}</b><span>${d}</span></button>`).join('')}</div>

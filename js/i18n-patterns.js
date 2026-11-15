@@ -37,6 +37,7 @@ function registerFnPatterns() {
   P(/^Resultado: (.+)\. Custo para manter a temperatura: ([\d.,]+) kWh de energia, ([\d.,]+) kg de combustível\. Plantação perdida: ([\d.,]+) kg\. Tempo fora da faixa segura: ([\d.,]+) s\.$/,
     (m, g, k, f, p, s) => `Result: ${t(g)}. Cost of keeping the temperature: ${k} kWh of energy, ${f} kg of fuel. Crops lost: ${p} kg. Time outside the safe range: ${s} s.`,
     (m, g, k, f, p, s) => `Resultado: ${t(g)}. Costo de mantener la temperatura: ${k} kWh de energía, ${f} kg de combustible. Cultivo perdido: ${p} kg. Tiempo fuera del rango seguro: ${s} s.`);
+  P(/^⚠ Rotina incompleta: (.+)$/, (m, a) => `⚠ Routine unfinished: ${a.split(' · ').map(t).join(' · ')}`, (m, a) => `⚠ Rutina incompleta: ${a.split(' · ').map(t).join(' · ')}`);
   P(/^✔ Rotina: (.+)$/, (m, a) => `✔ Routine: ${t(a)}`, (m, a) => `✔ Rutina: ${t(a)}`);
   P(/^Troca feita: (.+)$/, (m, a) => `Trade done: ${t(a)}`, (m, a) => `Intercambio hecho: ${t(a)}`);
   P(/^Análise de (.+) concluída\.\s*(.*)$/, (m, a, r) => `${t(a)} analysis complete.${r ? ' ' + t(r) : ''}`, (m, a, r) => `Análisis de ${low(t(a))} completado.${r ? ' ' + t(r) : ''}`);

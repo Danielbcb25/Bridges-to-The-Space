@@ -49,6 +49,8 @@ function endEvent(ok, extra) {
   else {
     res.points = 0; // falha não rende pontos
     if (def.failure) res.text = def.failure(ev) || '';
+    // toda falha também atrasa a viagem
+    if (S.stage === 1) { S.progress = Math.max(0, S.progress - 0.01); res.delay = true; }
     const loss = has('voz') ? 1 : 2; moral(S.unity ? -loss + 1 : -loss); S.unity = false;
   }
   if (extra) Object.assign(res, extra);

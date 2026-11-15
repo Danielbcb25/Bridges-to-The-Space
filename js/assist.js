@@ -71,7 +71,7 @@ function assistSteps() {
       // só a progressão principal: desafios aleatórios têm o próprio painel
       const tut = [
         ['Vá à Ponte de comando (andar de cima, à direita).', 'ponte', '🧭', 1],
-        ['Escolha o modo de cruzeiro no painel de pilotagem.', 'ponte', '🚀', 2],
+        ['Selecione a rota no painel.', 'ponte', '🚀', 2],
         ['Defina o cardápio na Cozinha (andar de baixo).', 'cozinha', '🍳', 4],
       ];
       tut.forEach(([t, st, ic, n]) => add(t, S.tutorial >= n, st ? { st } : null, ic));
