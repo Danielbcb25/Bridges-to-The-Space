@@ -92,7 +92,7 @@ const Net = {
     const peer = new Peer(this.peerOpts()); this.peer = peer;
     const timer = setTimeout(() => { if (this.peer === peer && !(this.conn && this.conn.open)) this.err(T('Não foi possível alcançar a sala. Confira o código e tente de novo.')); }, 20000);
     peer.on('open', () => {
-      const conn = peer.connect(PEER_PREFIX + code, { reliable: true }); this.conn = conn;
+      const conn = peer.connect(PEER_PREFIX + code, { reliable: true, serialization: 'json' }); this.conn = conn;
       conn.on('open', () => { clearTimeout(timer); this.room = code; this.send(hello); });
       conn.on('data', d => { let m; try { m = typeof d === 'string' ? JSON.parse(d) : d; } catch (e) { return; } this.onMsg(m); });
       conn.on('close', () => { if (this.conn === conn && (this.role === 'client' || this.relay)) this.onMsg({ t: 'closed' }); });
@@ -108,7 +108,7 @@ const Net = {
   join(url, code) {
     if (!code) return this.err(T('Digite o código da sala.'));
     const av = Object.assign({}, DEFAULT_AVATAR, Save.data.avatar || {});
-    const hello = { t: 'join', code, name: av.name || 'Tripulante', avatar: av, ship: (U.lobby && U.lobby.ship) || 1 };
+    const hello = { t: 'join', code, name: av.name || 'Tripulante', avatar: av, ship: (U.lobby && U.lobby.ship) || 1, role: (U.lobby && U.lobby.role) || '' };
     if (url) this.connectWS(url, () => this.send(hello)); else this.joinP2P(code, hello);
   },
   leave(silent) {
@@ -131,7 +131,7 @@ const Net = {
         const ship = Math.max(1, Math.min(4, +m.ship || 1));
         if (!this.relay && ship !== this.hubShip) return this.joinOther(m, ship); // outra Arca: o 1º vira Comandante dela
         const taken = Object.values(this.players).map(p => p.role);
-        const free = ROLES.find(r => !taken.includes(r.id));
+        const free = ROLES.find(r => r.id === m.role && !taken.includes(r.id)) || ROLES.find(r => !taken.includes(r.id));
         if (!free) { this.send({ t: 'to', pid: m.pid, msg: { t: 'error', msg: 'Sala cheia (6 tripulantes).' } }); return; }
         this.players[m.pid] = { name: String(m.name || 'Tripulante').slice(0, 14), role: free.id, avatar: m.avatar, pid: m.pid };
         if (!this.relay) this.roster[m.pid] = { pid: m.pid, name: this.players[m.pid].name, ship: this.hubShip, roleName: free.name };
@@ -217,7 +217,7 @@ const Net = {
     if (!pids.length) return;
     if (this.mode === 'ws') { for (const pid of pids) this.sendTo(pid, msg); return; }
     const str = JSON.stringify(msg);
-    for (const pid of pids) { const c = this.conns[pid]; if (c && c.open) try { c.send(str); } catch (e) { /* */ } }
+    for (const pid of pids) { const c = this.conns[pid]; if (c && c.open && !(msg.t === 'state' && c.dataChannel && c.dataChannel.bufferedAmount > 150000)) try { c.send(str); } catch (e) { /* */ } } // estado é um retrato completo: se o canal está cheio, pula este (evita fila de atraso)
   },
   // pids (do transporte) dos tripulantes da nave do próprio hub
   shipMembers() { return Object.keys(this.players).map(k => (this.players[k].pid != null ? this.players[k].pid : k)); },
@@ -233,7 +233,7 @@ const Net = {
       Chat.sysAll(K(`${nm} é o Comandante da Arca-${ship}.`, `${nm} is the Commander of Arca-${ship}.`, `${nm} es el Comandante de la Arca-${ship}.`), 'join');
       return;
     }
-    this.sendTo(a.cmdPid, { t: 'join', pid: m.pid, name: nm, avatar: m.avatar }); // o Comandante da Arca atribui a função
+    this.sendTo(a.cmdPid, { t: 'join', pid: m.pid, name: nm, avatar: m.avatar, role: m.role }); // o Comandante da Arca atribui a função
   },
   // mensagem enviada pelo Comandante de outra Arca para a sua tripulação (m.pid = quem enviou; m.to = destino)
   onRelay(m) {

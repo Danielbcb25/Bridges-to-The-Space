@@ -94,7 +94,7 @@ const Narrator = {
       }).sort((a, b) => b.sc - a.sc).map(x => x.v);
   },
   pickVoice() {
-    const list = this.voices(); const want = Save.data.settings.voice;
+    const list = this.voices(); const want = (Save.data.settings.voices || {})[I18n.lang];
     this.voice = (want && list.find(v => v.name === want)) || list[0] || null;
     return this.voice;
   },
@@ -105,7 +105,7 @@ const Narrator = {
     try {
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(L(text));
-      u.lang = I18n.speech(); u.rate = (Save.data.settings.voiceRate || 1) * 0.98; u.pitch = (opts && opts.pitch) || 1;
+      u.lang = (this.voice && this.voice.lang) || I18n.speech(); u.rate = (Save.data.settings.voiceRate || 1) * 0.98; u.pitch = (opts && opts.pitch) || 1;
       if (!this.voice || !this.voice.lang.toLowerCase().startsWith(I18n.speech().slice(0, 2))) this.pickVoice();
       if (this.voice) u.voice = this.voice;
       u.onstart = () => { this.speaking = true; Music.refreshVolume(); };
@@ -115,4 +115,4 @@ const Narrator = {
   },
   stop() { try { speechSynthesis.cancel(); } catch (e) { /* */ } this.speaking = false; Music.refreshVolume(); },
 };
-if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => Narrator.pickVoice();
+if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => { Narrator.voice = null; Narrator.pickVoice(); };

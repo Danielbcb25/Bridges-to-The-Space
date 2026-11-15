@@ -186,4 +186,5 @@ function arcaPeopleBlock() {
   const rows = CSHIPS.map(s => { const n = by[s.n + 1]; const st = (C.ships.find(x => x.n === s.n) || {}).state; return `<div class="alert ${n ? 'good' : 'info'}"><span style="color:${ARCA_COLORS[s.n + 1]}">■</span> <b>${s.name}</b> — ${n ? `${n} ${esc(L(K('colonos', 'colonists', 'colonos')))}` : st === 'inbound' ? esc(L(K('a caminho…', 'inbound…', 'en camino…'))) : esc(L(K('ainda não pousou', 'not landed yet', 'aún no aterriza')))}</div>`; }).join('');
   return rows;
 }
+UIH.netRole = r => { U.lobby = Object.assign({}, U.lobby, { role: r || '' }); };
 UIH.netShip = n => { U.lobby = Object.assign({}, U.lobby, { ship: +n }); };

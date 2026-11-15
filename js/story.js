@@ -96,7 +96,7 @@ UIH.mGo = i => { const m = U.mintro; if (!m) return; m.i = +i; m.t = 0; Narrator
 const HOWTO = [
   { k: ['←', '→'], t: 'Andar', mode: 'walk' },
   { k: ['Shift'], t: 'Correr', mode: 'run' },
-  { k: ['Espaço'], t: K('Pular', 'Jump', 'Saltar'), mode: 'jump' },
+  { k: ['J'], t: K('Pular', 'Jump', 'Saltar'), mode: 'jump' },
   { k: ['E'], t: 'Usar estações e conversar', mode: 'use' },
   { k: ['H'], t: 'Computador de bordo: peça ajuda', mode: 'help' },
 ];

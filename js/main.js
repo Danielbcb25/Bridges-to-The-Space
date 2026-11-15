@@ -170,6 +170,14 @@ function escAll() {
   if (U.hudFull) { U.hudFull = false; return true; }
   return false;
 }
+// Pular: tecla J (ou botão ⤒ no toque) — funciona em qualquer lugar, mesmo diante de consoles e prédios
+function jumpAction() {
+  if (!S) return;
+  if (S.scene === 'earth') { const E = U.earth; if (!E || U.comms || E.dialog || E.panel || cityBusy()) return; jumpStart(E.p, 'earth'); return; }
+  const c = me(); if (!c || !c.alive || U.panel || c.climb || c.csleep) return;
+  if (S.scene === 'colony' && S.colony.tut === 0) return;
+  if (S.scene === 'colony' || S.scene === 'ship') jumpStart(c, S.scene);
+}
 // Espaço: interage se houver algo perto; senão, pula
 function spaceAction() {
   if (!S) return;
@@ -198,6 +206,7 @@ window.addEventListener('keydown', e => {
   if (e.code === 'KeyS' && e.shiftKey) { keys.KeyS = false; UIH.fast(); return; }
   if (e.code === 'Enter' && Net.role && S.scene !== 'intro' && !U.comms) { e.preventDefault(); Chat.focus(); return; }
   if (U.help) { if (e.code === 'Space' || e.code === 'Enter') UIH.helpGo(); const d = /^Digit([1-9])$/.exec(e.code); if (d) { const q = pcQuestions()[+d[1] - 1]; if (q) UIH.pcAsk(q.id); } return; }
+  if (e.code === 'KeyJ' && S.scene !== 'intro') { if (!e.repeat) jumpAction(); return; }
   if (S.scene === 'intro' && U.howto) { if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) UIH.introSkip(); return; }
   if (S.scene === 'intro') { if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) UIH.mNext(); if (e.code === 'ArrowLeft') UIH.mPrev(); return; }
   if (S.scene === 'earth') {
@@ -250,7 +259,7 @@ function bindCanvas() {
     b.addEventListener('pointerdown', e => {
       e.preventDefault(); Music.unlock(); Sfx.ensure();
       const a = b.dataset.tact;
-      if (a === 'jump') spaceAction();
+      if (a === 'jump') jumpAction();
       else if (a === 'help') UIH.help();
       else if (a === 'fast') UIH.fast();
       else if (a === 'esc') { escAll() || (S && U.screen === 'game' && ['ship', 'colony'].includes(S.scene) && UIH.panel('menu')); }

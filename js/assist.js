@@ -20,7 +20,7 @@ function jumpTick(o, dt) {
   if (!o || !o.jy) return;
   const g = o.jg || 600;
   // pulo dinâmico: soltar a tecla na subida corta o pulo; no espaço, segurar faz flutuar mais
-  const holding = keys.Space;
+  const holding = keys.Space || keys.KeyJ;
   let gg = g;
   if (o.jv > 0 && !holding) gg = g * 2.2;
   if (o.jv < 0 && holding && g < 200) gg = g * 0.55;

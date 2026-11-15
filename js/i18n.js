@@ -29,7 +29,7 @@ const I18n = {
     this.lang = l;
     try { Save.data.settings.lang = l; Save.write(); } catch (e) { /* */ }
     if (typeof U !== 'undefined') U.cache = {};
-    if (typeof Narrator !== 'undefined') { Narrator.voice = null; }
+    if (typeof Narrator !== 'undefined') { Narrator.stop(); Narrator.voice = null; Narrator.pickVoice(); } // a voz acompanha o idioma (cada idioma lembra a sua)
     this.apply();
     if (typeof Chat !== 'undefined' && Chat.render) Chat.render(true);
   },

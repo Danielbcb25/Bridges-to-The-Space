@@ -20,7 +20,7 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 
 ## Controles e ajuda
 
-- **← →** andar (ou clique para andar — o teclado tem prioridade) · **Shift** correr · **Espaço** interagir; longe de tudo, **pula** (na nave o pulo é lento, de gravidade zero) · **E** interagir · **Esc** fecha/desmarca/volta.
+- **← →** andar (ou clique para andar — o teclado tem prioridade) · **Shift** correr · **Espaço** ou **E** interagir · **J** pula em qualquer lugar (também diante de consoles e prédios; no celular, o botão ⤒); o Espaço longe de tudo também pula (na nave o pulo é lento, de gravidade zero) · **E** interagir · **Esc** fecha/desmarca/volta.
 - **H** abre o **computador de bordo**: próximo passo, lista de tarefas e controles. A barra 💻 no topo mostra sempre o próximo passo.
 - **Shift+S** ou o botão ⏩: tempo 2x até o próximo evento.
 - HUD enxuto com 4 barras (oxigênio, fome, humor, armazenamento); ▾ mostra todos os recursos.

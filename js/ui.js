@@ -133,7 +133,7 @@ function settingsScreen(inGame) {
     <label class="field">Música <input type="range" min="0" max="1" step="0.05" value="${st.music}" data-set="music"></label>
     <label class="field">Efeitos <input type="range" min="0" max="1" step="0.05" value="${st.sfx}" data-set="sfx"></label>
     <label class="check"><input type="checkbox" data-set="narration" ${st.narration ? 'checked' : ''}> Narração por voz (pt-BR)</label>
-    <label class="field">${esc(L('Voz'))} <select data-set="voice"><option value="">${esc(L('Automática (a mais natural)'))}</option>${Narrator.voices().map(v => `<option value="${esc(v.name)}" ${st.voice === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}</select> <button class="btn small" data-ui="voiceTest">🔊</button></label>
+    <label class="field">${esc(L('Voz'))} <select data-set="voice"><option value="">${esc(L('Automática (a mais natural)'))}</option>${Narrator.voices().map(v => `<option value="${esc(v.name)}" ${(st.voices || {})[I18n.lang] === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}</select> <button class="btn small" data-ui="voiceTest">🔊</button></label>
     <label class="field">${esc(L('Velocidade da voz'))} <input type="range" min="0.7" max="1.3" step="0.05" value="${st.voiceRate || 1}" data-set="voiceRate"></label>
     <label class="check"><input type="checkbox" data-set="curios" ${st.curios !== false ? 'checked' : ''}> ${esc(L('Curiosidades do computador de bordo (texto e voz)'))}</label>
     <label class="check"><input type="checkbox" data-set="showDice" ${st.showDice ? 'checked' : ''}> Modo professor: mostrar as rolagens dos dados</label>
@@ -211,6 +211,7 @@ function drawAvatarPreviews() {
 // ---------- lobby multiplayer ----------
 const arcaHint = n => K('Arca-' + n + ': quem entra primeiro nessa nave vira o Comandante dela; os próximos entram na tripulação. Cada Arca faz a sua própria jornada (até 28 pessoas no total).', 'Arca-' + n + ': whoever enters this ship first becomes its Commander; the next ones join the crew. Each Arca makes its own journey (up to 28 people in total).', 'Arca-' + n + ': quien entra primero en esta nave se vuelve su Comandante; los siguientes se unen a la tripulación. Cada Arca hace su propio viaje (hasta 28 personas en total).');
 const arcaJoinLabel = n => K('Entrar na Arca-' + n, 'Join Arca-' + n, 'Entrar en la Arca-' + n);
+const roleChips = LB => `<div class="grp"><b>${esc(L(K('Sua função', 'Your role', 'Su función')))}</b><button class="chip ${!LB.role ? 'on' : ''}" data-ui="netRole" data-arg="">${esc(L(K('Qualquer', 'Any', 'Cualquiera')))}</button>${ROLES.map(r => `<button class="chip ${LB.role === r.id ? 'on' : ''}" data-ui="netRole" data-arg="${r.id}">${esc(L(r.short))}</button>`).join('')}</div>`;
 const shipChips = LB => `<div class="grp"><b>${esc(L(K('Escolha sua Arca', 'Choose your Arca', 'Elija su Arca')))}</b>${[1, 2, 3, 4].map(n => `<button class="chip ${(LB.ship || 1) === n ? 'on' : ''}" data-ui="netShip" data-arg="${n}">Arca-${n}</button>`).join('')}</div><p class="small muted">${esc(L(arcaHint(LB.ship || 1)))}</p>`;
 function lobbyScreen() {
   const LB = U.lobby || {};
@@ -237,6 +238,7 @@ function lobbyScreen() {
     <h2>MULTIPLAYER</h2>
     <p class="muted">${esc(L(K('Até 28 jogadores: 4 Arcas, cada uma com um Comandante e 6 tripulantes. Quem cria a sala é o Comandante da Arca que escolher.', 'Up to 28 players: 4 Arcas, each with a Commander and 6 crew. Whoever creates the room is the Commander of the Arca they choose.', 'Hasta 28 jugadores: 4 Arcas, cada una con un Comandante y 6 tripulantes. Quien crea la sala es el Comandante de la Arca que elija.')))} ${esc(L('Funciona online direto pelo navegador: não precisa de servidor nem de VPN.'))}</p>
     ${shipChips(LB)}
+    ${roleChips(LB)}
     <div class="row"><button class="btn primary" data-ui="netHost" ${LB.busy ? 'disabled' : ''}>${esc(L(K('Criar sala (Comandante da Arca-' + (LB.ship || 1) + ')', 'Create room (Commander of Arca-' + (LB.ship || 1) + ')', 'Crear sala (Comandante de la Arca-' + (LB.ship || 1) + ')')))}</button></div>
     <label class="field">Código da sala <input id="net-code" maxlength="5" value="${esc(LB.code || '')}" style="text-transform:uppercase" autocomplete="off"></label>
     <div class="row"><button class="btn" data-ui="netJoin" ${LB.busy ? 'disabled' : ''}>${esc(L(arcaJoinLabel(LB.ship || 1)))}</button></div>
@@ -649,7 +651,7 @@ function menuPanel() {
     <div class="menu"><button class="mbtn" data-ui="closePanel">▶ Continuar</button><button class="mbtn" data-ui="panel" data-arg="settings">⚙ Configurações</button>${Net.role !== 'client' ? `<button class="mbtn" data-ui="saveNow">💾 ${esc(L('Salvar progresso'))}</button>` : ''}<button class="mbtn" data-ui="fullscreen">⛶ ${esc(L('Tela cheia'))}</button>
     ${U.confirmQuit ? '<button class="mbtn red" data-ui="quit">Confirmar: sair para o título</button>' : '<button class="mbtn" data-ui="quitAsk">⏏ Sair para o título</button>'}</div>
     <div class="row" style="justify-content:center">${LANGS.map(l => `<button class="chip ${I18n.lang === l.id ? 'on' : ''}" data-ui="setLang" data-arg="${l.id}">${l.label}</button>`).join('')}</div>
-    <p class="small muted keyshelp">${esc(L('← → andar · ↑ ↓ escadas · Shift correr · E / Espaço interagir · H computador de bordo · R relatório · T tripulação · Esc menu'))}</p>
+    <p class="small muted keyshelp">${esc(L('← → andar · ↑ ↓ escadas · Shift correr · E / Espaço interagir · J pular · H computador de bordo · R relatório · T tripulação · Esc menu'))}</p>
     <p class="small muted">Pontos desta jornada: ${S.points} · Créditos: ${Save.data.credits}</p></div></div>`;
 }
 
@@ -918,7 +920,7 @@ UIH.pilot = d => act('puzzle', { op: 'move', d: +d * 0.08 });
 UIH.quitAsk = () => { U.confirmQuit = true; };
 UIH.quit = () => { exitGameFullscreen(); Narrator.stop(); if (Net.role) Net.leave(); S = null; U.screen = 'title'; U.panel = null; Music.play('intro'); };
 UIH.netHost = () => { const el = $('#net-url'); const url = el ? el.value.trim() : ''; U.lobby = { url, ship: (U.lobby && U.lobby.ship) || 1 }; Net.host(url); };
-UIH.netJoin = () => { enterGameFullscreen(); const el = $('#net-url'); const url = el ? el.value.trim() : ''; const code = $('#net-code').value.trim().toUpperCase(); U.lobby = { url, code, ship: (U.lobby && U.lobby.ship) || 1 }; Net.join(url, code); };
+UIH.netJoin = () => { enterGameFullscreen(); const el = $('#net-url'); const url = el ? el.value.trim() : ''; const code = $('#net-code').value.trim().toUpperCase(); U.lobby = { url, code, ship: (U.lobby && U.lobby.ship) || 1, role: (U.lobby && U.lobby.role) || '' }; Net.join(url, code); };
 UIH.netLeave = () => { Net.leave(); U.screen = 'lobby'; };
 ACTIONS.tut = p => { if (S.tutorial < p.n) S.tutorial = p.n; };
 
@@ -956,7 +958,7 @@ function bindUI() {
   layer.addEventListener('input', e => {
     const t = e.target;
     if (t.id === 'av-name' && U.avatarDraft) U.avatarDraft.name = t.value;
-    if (t.dataset.set) { const st = Save.data.settings; st[t.dataset.set] = t.type === 'checkbox' ? t.checked : t.tagName === 'SELECT' ? t.value : +t.value; Save.write(); if (t.dataset.set === 'voice') Narrator.voice = null; Music.refreshVolume(); if (t.dataset.set === 'narration' && !t.checked) Narrator.stop(); }
+    if (t.dataset.set) { const st = Save.data.settings; if (t.dataset.set === 'voice') { st.voices = st.voices || {}; st.voices[I18n.lang] = t.value; } else st[t.dataset.set] = t.type === 'checkbox' ? t.checked : t.tagName === 'SELECT' ? t.value : +t.value; Save.write(); if (t.dataset.set === 'voice') Narrator.voice = null; Music.refreshVolume(); if (t.dataset.set === 'narration' && !t.checked) Narrator.stop(); }
   });
   layer.addEventListener('change', e => {
     const t = e.target;
