@@ -1883,7 +1883,13 @@
   "Esse filtro estava bom. Tempo perdido!": "Ese filtro estaba bien. ¡Tiempo perdido!",
   "Arca-1 · Controle da Colônia": "Arca-1 · Control de la Colonia",
   "Colono": "Colono",
-  "Colonos": "Colonos"
+  "Colonos": "Colonos",
+  "Banco de dados da NASA": "Base de datos de la NASA",
+  "Fonte": "Fuente",
+  "Relatório do computador de bordo: dados reais da NASA": "Informe de la computadora de a bordo: datos reales de la NASA",
+  "O que a NASA sabe sobre isso?": "¿Qué sabe la NASA sobre esto?",
+  "Suprimentos das Arcas": "Suministros de las Arcas",
+  "Funciona online direto pelo navegador: não precisa de servidor nem de VPN.": "Funciona en línea directo en el navegador: no necesita servidor ni VPN."
  },
  "patterns": [
   [

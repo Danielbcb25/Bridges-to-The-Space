@@ -1882,7 +1882,13 @@
   "Esse filtro estava bom. Tempo perdido!": "That filter was fine. Time lost!",
   "Arca-1 · Controle da Colônia": "Arca-1 · Colony Control",
   "Colono": "Colonist",
-  "Colonos": "Colonists"
+  "Colonos": "Colonists",
+  "Banco de dados da NASA": "NASA database",
+  "Fonte": "Source",
+  "Relatório do computador de bordo: dados reais da NASA": "Onboard computer report: real NASA data",
+  "O que a NASA sabe sobre isso?": "What does NASA know about this?",
+  "Suprimentos das Arcas": "Supplies from the Arcas",
+  "Funciona online direto pelo navegador: não precisa de servidor nem de VPN.": "Works online right in the browser: no server or VPN needed."
  },
  "patterns": [
   [

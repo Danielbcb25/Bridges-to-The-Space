@@ -153,11 +153,12 @@ const PC_QA = [
   { id: 'ev', sc: ['ship'], q: 'Como funcionam os desafios?', a: () => ({ a: ['Quando o alarme tocar, siga a seta amarela até a estação indicada e cumpra os passos numerados. Chame a pessoa da função certa para ajudar.'] }) },
   { id: 'build', sc: ['colony'], q: 'Como construo a colônia?', a: () => ({ a: ['Siga a seta amarela até o próximo prédio e aperte E para ver as opções. Comece pelo campo solar: sem energia nada funciona.'] }) },
   { id: 'fast', sc: ['ship', 'colony'], q: 'Posso acelerar o tempo?', a: () => ({ a: ['Sim: Shift+S ou o botão ⏩ (2x → 5x → 10x → normal). Ele volta ao normal sozinho nos desafios.'] }) },
+  { id: 'nasa', q: 'O que a NASA sabe sobre isso?', a: () => { const nl = nasaList(false); const f = nl.length ? nl[nl.length - 1] : { t: NASA_ENDFACTS[0].t(), src: NASA_ENDFACTS[0].src }; return { a: [f.t, '@ (' + f.src + ')'] }; } },
   { id: 'keys', q: 'Quais são os controles?', a: () => ({ a: [PC_KEYS[S.scene] || PC_KEYS.ship] }) },
 ];
 function pcQuestions() { return PC_QA.filter(x => !x.sc || x.sc.includes(S.scene)); }
 // frases que começam com @ são textos já traduzíveis vindos de assistSteps
-const pcLine = k => k.split('@').map(x => esc(L(x))).join('');
+const pcLine = k => typeof k === 'string' ? k.split('@').map(x => esc(L(x))).join('') : esc(L(k));
 UIH.help = () => { U.help = !U.help; if (U.help && !(U.pcLog && U.pcLog.scene === S.scene)) U.pcLog = { scene: S.scene, items: [] }; Sfx.click(); };
 UIH.pcAsk = id => {
   const qa = PC_QA.find(x => x.id === id); if (!qa) return;
@@ -200,6 +201,7 @@ function helpPanel() {
       ${(() => { const rn = typeof routineNext === 'function' ? routineNext() : null; return rn ? `<div class="ln mis">📋 <small>${esc(L('Rotina'))}:</small> ${esc(L(rn.t))} <small class="muted">— ${esc(L(rn.how))}</small> ${goBtn(rn.go)}</div>` : ''; })()}
       ${n ? `<div class="ln mis">🎯 <small>${esc(L('Missão'))} ${done}/${all.length}:</small> ${esc(L(n.t))} ${goBtn(n.go, n.act)}</div>` : ''}
       ${log.map(e => `<div class="ln q">&gt; ${esc(L(e.q))}</div><div class="ln a">${e.a.map(pcLine).join(' ')} ${goBtn(e.go, e.act)}</div>`).join('')}
+      ${(() => { const nl = typeof nasaList === 'function' ? nasaList(false) : []; return nl.length ? `<div class="ln sys">📡 ${esc(L('Banco de dados da NASA'))} (${nl.length})</div>` + nl.map(f => `<div class="ln a">${esc(L(f.t))} <small class="muted">— ${esc(f.src)}</small></div>`).join('') : ''; })()}
       <div class="ln cur">_</div>
     </div>
     <div class="qs">${pcQuestions().map((x, i) => `<button class="btn tiny" data-ui="pcAsk" data-arg="${x.id}">${i + 1}. ${esc(L(x.q))}</button>`).join('')}</div>

@@ -751,6 +751,7 @@ function endScreen() {
     ${e.ok && e.note ? `<div class="alert good">${esc(L('A jornada terminou em Pontes-01b:'))} ${esc(T(e.note))}</div>` : ''}
     <p class="big">${e.ok ? (e.colony && !e.note ? esc(L(K('Em ' + e.site + ', a base cresceu, a Terra recebeu os dados e três naves trouxeram os primeiros colonos. A humanidade tem um novo começo — que custou caro.', 'At ' + e.site + ' the base grew, Earth received the data and three ships brought the first colonists. Humanity has a new beginning — and it came at a high cost.', 'En ' + e.site + ' la base creció, la Tierra recibió los datos y tres naves trajeron a los primeros colonos. La humanidad tiene un nuevo comienzo, que costó caro.'))) : `A expedição pousou no ${esc(e.site)}. A humanidade tem um novo começo — que custou caro.`) : esc(e.reason)}</p>
     ${endImpact(e.ok)}
+    ${nasaReport()}
     ${retryBlock()}
     ${e.ok && e.colony && S.colony ? `<div class="kv"><span>${esc(L('População final'))}</span><b>${colonyPop()}</b><span>${esc(L('Dias na colônia'))}</span><b>${S.colony.day}</b><span>${esc(L('Construções'))}</span><b>${S.colony.built}</b><span>${esc(L('Pacotes de dados enviados à Terra'))}</span><b>${S.colony.txCount}</b><span>${esc(L('Exoplanetas visitados por engano'))}</span><b>${(S.explore && S.explore.wrong) || 0}</b></div>` : ''}
     <div class="kv"><span>Dias de viagem</span><b>${S.day}</b><span>Tripulantes vivos</span><b>${alive().length}/7</b><span>Pontos</span><b>${S.points}</b><span>Energia gasta</span><b>${fmt(spent('energia'), 0)} kWh</b><span>Combustível gasto</span><b>${fmt(spent('combustivel'), 0)} kg</b><span>Água consumida</span><b>${fmt(spent('agua'), 0)} L</b><span>Oxigênio respirado</span><b>${fmt(spent('oxigenio'), 0)} kg</b>
@@ -777,7 +778,7 @@ function renderUI() {
       case 'setup': scr = U.setupDirty ? setupScreen() : U.cache.scr; U.setupDirty = false; break;
       case 'launch': scr = ''; break;
       case 'ship':
-        hud = hudTop() + assistMini() + routineBox() + hudBottom();
+        hud = hudTop() + assistMini() + routineBox() + nasaCard() + hudBottom();
         side = eventPanel();
         if (U.panel === 'report') modal = reportPanel();
         else if (U.panel === 'crew') modal = `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>Tripulação</h2>${crewList()}</div></div>`;
@@ -789,7 +790,7 @@ function renderUI() {
       case 'station': scr = stationScreen(); break;
       case 'detour': scr = S.detour ? detourScreen() : ''; break;
       case 'colony':
-        hud = colonyHud() + assistMini();
+        hud = colonyHud() + assistMini() + nasaCard();
         if (S.colony.tut === 0) modal = colonyIntro();
         else if (U.panel === 'menu') modal = menuPanel();
         else if (U.panel === 'settings') modal = `<div class="modal-bg">${settingsScreen(true)}</div>`;
