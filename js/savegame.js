@@ -72,7 +72,7 @@ const GameSave = {
   remove(id) { const l = this.list().filter(x => x.id !== id); this.store(l); },
   describe(e) {
     const s = e.data.S;
-    return { name: (s.crew && s.crew[0] && s.crew[0].name) || 'Comandante', journey: s.journey === 'curta' ? K('Jornada Curta', 'Short Journey', 'Jornada Corta') : K('Jornada Completa', 'Full Journey', 'Jornada Completa'),
+    return { name: (s.crew && s.crew[0] && s.crew[0].name) || 'Commander', journey: s.journey === 'curta' ? K('Jornada Curta', 'Short Journey', 'Jornada Corta') : K('Jornada Completa', 'Full Journey', 'Jornada Completa'),
       scene: SCENE_NAMES[s.scene] || K(s.scene, s.scene, s.scene), day: s.day, points: s.points, multi: s.mode === 'host', done: !!e.done, at: e.at, auto: e.auto };
   },
   summary() {

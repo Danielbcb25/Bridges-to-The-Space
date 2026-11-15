@@ -1819,7 +1819,12 @@
   "humor cai um pouco": "mood drops a little",
   "humor cai muito · risco de desmaio": "mood drops a lot · fainting risk",
   "Mais opções da cozinha": "More kitchen options",
-  "Hoje teve missão: o que faltar passa para amanhã.": "There was a mission today: anything left moves to tomorrow."
+  "Hoje teve missão: o que faltar passa para amanhã.": "There was a mission today: anything left moves to tomorrow.",
+  "O que servir": "What to serve",
+  "Só ração por enquanto.": "Only rations for now.",
+  "Plante e colha na Estufa para ter comida fresca.": "Plant and harvest in the Greenhouse to get fresh food.",
+  "Sem Estufa, a nave depende da ração.": "Without a Greenhouse, the ship relies on rations.",
+  "A tripulação come sozinha 3 vezes por dia.": "The crew eats on its own 3 times a day."
  },
  "patterns": [
   [

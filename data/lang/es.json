@@ -1819,7 +1819,13 @@
   "humor cai um pouco": "el ánimo baja un poco",
   "humor cai muito · risco de desmaio": "el ánimo baja mucho · riesgo de desmayo",
   "Mais opções da cozinha": "Más opciones de la cocina",
-  "Hoje teve missão: o que faltar passa para amanhã.": "Hoy hubo misión: lo que falte pasa a mañana."
+  "Hoje teve missão: o que faltar passa para amanhã.": "Hoy hubo misión: lo que falte pasa a mañana.",
+  "O que servir": "Qué servir",
+  "Só ração por enquanto.": "Solo ración por ahora.",
+  "Plante e colha na Estufa para ter comida fresca.": "Planta y cosecha en el Invernadero para tener comida fresca.",
+  "Sem Estufa, a nave depende da ração.": "Sin Invernadero, la nave depende de la ración.",
+  "A tripulação come sozinha 3 vezes por dia.": "La tripulación come sola 3 veces al día.",
+  "Commander": "Comandante"
  },
  "patterns": [
   [

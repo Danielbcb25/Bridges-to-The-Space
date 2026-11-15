@@ -274,7 +274,7 @@ const SUIT_COLORS = ['#0026ff', '#e8e8e8', '#ff7a1a', '#2c2c2c', '#00a37a', '#b5
 const VISOR_COLORS = [['#4cfcff', '#298889'], ['#ffd34c', '#a3801c'], ['#ff6a4c', '#8a2e1a'], ['#9dff6a', '#3f8a1f'], ['#c3c3ff', '#5a5a9a']];
 
 const DEFAULT_AVATAR = {
-  name: 'Comandante',
+  name: 'Commander',
   skin: 1, hair: 'lateral', hairColor: 2, eyes: 1,
   shirt: 0, pants: 5, shorts: true, longSleeve: false,
   suit: 0, pack: '#ff9411', visor: 0, badge: '#20a04f',

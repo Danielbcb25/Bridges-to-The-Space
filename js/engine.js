@@ -105,7 +105,7 @@ function newGame(journey, mode) {
   const cmdAvatar = Object.assign({}, DEFAULT_AVATAR, Save.data.avatar || {});
   const names = shuffle(CREW_NAMES.slice());
   const crew = [{
-    id: 'cmd', role: 'comandante', roleName: 'Comandante', name: cmdAvatar.name || 'Comandante', avatar: cmdAvatar,
+    id: 'cmd', role: 'comandante', roleName: 'Comandante', name: (cmdAvatar.name && cmdAvatar.name !== 'Comandante') ? cmdAvatar.name : 'Commander', avatar: cmdAvatar,
   }];
   ROLES.forEach((r, i) => crew.push({ id: r.id, role: r.id, roleName: roleForName(r.name, names[i]), name: names[i], avatar: Object.assign(randomAvatar(Math.random, FEM_NAMES.includes(names[i])), { name: names[i] }) }));
   crew.forEach((c, i) => Object.assign(c, {
@@ -867,6 +867,7 @@ ACTIONS.careAll = () => S.trays.forEach(t => { if (t.crop && t.state === 'cresce
 ACTIONS.harvest = p => harvestTray(S.trays[p.i]);
 ACTIONS.sacrificeTray = p => { const t = S.trays[p.i]; if (!t || !t.crop) return; addRes('lixo', 0.5, 'Bandeja sacrificada'); Object.assign(t, { crop: null, state: 'vazio', g: 0 }); toast('Bandeja sacrificada para economizar água.'); };
 ACTIONS.menu = p => { S.food.menu[p.slot] = p.item; };
+ACTIONS.menuAll = p => { S.food.menu = [p.item, p.item, p.item]; };
 ACTIONS.ration = p => { S.food.racionamento = p.level; logMsg('Racionamento: ' + p.level); };
 ACTIONS.mesa = p => { S.food.mesa = p.mode; };
 ACTIONS.cook = p => {

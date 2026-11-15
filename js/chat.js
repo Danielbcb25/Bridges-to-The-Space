@@ -47,7 +47,7 @@ const Chat = {
   focus() { if (typeof keys !== 'undefined') for (const k in keys) keys[k] = false; if (!this.open) this.toggle(true); else this.els.inp.focus(); },
   myName() {
     if (typeof S !== 'undefined' && S) { const c = crewById(U.me); if (c) return c.name; }
-    const av = Save.data.avatar; return (av && av.name) || (Net.role === 'host' ? 'Comandante' : 'Tripulante');
+    const av = Save.data.avatar; return (av && av.name && av.name !== 'Comandante' ? av.name : null) || (Net.role === 'host' ? 'Commander' : 'Tripulante');
   },
   myRole() { if (typeof S !== 'undefined' && S) { const c = crewById(U.me); if (c) return c.roleName; } return Net.role === 'host' ? 'Comandante' : (Net.myRoleName || ''); },
   // adiciona localmente
