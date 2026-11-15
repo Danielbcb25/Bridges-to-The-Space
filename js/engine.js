@@ -492,6 +492,7 @@ function simulate(dt) {
     c.saciedade = clamp(c.saciedade - 60 * f, 0, 100);
     // o humor também é o sono: acordado ele cai um pouco mais; dormir (Dormitórios) recupera
     if (!(c.task && c.task.key === 'sleep')) c.humor = clamp(c.humor - 4 * f, 0, 100);
+    else c.humor = clamp(c.humor + 60 * f, 0, 100); // dormindo: recupera aos poucos, além do bônus ao acordar
     if (!c.nut) c.nut = [80, 80, 80];
     for (let k = 0; k < 3; k++) c.nut[k] = clamp(c.nut[k] - 35 * f, 0, 100);
     c.nutricao = (c.nut[0] + c.nut[1] + c.nut[2]) / 3;
@@ -555,8 +556,9 @@ function checkStuck(dt) {
     const canGrow = S.trays.some(t => t.crop) || (S.trays.length && S.res.plantacao >= 0.5);
     if (S.res.comida < 0.05 && fresh < 0.2 && !canGrow) {
       S.stuckFood = (S.stuckFood || 0) + dt / S.dayLen;
-      if (S.stuckFood >= 1) return fail('A comida acabou e não há como produzir mais: a tripulação não chegaria viva a Pontes-01b.');
-    } else S.stuckFood = 0;
+      if (S.stuckFood >= 0.5 && !S.stuckFoodWarned) { S.stuckFoodWarned = true; toast('🍱 A comida acabou de vez! Troque, plante ou a missão vai falhar.', 'bad'); }
+      if (S.stuckFood >= 2) return fail('A comida acabou e não há como produzir mais: a tripulação não chegaria viva a Pontes-01b.');
+    } else { S.stuckFood = 0; S.stuckFoodWarned = false; }
     if (sc === 'station' && S.res.combustivel < 1) return fail('Sem combustível na Estação Ponte-Alfa: a nave não consegue mais partir.');
   }
   if (sc === 'migration') {
@@ -659,7 +661,8 @@ function newDay() {
   // fome prolongada
   for (const c of alive()) {
     if (c.saciedade <= 0) c.noFoodDays++; else c.noFoodDays = 0;
-    if (c.noFoodDays >= 2) {
+    if (c.noFoodDays === 1 || c.noFoodDays === 2) { toast(`🍱 ${c.name} está passando fome! Sirva comida ou coma na Cozinha.`, 'bad'); say(c, F('crew.c20')); }
+    if (c.noFoodDays >= 3) {
       const r = d10();
       if (r === 1) kill(c, 'fome'); else if (r <= 4) { c.status = 'incapacitado'; c.statusT = 30; } else c.humor = clamp(c.humor - 5, 0, 100);
     }
@@ -910,14 +913,32 @@ ACTIONS.hibernate = p => {
   if (c.hibernating) { c.statusT = c.statusT ? 1 : 0; goTo(c, 'dormitorio'); c.x = STATIONS.dormitorio.x; c.deck = 'L'; }
   toast(c.hibernating ? `${c.name} entrou em hibernação.` : `${c.name} saiu da hibernação.`);
 };
+// comer fora de hora: prato pronto > comida fresca > ração
+ACTIONS.eat = (p, actor) => {
+  const c = actor; if (!c || !c.alive) return;
+  if (c.saciedade >= 85) return toast('Você ainda está satisfeito.', 'info');
+  const fd = S.food; let item = null;
+  const dish = Object.keys(fd.dishes).find(k => fd.dishes[k] >= 1);
+  const crop = Object.keys(fd.fresh).find(k => fd.fresh[k] >= 0.3);
+  if (dish) { fd.dishes[dish] -= 1; item = dish; }
+  else if (crop) { fd.fresh[crop] -= 0.3; item = crop; }
+  else if (S.res.comida >= 0.2) { addRes('comida', -0.2, 'Lanche'); item = 'racao'; }
+  else return toast('Não há nada para comer!', 'bad');
+  c.saciedade = clamp(c.saciedade + 40, 0, 100); c.noFoodDays = 0;
+  const n = foodNutr(item); if (!c.nut) c.nut = [80, 80, 80];
+  for (let k = 0; k < 3; k++) c.nut[k] = clamp(c.nut[k] + n[k] * 0.5, 0, 100);
+  c.nutricao = (c.nut[0] + c.nut[1] + c.nut[2]) / 3;
+  addRes('lixo', 0.05, 'Restos de comida');
+  toast('🍴 ' + c.name + ' comeu.', 'good');
+};
 ACTIONS.sleep = (p, actor) => {
   const c = crewById(p.id || actor.id); if (!available(c)) return;
   if (p.id && p.id !== actor.id) callCrew(c, { station: 'dormitorio', dur: 9, label: 'Dormir', key: 'sleep' }); else assignTask(c, { station: 'dormitorio', dur: 9, label: 'Dormir', key: 'sleep' });
 };
-TASK_DONE.sleep = c => { c.humor = clamp(c.humor + 25, 0, 100); };
+TASK_DONE.sleep = c => { c.humor = clamp(c.humor + 50, 0, 100); };
 ACTIONS.rest = (p, actor) => {
   const c = crewById(p.id || actor.id); if (!available(c)) return;
   assignTask(c, { station: 'dormitorio', dur: 6, label: 'Descansar / lazer', key: 'rest' });
 };
-TASK_DONE.rest = c => { c.humor = clamp(c.humor + 8 + shopBonus().moral / 3, 0, 100); say(c, F('crew.c22')); };
+TASK_DONE.rest = c => { c.humor = clamp(c.humor + 15 + shopBonus().moral / 3, 0, 100); say(c, F('crew.c22')); };
 ACTIONS.selfTask = (p, actor) => {}; // reservado

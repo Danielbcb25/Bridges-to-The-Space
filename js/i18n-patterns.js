@@ -38,6 +38,8 @@ function registerFnPatterns() {
     (m, g, k, f, p, s) => `Result: ${t(g)}. Cost of keeping the temperature: ${k} kWh of energy, ${f} kg of fuel. Crops lost: ${p} kg. Time outside the safe range: ${s} s.`,
     (m, g, k, f, p, s) => `Resultado: ${t(g)}. Costo de mantener la temperatura: ${k} kWh de energía, ${f} kg de combustible. Cultivo perdido: ${p} kg. Tiempo fuera del rango seguro: ${s} s.`);
   P(/^⚠ Rotina incompleta: (.+)$/, (m, a) => `⚠ Routine unfinished: ${a.split(' · ').map(t).join(' · ')}`, (m, a) => `⚠ Rutina incompleta: ${a.split(' · ').map(t).join(' · ')}`);
+  P(/^🍱 (.+) está passando fome! Sirva comida ou coma na Cozinha\.$/, '🍱 $1 is starving! Serve food or eat in the Kitchen.', '🍱 ¡$1 está pasando hambre! Sirve comida o come en la Cocina.');
+  P(/^🍴 (.+) comeu\.$/, '🍴 $1 ate.', '🍴 $1 comió.');
   P(/^✔ Rotina: (.+)$/, (m, a) => `✔ Routine: ${t(a)}`, (m, a) => `✔ Rutina: ${t(a)}`);
   P(/^Troca feita: (.+)$/, (m, a) => `Trade done: ${t(a)}`, (m, a) => `Intercambio hecho: ${t(a)}`);
   P(/^Análise de (.+) concluída\.\s*(.*)$/, (m, a, r) => `${t(a)} analysis complete.${r ? ' ' + t(r) : ''}`, (m, a, r) => `Análisis de ${low(t(a))} completado.${r ? ' ' + t(r) : ''}`);

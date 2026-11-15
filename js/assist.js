@@ -127,6 +127,9 @@ function pcTips() {
   if (r.agua < c.agua * 0.2) add('Pouca água: o Suporte à vida recicla a água da nave.', '💧', { st: 'suporte' }, 2);
   const fome = crew.length ? crew.reduce((a, x) => a + x.saciedade, 0) / crew.length : 100;
   if (fome < 45) add('A tripulação está com fome: veja o cardápio na Cozinha.', '🍱', { st: 'cozinha' }, 2);
+  if (m && m.alive && m.saciedade < 30) add('Você está com fome: coma na Cozinha (Comer agora).', '🍴', { st: 'cozinha' }, 3);
+  { const fo = foodOutlook(); if (fo.days < 3) add(K(`A ração acaba em ≈ ${Math.max(0, Math.floor(fo.days))} dia(s)! Racione na Cozinha ou plante na Estufa.`, `Rations run out in ≈ ${Math.max(0, Math.floor(fo.days))} day(s)! Ration in the Kitchen or plant in the Greenhouse.`, `¡La ración se acaba en ≈ ${Math.max(0, Math.floor(fo.days))} día(s)! Raciona en la Cocina o planta en el Invernadero.`), '🍱', { st: 'cozinha' }, 3);
+    else if (S.stage === 1 && fo.days < fo.left) add('A ração não chega ao destino: reduza o racionamento ou produza comida.', '🍱', { st: 'cozinha' }, 1); }
   if (m && m.alive && !m.hibernating && m.humor < 35) add('Você está exausto: durma nos Dormitórios.', '😴', { st: 'dormitorio' }, 2);
   else if (crew.some(x => x.id !== U.me && x.humor < 25)) add('Alguém da tripulação precisa dormir: mande descansar nos Dormitórios.', '😴', { st: 'dormitorio' }, 1);
   if (r.lixo > 15) add('Muito lixo a bordo: use o Compactador.', '🗑', { st: 'lixo' }, 1);
@@ -142,8 +145,8 @@ const PC_QA = [
   { id: 'now', q: 'O que faço agora?', a: () => { const tp = pcTips()[0], n = assistNext(); const out = []; if (tp) out.push(tp.t); if (n) { out.push((tp ? 'Depois: ' : '') + '@' + n.t); if (n.how) out.push(n.how); } if (!out.length) out.push('Tudo em ordem. Explore ou acelere o tempo (Shift+S).'); return { a: out, go: tp && tp.go ? tp.go : n && n.go, act: !tp && n && n.act }; } },
   { id: 'rocket', sc: ['earth'], q: 'Onde fica o foguete?', a: () => ({ a: ['No fim da rua, à direita. Siga a seta amarela ou use "Pular para o foguete".'], go: { earth: rocketX() } }) },
   { id: 'city', sc: ['earth'], q: 'Por que explorar a cidade?', a: () => ({ a: ['Os prédios mostram por que a Terra ficou inabitável e o que a missão precisa resolver. É opcional, mas ajuda a entender a história.'] }) },
-  { id: 'food', sc: ['ship'], q: 'Como consigo comida?', a: () => ({ a: ['A ração fica na Cozinha: lá você define o cardápio. A Estufa produz comida fresca (plante, regue e colha), que traz vitaminas.'], go: { st: 'cozinha' } }) },
-  { id: 'sleep', sc: ['ship'], q: 'Como recupero o humor e o sono?', a: () => ({ a: ['Durma nos Dormitórios (+25). O humor cai sem dormir e com lixo acumulado; refeições na mesa completa ajudam.'], go: { st: 'dormitorio' } }) },
+  { id: 'food', sc: ['ship'], q: 'Como consigo comida?', a: () => ({ a: ['A tripulação come sozinha 3 vezes por dia o que estiver no cardápio da Cozinha. Se você estiver com fome, use "Comer agora" na Cozinha. A Estufa produz comida fresca (plante, regue e colha), que traz vitaminas; na Ponte-Alfa dá para trocar dados por ração.'], go: { st: 'cozinha' } }) },
+  { id: 'sleep', sc: ['ship'], q: 'Como recupero o humor e o sono?', a: () => ({ a: ['Durma nos Dormitórios (+50). O humor cai sem dormir e com lixo acumulado; refeições na mesa completa ajudam.'], go: { st: 'dormitorio' } }) },
   { id: 'o2', sc: ['ship'], q: 'E se o oxigênio acabar?', a: () => ({ a: ['O Suporte à vida gera O₂ a partir da água, usando energia. Mantenha água e energia; em emergência, a nave usa cilindros de O₂.'], go: { st: 'suporte' } }) },
   { id: 'rot', sc: ['ship'], q: 'O que é a rotina?', a: () => ({ a: ['Todo dia há tarefas pequenas de manutenção (lista no canto). Cada uma melhora um sistema; completar o dia anima a tripulação e dá pontos. Quando chega um desafio, a rotina pausa.'] }) },
   { id: 'ev', sc: ['ship'], q: 'Como funcionam os desafios?', a: () => ({ a: ['Quando o alarme tocar, siga a seta amarela até a estação indicada e cumpra os passos numerados. Chame a pessoa da função certa para ajudar.'] }) },

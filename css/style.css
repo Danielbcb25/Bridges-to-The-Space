@@ -535,3 +535,13 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .meal > span { min-width: 4.5em; color: var(--cyan); }
 .mchips { display: flex; flex-wrap: wrap; gap: 0.25em; align-items: center; }
 .mchips .chip small { color: var(--muted); }
+.foodstat { border: 2px solid #3fbf6a; padding: 0.3em 0.5em; margin: 0.3em 0; background: rgba(8, 14, 44, 0.8); }
+.foodstat.warn { border-color: #ffb15c; } .foodstat.bad { border-color: #ff4a5a; }
+/* mensagem final */
+.impact { margin: 0.8em 0 1em; padding: 1em 0.8em; border-top: 2px solid #2a3a7a; border-bottom: 2px solid #2a3a7a; background: rgba(0, 0, 0, 0.45); text-align: center; }
+.impact p { margin: 0.35em 0; opacity: 0; animation: impactIn 1.2s ease forwards; }
+.impact p.big { font-size: 1.35em; }
+.impact p.huge { font-family: var(--sk); font-size: 2.1em; letter-spacing: 0.04em; text-shadow: 3px 3px 0 #000; }
+.impact p.red { color: var(--red); } .impact p.cyan { color: var(--cyan); }
+@keyframes impactIn { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: none; } }
+.portions .opt span.big { color: var(--yellow); font-size: 1em; display: block; }
