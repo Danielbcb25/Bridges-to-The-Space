@@ -28,6 +28,11 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - **Salvar progresso**: salvamento automático (a cada 15 s e ao trocar de cena) e “Salvar progresso” no menu de pausa; **Continuar** na tela de título.
 - **Tempo acelerado**: Shift+S alterna 2x → 5x → 10x → normal até o próximo evento.
 
+## Jogos salvos e recomeçar
+
+- Cada jornada é salva automaticamente (a cada 15 s, ao trocar de cena e ao fechar a aba). Começar uma nova **não apaga** as anteriores: abra qualquer uma em **📂 Jogos salvos** (tela inicial ou sala do multiplayer). "Salvar progresso" no menu de pausa cria um salvamento extra.
+- Se a missão falhar (solo ou multiplayer), o botão **↺ Recomeçar da missão** volta ao início da etapa ou do desafio em que tudo deu errado, com os recursos daquele momento. No multiplayer, o Comandante recomeça e todos voltam juntos.
+
 ## O que tem
 
 - Narração da introdução, caminhada pela Terra poluída e comunicados.

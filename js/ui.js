@@ -91,7 +91,8 @@ function titleScreen() {
     <div class="logo"><h1>PONTES<span>01</span></h1><div class="sub">— EXPLORAÇÃO ESPACIAL —</div></div>
     <div class="menu">
       ${(() => { const sv = GameSave.summary(); return sv ? `<button class="mbtn primary" data-ui="continueGame">▶ ${esc(L('CONTINUAR'))} <small>${esc(sv.scene)} · ${esc(L('dia'))} ${sv.day}</small></button>` : ''; })()}
-      <button class="mbtn ${GameSave.read() ? '' : 'primary'}" data-ui="journey">▶ NOVA JORNADA</button>
+      <button class="mbtn ${GameSave.summary() ? '' : 'primary'}" data-ui="journey">▶ NOVA JORNADA</button>
+      ${GameSave.list().length ? `<button class="mbtn" data-ui="saves">📂 ${esc(L(K('JOGOS SALVOS', 'SAVED GAMES', 'PARTIDAS GUARDADAS')))} <small>${GameSave.list().length}</small></button>` : ''}
       <button class="mbtn" data-ui="lobby">👥 MULTIPLAYER</button>
       <button class="mbtn" data-ui="avatar">🧑‍🚀 CRIAR AVATAR</button>
       <button class="mbtn" data-ui="shop">✦ LOJA <small>${cr} créditos</small></button>
@@ -216,7 +217,7 @@ function lobbyScreen() {
         <button class="card" data-ui="startGame" data-arg="completa"><h3>🚀 Jornada Completa</h3></button>
         <button class="card" data-ui="startGame" data-arg="curta"><h3>⚡ Jornada Curta</h3></button>
       </div>
-      <div class="row"><button class="btn" data-ui="netLeave">◀ Fechar sala</button></div>
+      <div class="row"><button class="btn" data-ui="netLeave">◀ Fechar sala</button>${GameSave.list().length ? `<button class="btn" data-ui="saves">📂 ${esc(L(K('Abrir jogo salvo', 'Open saved game', 'Abrir partida guardada')))}</button>` : ''}</div>
     </div>`;
   }
   if (Net.role === 'client') {
@@ -696,6 +697,7 @@ function endScreen() {
   return `<div class="panel center wide scroll end ${e.ok ? 'ok' : 'bad'}">
     <h1>${e.ok ? (e.colony ? esc(L('PONTES-01b: A COLÔNIA ESTÁ DE PÉ')) : 'CHEGAMOS A PONTES-01b') : 'MISSÃO FRACASSADA'}</h1>
     <p class="big">${e.ok ? (e.colony ? esc(L(K('Em ' + e.site + ', a base cresceu, a Terra recebeu os dados e três naves trouxeram os primeiros colonos. A humanidade tem um novo começo — que custou caro.', 'At ' + e.site + ' the base grew, Earth received the data and three ships brought the first colonists. Humanity has a new beginning — and it came at a high cost.', 'En ' + e.site + ' la base creció, la Tierra recibió los datos y tres naves trajeron a los primeros colonos. La humanidad tiene un nuevo comienzo, que costó caro.'))) : `A expedição pousou no ${esc(e.site)}. A humanidade tem um novo começo — que custou caro.`) : esc(e.reason)}</p>
+    ${retryBlock()}
     ${e.ok && e.colony && S.colony ? `<div class="kv"><span>${esc(L('População final'))}</span><b>${colonyPop()}</b><span>${esc(L('Dias na colônia'))}</span><b>${S.colony.day}</b><span>${esc(L('Construções'))}</span><b>${S.colony.built}</b><span>${esc(L('Pacotes de dados enviados à Terra'))}</span><b>${S.colony.txCount}</b><span>${esc(L('Exoplanetas visitados por engano'))}</span><b>${(S.explore && S.explore.wrong) || 0}</b></div>` : ''}
     <div class="kv"><span>Dias de viagem</span><b>${S.day}</b><span>Tripulantes vivos</span><b>${alive().length} de 7</b><span>Pontos</span><b>${S.points}</b><span>Energia gasta</span><b>${fmt(spent('energia'), 0)} kWh</b><span>Combustível gasto</span><b>${fmt(spent('combustivel'), 0)} kg</b><span>Água consumida</span><b>${fmt(spent('agua'), 0)} L</b><span>Oxigênio respirado</span><b>${fmt(spent('oxigenio'), 0)} kg</b>
       <span>Comida produzida / desperdiçada</span><b>${fmt(fd.produced, 1)} / ${fmt(fd.wasted, 1)} kg</b><span>kWh e litros por kg de comida</span><b>${fd.produced > 0 ? fmt(S.stats.kwhFood / fd.produced, 1) + ' kWh · ' + fmt(S.stats.waterFood / fd.produced, 1) + ' L' : '—'}</b><span>Receitas descobertas</span><b>${fd.recipes.length}/${RECIPES.length}</b><span>Dias de mesa completa</span><b>${fd.mesaDays}</b><span>Humor médio</span><b>${fmt(humorAvg, 0)}</b>
@@ -703,14 +705,14 @@ function endScreen() {
     ${S.dead.length ? `<h4>Perdas</h4><p>${S.dead.map(d => `${esc(d.role)} ${esc(d.name)} (dia ${d.day}, ${esc(d.cause)})`).join('<br>')}</p>` : ''}
     <h4>Desafios</h4><p>${S.stats.events.map(x => `${EVENT_INFO[x.type].icon} ${EVENT_INFO[x.type].title}: <b class="${x.ok ? 'green' : 'red'}">${x.grade}</b>`).join('<br>') || '—'}</p>
     <p class="quote">Na Terra, o solo, a chuva, a atmosfera e os polinizadores fazem tudo isso de graça. Na nave, cada grau, cada litro e cada quilo custam energia, tempo e atenção. <b>É mais fácil manter a Terra habitável do que habitar outro planeta.</b></p>
-    <div class="row"><button class="btn primary" data-ui="journey">Jogar novamente</button><button class="btn" data-ui="shop">✦ Loja (${Save.data.credits})</button><button class="btn" data-ui="quit">Título</button></div></div>`;
+    <div class="row"><button class="btn ${S.fail ? '' : 'primary'}" data-ui="journey">Jogar novamente</button><button class="btn" data-ui="saves">📂 ${esc(L(K('Jogos salvos', 'Saved games', 'Partidas guardadas')))}</button><button class="btn" data-ui="shop">✦ Loja (${Save.data.credits})</button><button class="btn" data-ui="quit">Título</button></div></div>`;
 }
 
 // =============== RENDERIZAÇÃO ===============
 function renderUI() {
   let scr = '', hud = '', side = '', modal = '';
   if (!S || U.screen !== 'game') {
-    const map = { story: storyScreen, title: titleScreen, journey: journeyScreen, history: historyScreen, settings: () => settingsScreen(false), shop: shopScreen, avatar: () => U.avatarDirty ? avatarScreen() : U.cache.scr, lobby: lobbyScreen };
+    const map = { saves: savesScreen, story: storyScreen, title: titleScreen, journey: journeyScreen, history: historyScreen, settings: () => settingsScreen(false), shop: shopScreen, avatar: () => U.avatarDirty ? avatarScreen() : U.cache.scr, lobby: lobbyScreen };
     scr = (map[U.screen] || titleScreen)();
     U.avatarDirty = false;
   } else if (Net.role === 'client' && !['ship', 'station', 'detour', 'planet', 'migration', 'colony', 'end'].includes(S.scene)) {
