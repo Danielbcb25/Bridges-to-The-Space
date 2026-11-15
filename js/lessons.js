@@ -120,6 +120,8 @@ function lessonOf(rec) { return rec && rec.ev ? ALL_LESSONS[rec.ev] : null; }
 {
   const _rep = TASK_DONE.repair; TASK_DONE.repair = (c, d) => { _rep(c, d); if (d && SYS_LESSON[d.sys]) teach(SYS_LESSON[d.sys]); };
   const _hook = routineHook; routineHook = function (type, p, actor) { const r = S && S.routine; const before = r ? r.items.filter(x => x.done).map(x => x.id) : []; _hook(type, p, actor); if (!r) return; const now = r.items.filter(x => x.done && !before.includes(x.id)); if (now[0] && CHORE_LESSON[now[0].id]) teach(CHORE_LESSON[now[0].id]); };
+  const ACTION_LESSON = { eat: 'horta', cook: 'horta', harvest: 'horta', plant: 'horta', careAll: 'horta', sleep: 'doenca', rest: 'doenca', treat: 'doenca', replaceMeds: 'doenca', processTrash: 'lixo', ejectTrash: 'lixo', research: 'webb', cruise: 'phases', trade: 'iss', analyzeExo: 'webb', cEat: 'horta', cSleep: 'sol' };
+  const _apply = applyAction; applyAction = function (type, p, actorId) { _apply(type, p, actorId); if (ACTION_LESSON[type] && S && (type !== 'research' || (p && p.on))) teach(ACTION_LESSON[type]); };
   const _fund = ACTIONS.fund; ACTIONS.fund = (p, a) => { _fund(p, a); teach('margins'); };
   const _st = enterStation; enterStation = function () { _st(); teach('iss', true); };
   const _pl = enterPlanet; enterPlanet = function () { _pl(); teach('marsAtm', true); };
@@ -167,7 +169,11 @@ function lessonCard() {
   if (!S || !S.lessonLast || !['ship', 'colony', 'station', 'planet', 'migration', 'detour'].includes(S.scene) || (S.event && S.event.phase !== 'result')) return '';
   const rec = S.lessonLast; const ls = lessonOf(rec); if (!ls || !ls.fact) return '';
   if (Date.now() - rec.at > 45000 || U.lessonHide === rec.at) return '';
-  if (U.lessonMarked !== rec.at) { U.lessonMarked = rec.at; learnMark(ls.quiz.l); } // vale bônus no Quiz
+  if (U.lessonMarked !== rec.at) { // primeira vez na tela: marca o tema para o Quiz e o computador fala
+    U.lessonMarked = rec.at; learnMark(ls.quiz.l);
+    const pre = K('Você sabia? ', 'Did you know? ', '¿Sabías que…? '), post = K(' Isso pode cair no Quiz.', ' This may come up in the Quiz.', ' Esto puede salir en el Quiz.');
+    if (typeof Narrator !== 'undefined') Narrator.say(L(pre) + L(ls.fact) + L(post));
+  }
   return `<div class="lesson-card"><button class="x" data-ui="lessonClose">✕</button><b>💻 ${esc(L('Você sabia?'))}</b><p>${esc(L(ls.fact))}</p><small class="muted">${esc(L('Tema aprendido: vale bônus no Quiz da tela inicial.'))}</small></div>`;
 }
 UIH.lessonClose = () => { if (S && S.lessonLast) U.lessonHide = S.lessonLast.at; };
