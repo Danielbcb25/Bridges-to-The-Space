@@ -558,3 +558,19 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .nasa-card b { color: #7ab8ff; font-family: var(--sk); } .nasa-card p { margin: 0.3em 0; } .nasa-card small { color: var(--muted); } .nasa-card .x { position: absolute; right: 0.3em; top: 0.1em; }
 .nasa-report { margin: 0.8em 0; border: 2px solid #3d7dff; padding: 0.5em 0.8em; background: rgba(4, 12, 30, 0.7); }
 .nasa-report h4 { color: #7ab8ff; margin: 0 0 0.3em; } .nasa-report .nf { border-left: 3px solid #3d7dff; padding: 0.15em 0.5em; margin: 0.35em 0; } .nasa-report .nf p { margin: 0; } .nasa-report small { color: var(--muted); }
+
+/* ---------- introdução da colônia e painéis em telas pequenas (celular) ---------- */
+.introhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.6em; }
+.introhead h2 { margin: 0.1em 0; }
+.objgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.2em 0.5em; margin: 0.3em 0; }
+.objgrid .alert { margin: 0; }
+.stickyfoot { position: sticky; bottom: 0; background: var(--panel); padding: 0.3em 0; margin-top: 0.3em; }
+@media (pointer: coarse) and (max-height: 520px) {
+  #ui-layer { font-size: 11px; }
+  #game .panel { padding: 0.4em 0.7em; }
+  #game .panel.center, #game .panel.station { max-height: 96%; }
+  #game .panel h2 { font-size: 0.85em; margin: 0.1em 0 0.3em; }
+  #game .panel p { margin: 0.2em 0; }
+  .objgrid { grid-template-columns: 1fr 1fr; }
+  #game .btn.big { font-size: 1.1em; padding: 0.25em 0.9em; }
+}

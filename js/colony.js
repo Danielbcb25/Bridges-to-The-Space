@@ -567,11 +567,11 @@ function colonyPanel(id) {
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>${B.icon} ${esc(L(B.name))}</h2>${body}<p class="quote small">🛰 ${esc(L(B.fact))}</p></div></div>`;
 }
 function colonyIntro() {
-  return `<div class="modal-bg"><div class="panel center wide scroll" data-stop="1"><div class="blink cyan">● ${esc(L('PONTES-01b · SUPERFÍCIE'))}</div><h2>${esc(L('A MISSÃO CONTINUA'))}</h2>
+  return `<div class="modal-bg"><div class="panel center wide scroll" data-stop="1"><div class="introhead"><div><div class="blink cyan">● ${esc(L('PONTES-01b · SUPERFÍCIE'))}</div><h2>${esc(L('A MISSÃO CONTINUA'))}</h2></div><button class="btn primary big" data-act="cTut">${esc(L('Começar a construir ▶'))}</button></div>
     <p class="big">${esc(L(K('Pousamos em ' + S.colony.site + '! Mas uma colônia não se faz sozinha.', 'We landed at ' + T(S.colony.site) + '! But a colony does not build itself.', '¡Aterrizamos en ' + T(S.colony.site) + '! Pero una colonia no se construye sola.')))}</p>
-    ${colonyObjectives().map(o => `<div class="alert info">▫ ${esc(L(o.t))}</div>`).join('')}
+    <div class="objgrid">${colonyObjectives().map(o => `<div class="alert info">▫ ${esc(L(o.t))}</div>`).join('')}</div>
     <p class="small">${esc(L('Ande com ← → (A/D) e use E nas construções. Você pode trabalhar sozinho ou chamar a equipe (bots/jogadores). Fique perto do local enquanto trabalha. Nenhuma construção funciona sem energia: comece pelo campo solar. Se faltar comida ou água por 3 dias, a colônia falha.'))}</p>
-    <div class="row"><button class="btn primary big" data-act="cTut">${esc(L('Começar a construir ▶'))}</button></div></div></div>`;
+    <div class="row stickyfoot"><button class="btn primary big" data-act="cTut">${esc(L('Começar a construir ▶'))}</button></div></div></div>`;
 }
 
 // ---------- desvio de rota: planeta errado ----------
