@@ -61,7 +61,7 @@ const Net = {
       conn.on('data', d => {
         let m; try { m = typeof d === 'string' ? JSON.parse(d) : d; } catch (e) { return; }
         if (!m || typeof m !== 'object') return;
-        if (m.t === 'join' && Object.keys(this.players).length >= 6) { try { conn.send(JSON.stringify({ t: 'error', msg: T('Sala cheia.') })); } catch (e) { /* */ } return; }
+        if (m.t === 'join' && Object.keys(this.players).length >= 24) { try { conn.send(JSON.stringify({ t: 'error', msg: T('Sala cheia.') })); } catch (e) { /* */ } return; }
         m.pid = pid; this.onMsg(m);
       });
       const bye = () => { if (!this.conns[pid]) return; delete this.conns[pid]; this.onMsg({ t: 'leave', pid }); };
@@ -96,7 +96,7 @@ const Net = {
   join(url, code) {
     if (!code) return this.err(T('Digite o código da sala.'));
     const av = Object.assign({}, DEFAULT_AVATAR, Save.data.avatar || {});
-    const hello = { t: 'join', code, name: av.name || 'Tripulante', avatar: av };
+    const hello = { t: 'join', code, name: av.name || 'Tripulante', avatar: av, ship: (U.lobby && U.lobby.ship) || 1 };
     if (url) this.connectWS(url, () => this.send(hello)); else this.joinP2P(code, hello);
   },
   leave(silent) {
@@ -116,6 +116,8 @@ const Net = {
       // ---- host ----
       case 'join': {
         if (this.role !== 'host') return;
+        const ship = Math.max(1, Math.min(4, +m.ship || 1));
+        if (ship > 1) return this.joinArca(m, ship); // Arca-2/3/4: entra como colono da nave escolhida
         const taken = Object.values(this.players).map(p => p.role);
         const free = ROLES.find(r => !taken.includes(r.id));
         if (!free) { this.send({ t: 'to', pid: m.pid, msg: { t: 'error', msg: 'Sala cheia (6 tripulantes).' } }); return; }
@@ -132,7 +134,7 @@ const Net = {
         const p = this.players[m.pid]; if (!p) return;
         delete this.players[m.pid];
         Chat.sysAll(K(`${p.name} saiu da sala.`, `${p.name} left the room.`, `${p.name} salió de la sala.`), 'join');
-        if (S) { const c = crewById(p.role); if (c) { c.owner = null; c.task = null; } toast(`${p.name} saiu. Um bot assumiu.`); }
+        if (S) { const c = p.role ? crewById(p.role) : null; if (c) { c.owner = null; c.task = null; c.ctask = null; } toast(`${p.name} saiu. Um bot assumiu.`); }
         break;
       }
       case 'pos': {
@@ -152,7 +154,7 @@ const Net = {
       }
       case 'chat': if (this.role === 'host') Chat.fromPlayer(m.pid, m.text); else if (this.role === 'client') Chat.fromNet(m.m); break;
       // ---- cliente ----
-      case 'welcome': U.lobby = Object.assign({}, U.lobby, { err: '', busy: false }); this.role = 'client'; this.room = m.code; U.me = m.crew; this.myRoleName = m.roleName; U.screen = 'lobby'; break;
+      case 'welcome': U.lobby = Object.assign({}, U.lobby, { err: '', busy: false }); this.role = 'client'; this.room = m.code; U.me = m.crew; this.myRoleName = m.roleName; this.pendingShip = m.pendingShip || null; if (!S) U.screen = 'lobby'; break;
       case 'state': {
         if (this.role !== 'client') return;
         const keep = S && crewById(U.me);
@@ -167,6 +169,27 @@ const Net = {
       case 'closed': { const was = this.role; this.leave(true); if (was === 'client') { S = null; U.screen = 'lobby'; this.err(T('O Comandante fechou a sala.')); } break; }
     }
   },
+  // ---- Arcas: jogadores de outro grupo entram escolhendo a nave (Arca-2, 3 ou 4) ----
+  joinArca(m, ship) {
+    const nm = String(m.name || 'Colono').slice(0, 14);
+    this.players[m.pid] = { name: nm, role: null, ship, avatar: m.avatar, pid: m.pid };
+    const shipName = 'Arca-' + ship;
+    Chat.sysAll(K(`${nm} entrou pela ${shipName}.`, `${nm} joined through ${shipName}.`, `${nm} entró por la ${shipName}.`), 'join');
+    if (!this.claim(m.pid)) this.send({ t: 'to', pid: m.pid, msg: { t: 'welcome', crew: null, roleName: shipName, code: this.room, pendingShip: ship } });
+  },
+  claim(pid) {
+    const p = this.players[pid]; if (!p || p.role || !S || !S.colony || !S.colony.people) return false;
+    const person = S.colony.people.find(x => x.ship === p.ship && !x.owner && x.alive);
+    if (!person) return false;
+    person.owner = pid; person.name = p.name; person.csleep = null; person.goal = null;
+    person.avatar = Object.assign({}, DEFAULT_AVATAR, p.avatar || {}, { name: p.name });
+    p.role = person.id; person.spawnT = 0;
+    this.send({ t: 'to', pid: p.pid != null ? p.pid : pid, msg: { t: 'welcome', crew: person.id, roleName: person.roleName, code: this.room } }); // pid original (número no servidor próprio)
+    Chat.sysAll(K(`${p.name} desceu da Arca-${p.ship}!`, `${p.name} came down from Arca-${p.ship}!`, `¡${p.name} bajó de la Arca-${p.ship}!`), 'join');
+    S.v++;
+    return true;
+  },
+  claimPending(n) { for (const pid in this.players) { const p = this.players[pid]; if (p.ship === n && !p.role) this.claim(pid); } },
   assignSeats() {
     if (!S) return;
     for (const pid in this.players) {

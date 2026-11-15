@@ -148,6 +148,7 @@ function frame(now) {
 const shiftOn = () => keys.ShiftLeft || keys.ShiftRight;
 // Esc: fecha o que estiver aberto, desmarca seleções e volta
 function escAll() {
+  if (S && U.screen === 'game' && S.scene === 'colony' && me() && me().csleep) { act('cWake'); return true; } // dormindo: Esc acorda
   if (U.help) { U.help = false; return true; }
   if (Chat.open) { Chat.toggle(false); return true; }
   if (U.screen === 'story') { UIH.storySkip(); return true; }
@@ -166,6 +167,7 @@ function spaceAction() {
   if (!S) return;
   if (S.scene === 'earth') { const E = U.earth; if (U.comms) return; if (E.dialog || cityNear()) return cityInteract(); if (!cityBusy()) jumpStart(E.p, 'earth'); return; }
   const c = me(); if (!c || !c.alive || U.panel) return;
+  if (S.scene === 'colony' && c.csleep) return act('cWake');
   if (S.scene === 'colony') { if (S.colony.tut === 0 || nearBuilding(c)) return interact(); jumpStart(c, 'colony'); return; }
   if (S.scene === 'ship') {
     const trash = S.event && S.event.type === 'lixo' && S.event.phase === 'run' && S.trash.some(t => t.deck === c.deck && Math.abs(t.x - c.x) < 16);
@@ -195,6 +197,7 @@ window.addEventListener('keydown', e => {
     return;
   }
   if (S.scene === 'colony') {
+    if ((e.code === 'KeyE' || e.code === 'Space') && me() && me().csleep) { act('cWake'); return; }
     if (e.code === 'Space') { if (U.panel && U.panel.startsWith('c:')) UIH.closePanel(); else spaceAction(); }
     if (e.code === 'KeyE') { if (U.panel && U.panel.startsWith('c:')) UIH.closePanel(); else interact(); }
     if (e.code === 'KeyT') { U.panel === 'crew' ? UIH.closePanel() : UIH.panel('crew'); }

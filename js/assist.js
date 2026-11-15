@@ -93,6 +93,9 @@ function assistSteps() {
       break;
     case 'colony':
       if (S.colony.tut === 0) add('Leia a missão e comece a construir.', false, null, '📜', 'cTut');
+      { const m = me();
+        if (m && m.alive && m.saciedade < 35) add(K('Você está com fome: coma no refeitório (nave, habitat ou estufa).', 'You are hungry: eat at the mess (ship, habitat or greenhouse).', 'Tiene hambre: coma en el comedor (nave, hábitat o invernadero).'), false, { b: 'habitat' }, '🍴');
+        if (m && m.alive && m.humor < 35) add(K('Você está cansado: durma em um quarto do habitat.', 'You are tired: sleep in a habitat bedroom.', 'Está cansado: duerma en una habitación del hábitat.'), false, { b: 'habitat' }, '😴'); }
       colonyObjectives().forEach(o => add(o.t, o.done, { b: { solar: 'solar', agua: 'agua', estufa: 'estufa', torre: 'torre', tx: 'torre', pista: 'pista', naves: 'pista' }[o.id] }, o.done ? '✔' : '🏗'));
       break;
   }

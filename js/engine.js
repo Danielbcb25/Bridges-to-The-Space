@@ -218,7 +218,7 @@ function addRes(k, v, reason) {
   return real;
 }
 const alive = () => S.crew.filter(c => c.alive);
-const crewById = id => S.crew.find(c => c.id === id);
+const crewById = id => S.crew.find(c => c.id === id) || (S.colony && S.colony.people ? S.colony.people.find(c => c.id === id) : undefined); // inclui colonos (Arcas)
 const byRole = role => S.crew.filter(c => c.role === role || (role === 'engenheiro' && (c.role === 'engenheiro1' || c.role === 'engenheiro2')));
 function available(c) { return c && c.alive && !c.hibernating && c.status !== 'incapacitado' && !c.task && !(c.status === 'ferido' && c.statusT > 0); }
 function roleAvailable(role) { return byRole(role).find(available); }
@@ -494,8 +494,8 @@ function simulate(dt) {
     if (S.food.racionamento === 'minimo') decay += 5;
     if (c.sickness) decay += 4;
     c.humor = clamp(c.humor - decay * f, 0, 100);
-    // a fome desce na metade do ritmo do sono (humor acordado)
-    c.saciedade = clamp(c.saciedade - 0.5 * (Math.max(0, decay) + 4) * f, 0, 100);
+    // a fome desce 2x mais rápido que o sono (humor acordado)
+    c.saciedade = clamp(c.saciedade - 2 * (Math.max(0, decay) + 4) * f, 0, 100);
     // o humor também é o sono: acordado ele cai um pouco mais; dormir (Dormitórios) recupera
     if (!(c.task && c.task.key === 'sleep')) c.humor = clamp(c.humor - 4 * f, 0, 100);
     else c.humor = clamp(c.humor + 60 * f, 0, 100); // dormindo: recupera aos poucos, além do bônus ao acordar

@@ -8,7 +8,7 @@
 const COLONY_W = 1900, CGROUND = 226;
 
 const CBUILD = {
-  nave: { x: 150, icon: '🚀', name: 'Nave pousada · Controle da Colônia',
+  nave: { x: 150, icon: '🚀', name: 'Arca-1 · Controle da Colônia',
     fact: 'O pouso em Marte da Perseverance (2021) usou o “guindaste aéreo” e levou cerca de 7 minutos da atmosfera ao solo, sem nenhum controle ao vivo: o sinal demora minutos para chegar da Terra.' },
   lab: { x: 360, icon: '🔬', name: 'Laboratório de campo e oficina',
     fact: 'O instrumento MOXIE, a bordo do rover Perseverance, produziu oxigênio a partir do CO₂ da atmosfera de Marte: 122 gramas no total, o suficiente para um cachorro pequeno respirar por cerca de 10 horas (NASA). É o princípio do uso de recursos locais (ISRU).' },
@@ -25,7 +25,7 @@ const CBUILD = {
   habitat: { x: 1720, icon: '🏠', name: 'Habitat e domos',
     fact: 'Na simulação CHAPEA da NASA, quatro voluntários viveram 378 dias em um habitat impresso em 3D (“Mars Dune Alpha”, 2023–2024) para estudar o isolamento, a comida e o trabalho em equipe.' },
 };
-const CSHORT = { nave: 'Nave', lab: 'Laboratório', solar: 'Campo solar', agua: 'Água', estufa: 'Estufa', torre: 'Torre', pista: 'Pista', habitat: 'Habitat' };
+const CSHORT = { nave: 'Arca-1', lab: 'Laboratório', solar: 'Campo solar', agua: 'Água', estufa: 'Estufa', torre: 'Torre', pista: 'Pista', habitat: 'Habitat' };
 const CORDER = ['nave', 'lab', 'solar', 'agua', 'estufa', 'torre', 'pista', 'habitat'];
 // custos por nível (kwh, água L, peças, sementes kg, duração s)
 const CCOST = {
@@ -67,7 +67,7 @@ function startColony(site, score) {
     t: 0, day: 1, dayT: 0, dayLen: 40, site: site.name, score,
     b: { solar: 0, agua: 0, estufa: 0, torre: 0, pista: 0, habitat: 0 },
     colonists: 0, tx: {}, txCount: 0, ships: [], shipsLanded: 0, short: { comida: 0, agua: 0 },
-    tut: 0, done: false, finishT: 0, feed: [], storm: 0, factN: 0, nextFact: 70, built: 0,
+    tut: 0, done: false, finishT: 0, feed: [], storm: 0, factN: 0, nextFact: 70, built: 0, people: [], pid: 0,
   };
   S.crew.forEach((c, i) => { c.x = 110 + i * 22; c.deck = 'L'; c.tx = c.x; c.tdeck = 'L'; c.moving = false; c.ctask = null; c.task = null; c.climb = 0; c.eva = false; c.hibernating = false; c.bubble = null; });
   narrate(K('Pouso realizado em ' + site.name + '. Bem-vindos a Pontes-01b! A viagem acabou, mas a missão está só começando: construam a base, falem com a Terra e recebam as naves de tripulação.',
@@ -229,7 +229,7 @@ function landShip(sh) {
     S.fast = 0; sh.state = 'abort'; C.ships = C.ships.filter(x => x !== sh);
     return colonyMsg(K('Pouso abortado! A ' + sh.name + ' voltou à órbita por falta de guiagem' + (C.storm > 0 ? ' e por causa da tempestade de poeira' : '') + '. Acenda o farol e melhore a pista, depois chame de novo.', 'Landing aborted! Ship ' + sh.name + ' went back to orbit for lack of guidance' + (C.storm > 0 ? ' and because of the dust storm' : '') + '. Light the beacon and improve the pad, then call again.', '¡Aterrizaje abortado! La nave ' + sh.name + ' volvió a órbita por falta de guía' + (C.storm > 0 ? ' y por la tormenta de polvo' : '') + '. Encienda la baliza y mejore la pista, luego llame de nuevo.'), 'bad');
   }
-  S.fast = 0; sh.state = 'landed'; C.shipsLanded++; C.colonists += sh.size;
+  S.fast = 0; sh.state = 'landed'; C.shipsLanded++; C.colonists += sh.size; arcaLanded(sh);
   addRes('energia', def.sup.kwh, 'Suprimentos da nave'); addRes('agua', def.sup.agua, 'Suprimentos da nave'); addRes('comida', def.sup.comida, 'Suprimentos da nave');
   moral(6); addPoints(60, 'Nave de tripulação recebida');
   colonyMsg(K(sh.name + ' pousou! +' + sh.size + ' colonos chegaram a Pontes-01b trazendo suprimentos. População: ' + colonyPop() + '.', sh.name + ' landed! +' + sh.size + ' colonists arrived on Pontes-01b with supplies. Population: ' + colonyPop() + '.', sh.name + ' aterrizó! +' + sh.size + ' colonos llegaron a Pontes-01b con suministros. Población: ' + colonyPop() + '.'), 'good');
@@ -274,9 +274,11 @@ function tickColony(dt) {
   C.t += dt; C.dayT += dt; if (C.txFx > 0) C.txFx -= dt;
   if (C.dayT >= C.dayLen) { C.dayT -= C.dayLen; colonyNewDay(); if (S.fail) return; }
   if (S.toast) { S.toast.t -= dt; if (S.toast.t <= 0) S.toast = null; }
-  // tripulação
-  for (const c of S.crew) {
-    if (!c.alive) continue;
+  // fome, sono, colonos (bots) e jogadores que entraram por outra nave
+  arcaTick(dt);
+  // tripulação e colonos
+  for (const c of colonyAll()) {
+    if (!c.alive || c.csleep || c.spawnT > 0) continue;
     if (c.bubble) { c.bubble.t -= dt; if (c.bubble.t <= 0) c.bubble = null; }
     if (c.statusT > 0) { c.statusT -= dt; if (c.statusT <= 0) { c.status = 'ok'; c.statusT = 0; } }
     const human = c.owner && c.owner !== 'bot';
@@ -291,7 +293,7 @@ function tickColony(dt) {
         t.wait = (t.wait || 0) + dt;
         if (t.wait > CALL_TIMEOUT) { c.ctask = null; const bot = S.crew.find(b => b.alive && !b.ctask && !isHumanCrew(b) && b.id !== 'cmd' && b.status !== 'incapacitado' && roleMatch(b, t.role)) || S.crew.find(b => b.alive && !b.ctask && !isHumanCrew(b) && b.id !== 'cmd' && b.status !== 'incapacitado'); if (bot) { bot.ctask = Object.assign({}, t, { called: false, t: 0 }); toast(K(`${c.name} não atendeu; ${bot.name} assumiu.`, `${c.name} didn't answer; ${bot.name} took over.`, `${c.name} no respondió; ${bot.name} tomó el relevo.`), 'warn'); } S.v++; }
       }
-    } else if (!human) {
+    } else if (!human && !c.goal && !(c.eatT > 0)) {
       c.idleT -= dt;
       if (c.idleT <= 0) { c.idleT = 4 + Math.random() * 8; c.wx = 90 + Math.random() * (COLONY_W - 180); if (Math.random() < 0.5) c.wx = CBUILD[pick(CORDER)].x + (Math.random() * 60 - 30); }
       if (c.wx != null) { if (moveToward(c, c.wx, dt, 38)) c.wx = null; } else c.moving = false;
@@ -323,6 +325,7 @@ function finishColony() {
 // ---------- movimento do jogador local ----------
 function moveColonyHuman(c, dt) {
   if (!c || !c.alive) return;
+  if (c.csleep) { c.moving = false; if (keys.ArrowLeft || keys.ArrowRight || keys.KeyA || keys.KeyD) act('cWake'); return; } // dormindo no quarto: qualquer seta acorda
   const L_ = keys.ArrowLeft || keys.KeyA, R_ = keys.ArrowRight || keys.KeyD;
   if (L_ || R_) U.clickTarget = null;
   let dx = (R_ ? 1 : 0) - (L_ ? 1 : 0);
@@ -387,13 +390,15 @@ function drawColony(dt) {
   }
   // tripulantes
   for (const c of S.crew) if (!c.alive) { const x = Math.round(c.x - cam); if (x > -40 && x < VW + 40) drawCorpse(c, x, CGROUND + 14); }
-  const order = S.crew.filter(c => c.alive).sort((a, b) => a.x - b.x);
+  drawSleepers(cam); drawPeople(cam);
+  const order = S.crew.filter(c => c.alive && !c.csleep).sort((a, b) => a.x - b.x);
   for (const c of order) {
     const x = Math.round(c.x - cam); if (x < -30 || x > VW + 30) continue;
     drawChar(c.avatar, 'suit', x, CGROUND + 14 - (c.jy || 0), c.face, c.moving ? Math.floor(c.walkT * 8) : 0, c.humor < 35 ? 'sad' : 'happy');
     const mine = c.id === U.me;
     text(c.name, x, CGROUND + 14 - SPR_H - 10, mine ? '#ffd34c' : (c.owner && c.owner !== 'bot' ? '#7dffb0' : '#bcd3ff'), 7, 'center');
     if (c.ctask) { const B = CBUILD[c.ctask.bid]; const pr = clamp(c.ctask.t / c.ctask.dur, 0, 1); cx.fillStyle = '#000'; cx.fillRect(x - 12, CGROUND + 14 - SPR_H - 3, 24, 4); cx.fillStyle = Math.abs(c.x - B.x) < 70 ? '#46e08a' : '#ffd23f'; cx.fillRect(x - 11, CGROUND + 14 - SPR_H - 2, Math.round(22 * pr), 2); }
+    if (c.eatT > 0) drawEatIcon(x + 9, CGROUND + 14 - 12);
     if (c.bubble) bubble(c.bubble.text, x, CGROUND + 14 - SPR_H - 12);
   }
   // noite
@@ -401,7 +406,7 @@ function drawColony(dt) {
   if (C.storm > 0) { cx.fillStyle = 'rgba(190,140,80,0.22)'; cx.fillRect(0, 0, VW, VH); cx.fillStyle = 'rgba(220,170,110,0.5)'; for (let i = 0; i < 30; i++) cx.fillRect(((i * 53 + R.t * 220) % (VW + 40)) - 20, (i * 37) % VH, 12, 1); }
   // prompt de proximidade
   const nb = m ? nearBuilding(m) : null;
-  if (nb && !U.panel && C.tut) text('[E] ' + T(L(CSHORT[nb])), VW / 2, 64, '#fff', 8, 'center');
+  if (nb && !U.panel && C.tut && !(m && m.csleep)) text('[E] ' + T(L(CSHORT[nb])), VW / 2, 64, '#fff', 8, 'center');
 }
 function drawShipExteriorRaw(x, y, flame) { drawShipExterior(x, y, 1, flame); }
 function drawBuilding(id, bx, cam) {
@@ -485,6 +490,7 @@ function colonyHud() {
   });
   items.push(`<div class="rb" title="${esc(L('Peças'))}"><span class="ic">⚙</span><span class="v">${S.peças}<small>${esc(L('peças'))}</small></span></div>`);
   items.push(`<div class="rb" title="${esc(L('População'))}"><span class="ic">👥</span><span class="v">${colonyPop()}<small>${esc(L('pessoas'))}</small></span></div>`);
+  if (me()) items.push(needBars(me()));
   items.push(`<div class="rb" title="Moral"><span class="ic">☺</span>${bar(moralIndex(), 100)}<span class="v">${fmt(moralIndex(), 0)}<small>pts</small></span></div>`);
   const f = C.dayT / C.dayLen, hh = Math.floor(f * 24), mm = Math.floor((f * 24 * 60) % 60);
   const obj = colonyObjectives(); const doneN = obj.filter(o => o.done).length;
@@ -555,6 +561,8 @@ function colonyPanel(id) {
   } else if (id === 'habitat') {
     body = buildBlock(id) + `<p>${esc(L('Camas'))}: <b>${C.colonists}/${colonyBeds()}</b> · ${esc(L('Naves previstas'))}: 10 + 15 + 20</p>`;
   } else body = buildBlock(id);
+  if (id === 'nave') body += sec(K('Arcas e colonos', 'Arcas and colonists', 'Arcas y colonos')) + arcaPeopleBlock();
+  body += arcaPanelExtra(id);
   body = ctaskBar(id === 'nave' ? '__' : id) + body;
   return `<div class="modal-bg" data-ui="closePanel"><div class="panel station wide" data-stop="1"><button class="x" data-ui="closePanel">✕</button><h2>${B.icon} ${esc(L(B.name))}</h2>${body}<p class="quote small">🛰 ${esc(L(B.fact))}</p></div></div>`;
 }

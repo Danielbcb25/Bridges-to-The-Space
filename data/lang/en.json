@@ -1879,7 +1879,10 @@
   "ENTUPIDO": "CLOGGED",
   "limpo": "clean",
   "Sequência": "Sequence",
-  "Esse filtro estava bom. Tempo perdido!": "That filter was fine. Time lost!"
+  "Esse filtro estava bom. Tempo perdido!": "That filter was fine. Time lost!",
+  "Arca-1 · Controle da Colônia": "Arca-1 · Colony Control",
+  "Colono": "Colonist",
+  "Colonos": "Colonists"
  },
  "patterns": [
   [

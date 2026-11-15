@@ -83,9 +83,9 @@ server.on('upgrade', (req, sock) => {
     if (m.t === 'join' && !conn.room) {
       const r = rooms.get(String(m.code || '').toUpperCase());
       if (!r) return send({ t: 'error', msg: 'Sala não encontrada.' });
-      if (r.clients.size >= 6) return send({ t: 'error', msg: 'Sala cheia.' });
+      if (r.clients.size >= 24) return send({ t: 'error', msg: 'Sala cheia.' });
       conn.room = String(m.code).toUpperCase(); r.clients.set(conn.pid, conn);
-      wsSend(r.host.sock, JSON.stringify({ t: 'join', pid: conn.pid, name: m.name, avatar: m.avatar })); return;
+      wsSend(r.host.sock, JSON.stringify({ t: 'join', pid: conn.pid, name: m.name, avatar: m.avatar, ship: m.ship })); return;
     }
     const r = conn.room && rooms.get(conn.room); if (!r) return;
     if (conn.isHost) {

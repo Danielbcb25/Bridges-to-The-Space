@@ -33,6 +33,12 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - Cada jornada é salva automaticamente (a cada 15 s, ao trocar de cena e ao fechar a aba). Começar uma nova **não apaga** as anteriores: abra qualquer uma em **📂 Jogos salvos** (tela inicial ou sala do multiplayer). "Salvar progresso" no menu de pausa cria um salvamento extra.
 - Se a missão falhar (solo ou multiplayer), o botão **↺ Recomeçar da missão** volta ao início da etapa ou do desafio em que tudo deu errado, com os recursos daquele momento. No multiplayer, o Comandante recomeça e todos voltam juntos.
 
+## Colônia: dormir, comer e as Arcas
+
+- Na colônia dá para **dormir** nos quartos dos habitats instalados (cada cúpula tem 2 camas; E no habitat → Quartos; E, Espaço, Esc ou uma seta acordam) e **comer** no refeitório (nave, habitat ou estufa). A barra de **fome cai 2x mais rápido** que a de **sono**, na nave e na colônia; os bots também vão comer e dormir sozinhos.
+- Quando uma nave pousa (**Arca-2, 3 ou 4**), os colonos descem como **bots** (cada nave com uma cor). **Arca-1** é a sua nave original.
+- No multiplayer, outro jogador ou outro grupo pode **se ligar à sala** com o mesmo código e **escolher a nave**: Arca-1 (tripulação original) ou Arca-2/3/4 (colonos). Quem escolhe uma nave que ainda não pousou espera e desce quando ela chegar. A sala aceita até 24 jogadores.
+
 ## O que tem
 
 - Narração da introdução, caminhada pela Terra poluída e comunicados.
