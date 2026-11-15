@@ -33,11 +33,16 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - Cada jornada é salva automaticamente (a cada 15 s, ao trocar de cena e ao fechar a aba). Começar uma nova **não apaga** as anteriores: abra qualquer uma em **📂 Jogos salvos** (tela inicial ou sala do multiplayer). "Salvar progresso" no menu de pausa cria um salvamento extra.
 - Se a missão falhar (solo ou multiplayer), o botão **↺ Recomeçar da missão** volta ao início da etapa ou do desafio em que tudo deu errado, com os recursos daquele momento. No multiplayer, o Comandante recomeça e todos voltam juntos.
 
-## Colônia: dormir, comer e as Arcas
+## Colônia: dormir e comer
 
 - Na colônia dá para **dormir** nos quartos dos habitats instalados (cada cúpula tem 2 camas; E no habitat → Quartos; E, Espaço, Esc ou uma seta acordam) e **comer** no refeitório (nave, habitat ou estufa). A barra de **fome cai 2x mais rápido** que a de **sono**, na nave e na colônia; os bots também vão comer e dormir sozinhos.
-- Quando uma nave pousa (**Arca-2, 3 ou 4**), os colonos descem como **bots** (cada nave com uma cor). **Arca-1** é a sua nave original.
-- No multiplayer, outro jogador ou outro grupo pode **se ligar à sala** com o mesmo código e **escolher a nave**: Arca-1 (tripulação original) ou Arca-2/3/4 (colonos). Quem escolhe uma nave que ainda não pousou espera e desce quando ela chegar. A sala aceita até 24 jogadores.
+- Quando um cargueiro de colonos (**Colonial-1, 2, 3**) pousa, os colonos descem como **bots**.
+
+## Multiplayer com várias Arcas (até 28 pessoas)
+
+- Ao criar a sala você escolhe sua **Arca (1 a 4)** e é o **Comandante** dela. Quem entrar com o código escolhendo **outra Arca** e for o **primeiro** nela vira o **Comandante** dessa Arca; os próximos entram na tripulação (6 funções por Arca).
+- Cada Arca faz a **sua própria jornada** (montagem, viagem, desafios, colônia), simulada no navegador do respectivo Comandante; a sala só repassa as mensagens. O **chat é da sala toda** (com o nome da Arca). Total: 4 Arcas × (Comandante + 6) = **28 pessoas**.
+- Se o Comandante de uma Arca sair, a tripulação dela volta ao lobby e a Arca fica livre.
 
 ## O que tem
 

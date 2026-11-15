@@ -66,31 +66,32 @@ const Chat = {
       return;
     }
     this.add(Object.assign({}, m));
-    if (typeof Net !== 'undefined' && Net.role === 'host') Net.send({ t: 'bcast', msg: { t: 'chat', m } });
+    if (typeof Net !== 'undefined' && Net.role === 'host') { if (Net.relay || kind === 'join') Net.send({ t: 'bcast', msg: { t: 'chat', m } }); else Net.sendMembers(Net.shipMembers(), { t: 'chat', m }); } // avisos da nave ficam na nave; entradas/saídas vão para a sala
   },
   // o jogador local digitou algo
   send(text) {
     text = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 200); if (!text) return;
     const now = Date.now(); if (now - this.lastSend < 350) return; this.lastSend = now;
-    if (Net.role === 'client') { Net.send({ t: 'chat', text }); return; }
-    const m = { from: this.myName(), role: this.myRole(), rid: U.me, text };
+    if (Net.role === 'client' || Net.relay) { Net.send({ t: 'chat', text }); return; } // o hub devolve a mensagem para a sala toda
+    const m = { from: this.myName(), role: 'Arca-' + (Net.mySh || 1) + ' · ' + this.myRole(), rid: U.me, arca: Net.mySh || 1, text };
     this.add(Object.assign({ mine: true }, m));
     if (Net.role === 'host') Net.send({ t: 'bcast', msg: { t: 'chat', m } });
     if (typeof S !== 'undefined' && S && U.screen === 'game') this.botReply(text);
   },
   // host recebe texto de um tripulante
   fromPlayer(pid, text) {
-    const p = Net.players[pid]; if (!p) return;
+    const p = Net.players[pid] || Net.roster[pid]; if (!p) return;
     const now = Date.now(); if (now - (p.lastChat || 0) < 350) return; p.lastChat = now;
     text = String(text || '').replace(/\s+/g, ' ').trim().slice(0, 200); if (!text) return;
     const r = ROLES.find(x => x.id === p.role);
-    const m = { from: p.name, role: r ? r.name : '', rid: p.role, text };
+    const ship = p.ship || Net.hubShip;
+    const m = { from: p.name, role: 'Arca-' + ship + ' · ' + (r ? r.name : (p.roleName || '')), rid: p.role || 'cmd', arca: ship, text };
     this.add(Object.assign({}, m));
     Net.send({ t: 'bcast', msg: { t: 'chat', m } });
     if (typeof S !== 'undefined' && S) this.botReply(text, true);
   },
   // cliente recebe
-  fromNet(m) { if (!m || typeof m !== 'object') return; const mine = !m.sys && m.rid === U.me && m.from === this.myName(); this.add(Object.assign({}, m, { mine })); },
+  fromNet(m) { if (!m || typeof m !== 'object') return; const mine = !m.sys && m.rid === U.me && m.from === this.myName() && (m.arca == null || m.arca === (Net.mySh || 1)); this.add(Object.assign({}, m, { mine })); },
 
   // ---------- respostas dos bots (solo) ----------
   botReply(text, onlyMention) {

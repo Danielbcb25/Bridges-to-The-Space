@@ -1,11 +1,9 @@
 // ============================================================
-//  ARCAS, SONO E FOME NA COLÔNIA
+//  SONO, FOME E COLONOS NA COLÔNIA
 //  • Dormir nos quartos dos habitats instalados e comer na colônia.
 //  • Fome (saciedade) cai 2x mais rápido que o sono (humor/sono).
-//  • Quando uma nave (Arca-2, 3 ou 4) pousa, os colonos descem como
-//    bots. No multiplayer, outro grupo (ou outro jogador) entra na
-//    sala com o mesmo código e escolhe a nave: Arca-1 (tripulação
-//    original), Arca-2, Arca-3 ou Arca-4, e assume um dos colonos.
+//  • Quando um cargueiro de colonos (Colonial-1, 2, 3) pousa, as
+//    pessoas descem como bots.
 // ============================================================
 'use strict';
 
@@ -44,7 +42,6 @@ function spawnColonists(sh) {
 }
 function arcaLanded(sh) {
   spawnColonists(sh);
-  if (typeof Net !== 'undefined' && Net.role === 'host') Net.claimPending(sh.n + 1);
 }
 
 // ---------- dormir ----------
@@ -185,8 +182,8 @@ function arcaPanelExtra(id) { // anexado aos painéis nave / habitat / estufa
   return '';
 }
 function arcaPeopleBlock() {
-  const C = S.colony; const by = {}; (C.people || []).forEach(p => { by[p.ship] = by[p.ship] || { n: 0, h: 0 }; by[p.ship].n++; if (p.owner && p.owner !== 'bot') by[p.ship].h++; });
-  const rows = CSHIPS.map(s => { const b = by[s.n + 1]; const st = (C.ships.find(x => x.n === s.n) || {}).state; return `<div class="alert ${b ? 'good' : 'info'}"><span style="color:${ARCA_COLORS[s.n + 1]}">■</span> <b>${s.name}</b> — ${b ? `${b.n} ${esc(L(K('colonos', 'colonists', 'colonos')))}${b.h ? ' · 🎮 ' + b.h : ''}` : st === 'inbound' ? esc(L(K('a caminho…', 'inbound…', 'en camino…'))) : esc(L(K('ainda não pousou', 'not landed yet', 'aún no aterriza')))}</div>`; }).join('');
-  return `<div class="alert good"><b>Arca-1</b> — ${esc(L(K('a nave original (tripulação)', 'the original ship (crew)', 'la nave original (tripulación)')))}</div>${rows}<p class="small muted">${esc(L(K('No multiplayer, outros jogadores podem entrar com o código da sala e escolher a Arca-1, 2, 3 ou 4. Quem escolhe uma nave que ainda não pousou entra quando ela chegar.', 'In multiplayer, other players can join with the room code and choose Arca-1, 2, 3 or 4. Whoever picks a ship that has not landed yet joins when it arrives.', 'En multijugador, otros jugadores pueden entrar con el código de la sala y elegir Arca-1, 2, 3 o 4. Quien elija una nave que aún no aterrizó entra cuando llegue.')))}</p>`;
+  const C = S.colony; const by = {}; (C.people || []).forEach(p => { by[p.ship] = by[p.ship] || 0; by[p.ship]++; });
+  const rows = CSHIPS.map(s => { const n = by[s.n + 1]; const st = (C.ships.find(x => x.n === s.n) || {}).state; return `<div class="alert ${n ? 'good' : 'info'}"><span style="color:${ARCA_COLORS[s.n + 1]}">■</span> <b>${s.name}</b> — ${n ? `${n} ${esc(L(K('colonos', 'colonists', 'colonos')))}` : st === 'inbound' ? esc(L(K('a caminho…', 'inbound…', 'en camino…'))) : esc(L(K('ainda não pousou', 'not landed yet', 'aún no aterriza')))}</div>`; }).join('');
+  return rows;
 }
 UIH.netShip = n => { U.lobby = Object.assign({}, U.lobby, { ship: +n }); };

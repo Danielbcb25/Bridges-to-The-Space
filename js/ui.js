@@ -205,17 +205,18 @@ function drawAvatarPreviews() {
 }
 
 // ---------- lobby multiplayer ----------
-const arcaHint = n => n === 1
-  ? K('Arca-1: a tripulação original (6 funções + o Comandante).', 'Arca-1: the original crew (6 roles + the Commander).', 'Arca-1: la tripulación original (6 funciones + el Comandante).')
-  : K('Arca-' + n + ': você desce como colono quando essa nave pousar em Pontes-01b. Serve para ligar outro grupo de jogadores a esta sala.', 'Arca-' + n + ': you come down as a colonist when this ship lands on Pontes-01b. Lets another group of players link up with this room.', 'Arca-' + n + ': baja como colono cuando esta nave aterrice en Pontes-01b. Sirve para conectar a otro grupo de jugadores con esta sala.');
-const arcaJoinLabel = n => n === 1 ? K('Entrar como tripulante', 'Join as crew member', 'Entrar como tripulante') : K('Entrar como colono', 'Join as colonist', 'Entrar como colono');
+const arcaHint = n => K('Arca-' + n + ': quem entra primeiro nessa nave vira o Comandante dela; os próximos entram na tripulação. Cada Arca faz a sua própria jornada (até 28 pessoas no total).', 'Arca-' + n + ': whoever enters this ship first becomes its Commander; the next ones join the crew. Each Arca makes its own journey (up to 28 people in total).', 'Arca-' + n + ': quien entra primero en esta nave se vuelve su Comandante; los siguientes se unen a la tripulación. Cada Arca hace su propio viaje (hasta 28 personas en total).');
+const arcaJoinLabel = n => K('Entrar na Arca-' + n, 'Join Arca-' + n, 'Entrar en la Arca-' + n);
+const shipChips = LB => `<div class="grp"><b>${esc(L(K('Escolha sua Arca', 'Choose your Arca', 'Elija su Arca')))}</b>${[1, 2, 3, 4].map(n => `<button class="chip ${(LB.ship || 1) === n ? 'on' : ''}" data-ui="netShip" data-arg="${n}">Arca-${n}</button>`).join('')}</div><p class="small muted">${esc(L(arcaHint(LB.ship || 1)))}</p>`;
 function lobbyScreen() {
   const LB = U.lobby || {};
   if (Net.role === 'host' && Net.room) {
     return `<div class="panel center wide">
-      <h2>SALA <span class="code">${esc(Net.room)}</span></h2>
+      <h2>SALA <span class="code">${esc(Net.room)}</span> · Arca-${Net.mySh || 1}</h2>
+      <p class="small yellow">${esc(L(K('Você é o Comandante da Arca-' + (Net.mySh || 1) + '.', 'You are the Commander of Arca-' + (Net.mySh || 1) + '.', 'Usted es el Comandante de la Arca-' + (Net.mySh || 1) + '.')))}</p>
       <p class="muted">Passe o código para até 6 amigos. Cada um assume um tripulante; os lugares vazios ficam com bots.</p>
-      <p class="small cyan">${esc(L(K('Outros grupos podem se ligar a esta sala com o mesmo código escolhendo Arca-2, 3 ou 4: eles descem como colonos quando essas naves pousarem em Pontes-01b.', 'Other groups can link to this room with the same code by choosing Arca-2, 3 or 4: they come down as colonists when those ships land on Pontes-01b.', 'Otros grupos pueden conectarse a esta sala con el mismo código eligiendo Arca-2, 3 o 4: bajan como colonos cuando esas naves aterricen en Pontes-01b.')))}</p>
+      ${!Net.relay ? `<p class="small cyan">${esc(L(K('Outras Arcas: quem entrar com este código escolhendo outra Arca vira o Comandante dela (jornada própria). Até 28 pessoas: 4 Arcas × (Comandante + 6).', 'Other Arcas: whoever joins with this code and picks another Arca becomes its Commander (own journey). Up to 28 people: 4 Arcas × (Commander + 6).', 'Otras Arcas: quien entre con este código eligiendo otra Arca se vuelve su Comandante (viaje propio). Hasta 28 personas: 4 Arcas × (Comandante + 6).')))}</p>
+      ${[1, 2, 3, 4].filter(n => n !== Net.hubShip).map(n => { const a = Net.arcas[n]; return `<div class="alert ${a ? 'good' : 'info'}"><b>Arca-${n}</b> — ${a ? '🎮 ' + esc(a.cmdName || '') + ' · ' + a.members.length + '/6 ' + esc(L(K('tripulantes', 'crew', 'tripulantes'))) : esc(L(K('livre (o 1º que entrar vira Comandante)', 'free (the first to join becomes Commander)', 'libre (el primero en entrar será Comandante)')))}</div>`; }).join('')}` : ''}
       <p class="small cyan">${Net.mode === 'p2p' ? '🌐 Sala online (P2P): funciona pela internet, sem servidor e sem VPN. Mantenha esta aba aberta.' : '🖧 Servidor próprio'}</p>
       <div class="seats">${ROLES.map(r => { const p = Object.values(Net.players).find(x => x.role === r.id); return `<div class="seat ${p ? 'human' : ''}"><b>${r.name}</b><span>${p ? '🎮 ' + esc(p.name) : '🤖 Bot'}</span></div>`; }).join('')}</div>
       <div class="cards two">
@@ -226,15 +227,14 @@ function lobbyScreen() {
     </div>`;
   }
   if (Net.role === 'client') {
-    return `<div class="panel center"><h2>CONECTADO</h2><p>Sala <span class="code">${esc(Net.room || '')}</span>. Você será: <b>${esc(Net.myRoleName || '...')}</b>.</p><p class="muted">${Net.pendingShip ? esc(L(K('Você entrou pela ' + 'Arca-' + Net.pendingShip + ': quando ela pousar em Pontes-01b, você desce como colono.', 'You joined through Arca-' + Net.pendingShip + ': when it lands on Pontes-01b you come down as a colonist.', 'Entró por la Arca-' + Net.pendingShip + ': cuando aterrice en Pontes-01b, baja como colono.'))) : 'Aguardando o Comandante iniciar a jornada e montar a nave...'}</p>${ROLE_DUTIES[U.me] ? `<p class="small cyan">${esc(L('Sua função:'))} ${esc(L(ROLE_DUTIES[U.me]))}</p><p class="small muted">${esc(L('Quando chamarem a sua função, aparece um aviso 📢: vá até a estação e pressione E. Se não for em 45 s, um bot assume.'))}</p>` : ''}<div class="row"><button class="btn" data-ui="netLeave">◀ Sair</button></div></div>`;
+    return `<div class="panel center"><h2>CONECTADO</h2><p>Sala <span class="code">${esc(Net.room || '')}</span>. Arca-${Net.mySh || 1}${Net.cmdName ? ' · ' + esc(L(K('Comandante: ', 'Commander: ', 'Comandante: '))) + esc(Net.cmdName) : ''}. Você será: <b>${esc(L(Net.myRoleName || '...'))}</b>.</p><p class="muted">Aguardando o Comandante iniciar a jornada e montar a nave...</p>${ROLE_DUTIES[U.me] ? `<p class="small cyan">${esc(L('Sua função:'))} ${esc(L(ROLE_DUTIES[U.me]))}</p><p class="small muted">${esc(L('Quando chamarem a sua função, aparece um aviso 📢: vá até a estação e pressione E. Se não for em 45 s, um bot assume.'))}</p>` : ''}<div class="row"><button class="btn" data-ui="netLeave">◀ Sair</button></div></div>`;
   }
   return `<div class="panel center">
     <h2>MULTIPLAYER</h2>
-    <p class="muted">Até 6 jogadores na tripulação + o Comandante (quem cria a sala). Funciona online direto pelo navegador: não precisa de servidor nem de VPN.</p>
-    <div class="row"><button class="btn primary" data-ui="netHost" ${LB.busy ? 'disabled' : ''}>Criar sala (Comandante)</button></div>
+    <p class="muted">${esc(L(K('Até 28 jogadores: 4 Arcas, cada uma com um Comandante e 6 tripulantes. Quem cria a sala é o Comandante da Arca que escolher.', 'Up to 28 players: 4 Arcas, each with a Commander and 6 crew. Whoever creates the room is the Commander of the Arca they choose.', 'Hasta 28 jugadores: 4 Arcas, cada una con un Comandante y 6 tripulantes. Quien crea la sala es el Comandante de la Arca que elija.')))} ${esc(L('Funciona online direto pelo navegador: não precisa de servidor nem de VPN.'))}</p>
+    ${shipChips(LB)}
+    <div class="row"><button class="btn primary" data-ui="netHost" ${LB.busy ? 'disabled' : ''}>${esc(L(K('Criar sala (Comandante da Arca-' + (LB.ship || 1) + ')', 'Create room (Commander of Arca-' + (LB.ship || 1) + ')', 'Crear sala (Comandante de la Arca-' + (LB.ship || 1) + ')')))}</button></div>
     <label class="field">Código da sala <input id="net-code" maxlength="5" value="${esc(LB.code || '')}" style="text-transform:uppercase" autocomplete="off"></label>
-    <div class="grp"><b>${esc(L(K('Escolha sua nave', 'Choose your ship', 'Elija su nave')))}</b>${[1, 2, 3, 4].map(n => `<button class="chip ${(LB.ship || 1) === n ? 'on' : ''}" data-ui="netShip" data-arg="${n}">Arca-${n}</button>`).join('')}</div>
-    <p class="small muted">${esc(L(arcaHint(LB.ship || 1)))}</p>
     <div class="row"><button class="btn" data-ui="netJoin" ${LB.busy ? 'disabled' : ''}>${esc(L(arcaJoinLabel(LB.ship || 1)))}</button></div>
     ${LB.busy ? `<p class="cyan">⏳ ${esc(LB.busy)}</p>` : ''}
     <p class="err">${esc(LB.err || '')}</p>
@@ -768,8 +768,6 @@ function renderUI() {
     const map = { saves: savesScreen, story: storyScreen, title: titleScreen, journey: journeyScreen, history: historyScreen, settings: () => settingsScreen(false), shop: shopScreen, avatar: () => U.avatarDirty ? avatarScreen() : U.cache.scr, lobby: lobbyScreen };
     scr = (map[U.screen] || titleScreen)();
     U.avatarDirty = false;
-  } else if (Net.role === 'client' && !U.me) {
-    scr = `<div class="panel center"><h2>🛬 ${esc(L(K('AGUARDANDO A ARCA-' + (Net.pendingShip || ''), 'WAITING FOR ARCA-' + (Net.pendingShip || ''), 'ESPERANDO LA ARCA-' + (Net.pendingShip || ''))))}</h2><p>${esc(L(K('Sua nave ainda não pousou em Pontes-01b. Quando ela chegar, você desce como colono automaticamente.', 'Your ship has not landed on Pontes-01b yet. When it arrives you come down as a colonist automatically.', 'Su nave aún no aterrizó en Pontes-01b. Cuando llegue, baja como colono automáticamente.')))}</p><p class="muted small">${esc(L(K('Enquanto isso, acompanhe a jornada e use o chat (Enter).', 'Meanwhile, follow the journey and use the chat (Enter).', 'Mientras tanto, siga la jornada y use el chat (Enter).')))}</p></div>`;
   } else if (Net.role === 'client' && !['ship', 'station', 'detour', 'planet', 'migration', 'colony', 'end'].includes(S.scene)) {
     scr = `<div class="panel center"><h2>AGUARDANDO O COMANDANTE</h2><p class="muted">${{ intro: 'Narração da introdução', earth: 'Caminhando pela Terra poluída', setup: 'Montando a nave com a verba limitada', launch: 'Decolagem!' }[S.scene] || '...'}</p><p>Você é: <b>${esc(Net.myRoleName || '')}</b></p></div>`;
   } else {
@@ -857,7 +855,7 @@ UIH.startGame = journey => {
   const mode = Net.role === 'host' ? 'host' : 'solo';
   newGame(journey, mode);
   if (Net.role === 'host') Net.assignSeats();
-  U.screen = 'game'; U.panel = null; U.me = 'cmd'; U.help = false;
+  U.screen = 'game'; U.panel = null; U.me = 'cmd'; U.help = false; S.arca = Net.role ? Net.mySh : 1;
   S.scene = 'intro'; Music.play('intro');
   modeIntroStart(Net.role === 'host' ? 'multi' : journey); // introdução interativa do modo escolhido
 };
@@ -910,7 +908,7 @@ UIH.cook = () => { act('cook', { ing: U.cook.slice() }); U.cook = []; };
 UIH.pilot = d => act('puzzle', { op: 'move', d: +d * 0.08 });
 UIH.quitAsk = () => { U.confirmQuit = true; };
 UIH.quit = () => { exitGameFullscreen(); Narrator.stop(); if (Net.role) Net.leave(); S = null; U.screen = 'title'; U.panel = null; Music.play('intro'); };
-UIH.netHost = () => { const el = $('#net-url'); const url = el ? el.value.trim() : ''; U.lobby = { url }; Net.host(url); };
+UIH.netHost = () => { const el = $('#net-url'); const url = el ? el.value.trim() : ''; U.lobby = { url, ship: (U.lobby && U.lobby.ship) || 1 }; Net.host(url); };
 UIH.netJoin = () => { enterGameFullscreen(); const el = $('#net-url'); const url = el ? el.value.trim() : ''; const code = $('#net-code').value.trim().toUpperCase(); U.lobby = { url, code, ship: (U.lobby && U.lobby.ship) || 1 }; Net.join(url, code); };
 UIH.netLeave = () => { Net.leave(); U.screen = 'lobby'; };
 ACTIONS.tut = p => { if (S.tutorial < p.n) S.tutorial = p.n; };

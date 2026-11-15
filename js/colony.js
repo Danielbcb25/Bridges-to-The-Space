@@ -8,7 +8,7 @@
 const COLONY_W = 1900, CGROUND = 226;
 
 const CBUILD = {
-  nave: { x: 150, icon: '🚀', name: 'Arca-1 · Controle da Colônia',
+  nave: { x: 150, icon: '🚀', name: 'Nave pousada · Controle da Colônia',
     fact: 'O pouso em Marte da Perseverance (2021) usou o “guindaste aéreo” e levou cerca de 7 minutos da atmosfera ao solo, sem nenhum controle ao vivo: o sinal demora minutos para chegar da Terra.' },
   lab: { x: 360, icon: '🔬', name: 'Laboratório de campo e oficina',
     fact: 'O instrumento MOXIE, a bordo do rover Perseverance, produziu oxigênio a partir do CO₂ da atmosfera de Marte: 122 gramas no total, o suficiente para um cachorro pequeno respirar por cerca de 10 horas (NASA). É o princípio do uso de recursos locais (ISRU).' },
@@ -25,7 +25,7 @@ const CBUILD = {
   habitat: { x: 1720, icon: '🏠', name: 'Habitat e domos',
     fact: 'Na simulação CHAPEA da NASA, quatro voluntários viveram 378 dias em um habitat impresso em 3D (“Mars Dune Alpha”, 2023–2024) para estudar o isolamento, a comida e o trabalho em equipe.' },
 };
-const CSHORT = { nave: 'Arca-1', lab: 'Laboratório', solar: 'Campo solar', agua: 'Água', estufa: 'Estufa', torre: 'Torre', pista: 'Pista', habitat: 'Habitat' };
+const CSHORT = { nave: 'Nave', lab: 'Laboratório', solar: 'Campo solar', agua: 'Água', estufa: 'Estufa', torre: 'Torre', pista: 'Pista', habitat: 'Habitat' };
 const CORDER = ['nave', 'lab', 'solar', 'agua', 'estufa', 'torre', 'pista', 'habitat'];
 // custos por nível (kwh, água L, peças, sementes kg, duração s)
 const CCOST = {
@@ -50,9 +50,9 @@ const TX_PACKAGES = [
   { id: 'saude', gb: 10, name: 'Relatório médico da tripulação', need: null },
 ];
 const CSHIPS = [
-  { n: 1, name: 'Arca-2', size: 10, sup: { kwh: 10, agua: 80, comida: 20 } },
-  { n: 2, name: 'Arca-3', size: 15, sup: { kwh: 12, agua: 100, comida: 30 } },
-  { n: 3, name: 'Arca-4', size: 20, sup: { kwh: 15, agua: 120, comida: 40 } },
+  { n: 1, name: 'Colonial-1', size: 10, sup: { kwh: 10, agua: 80, comida: 20 } },
+  { n: 2, name: 'Colonial-2', size: 15, sup: { kwh: 12, agua: 100, comida: 30 } },
+  { n: 3, name: 'Colonial-3', size: 20, sup: { kwh: 15, agua: 120, comida: 40 } },
 ];
 const CFACTS = []; // preenchido por data/lang/<idioma>.json ("falas")
 

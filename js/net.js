@@ -23,10 +23,22 @@ const roomCode = () => { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = '
 const Net = {
   ws: null, peer: null, conn: null, conns: {}, nextPid: 1, mode: null, open: false,
   role: null, room: null, players: {}, myRoleName: null, sendT: 0, posT: 0,
+  hubShip: 1, arcas: {}, roster: {}, relay: false, mySh: 1,
   err(t) { U.lobby = Object.assign({}, U.lobby, { err: t, busy: false }); },
   info(t) { U.lobby = Object.assign({}, U.lobby, { err: '', busy: t }); },
   // ---------- envio ----------
+  // Comandante de outra Arca (host "por trás" do hub): bcast/to viram mensagens de relé para a sala
+  sendRelay(m) {
+    if (m.t === 'bcast') this.sendRaw({ t: 'relay', k: 'bcast', msg: m.msg });
+    else if (m.t === 'to') this.sendRaw({ t: 'relay', k: 'to', to: m.pid, msg: m.msg });
+    else this.sendRaw(m);
+  },
+  sendRaw(o) {
+    if (this.mode === 'ws') { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(o)); }
+    else if (this.conn && this.conn.open) { try { this.conn.send(JSON.stringify(o)); } catch (e) { /* */ } }
+  },
   send(m) {
+    if (this.relay) return this.sendRelay(m);
     if (this.mode === 'ws') { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify(m)); return; }
     if (this.mode !== 'p2p') return;
     if (this.role === 'host') {
@@ -34,7 +46,7 @@ const Net = {
       else if (m.t === 'to') { const c = this.conns[m.pid]; if (c && c.open) try { c.send(JSON.stringify(m.msg)); } catch (e) { /* */ } }
     } else if (this.conn && this.conn.open) { try { this.conn.send(JSON.stringify(m)); } catch (e) { /* */ } }
   },
-  ready() { return this.mode === 'ws' ? !!(this.ws && this.ws.readyState === 1) : this.mode === 'p2p' && (this.role === 'host' ? !!this.peer && this.open : !!(this.conn && this.conn.open)); },
+  ready() { if (this.relay) return this.mode === 'ws' ? !!(this.ws && this.ws.readyState === 1) : !!(this.conn && this.conn.open); return this.mode === 'ws' ? !!(this.ws && this.ws.readyState === 1) : this.mode === 'p2p' && (this.role === 'host' ? !!this.peer && this.open : !!(this.conn && this.conn.open)); },
   // ---------- WebSocket (servidor próprio) ----------
   connectWS(url, onOpen) {
     this.leave(true);
@@ -44,7 +56,7 @@ const Net = {
     ws.onopen = onOpen;
     ws.onmessage = ev => { let m; try { m = JSON.parse(ev.data); } catch (e) { return; } this.onMsg(m); };
     ws.onerror = () => this.err(T('Não foi possível conectar ao servidor. Rode “node server/server.js” e abra o jogo por ele.'));
-    ws.onclose = () => { if (this.ws === ws) { const was = this.role; this.ws = null; this.role = null; this.mode = null; if (was === 'client') { S = null; U.screen = 'lobby'; this.err(T('Conexão encerrada.')); } } };
+    ws.onclose = () => { if (this.ws === ws) { const was = this.role; const rel = this.relay; this.ws = null; this.role = null; this.relay = false; this.mode = null; if (was === 'client' || rel) { S = null; U.screen = 'lobby'; this.err(T('Conexão encerrada.')); } } };
   },
   // ---------- P2P (PeerJS) ----------
   peerOpts() { return Object.assign({ debug: 0, config: { iceServers: PEER_ICE } }, window.PEER_OPTS || {}); },
@@ -61,7 +73,7 @@ const Net = {
       conn.on('data', d => {
         let m; try { m = typeof d === 'string' ? JSON.parse(d) : d; } catch (e) { return; }
         if (!m || typeof m !== 'object') return;
-        if (m.t === 'join' && Object.keys(this.players).length >= 24) { try { conn.send(JSON.stringify({ t: 'error', msg: T('Sala cheia.') })); } catch (e) { /* */ } return; }
+        if (m.t === 'join' && Object.keys(this.roster).length >= 27) { try { conn.send(JSON.stringify({ t: 'error', msg: T('Sala cheia.') })); } catch (e) { /* */ } return; }
         m.pid = pid; this.onMsg(m);
       });
       const bye = () => { if (!this.conns[pid]) return; delete this.conns[pid]; this.onMsg({ t: 'leave', pid }); };
@@ -83,7 +95,7 @@ const Net = {
       const conn = peer.connect(PEER_PREFIX + code, { reliable: true }); this.conn = conn;
       conn.on('open', () => { clearTimeout(timer); this.room = code; this.send(hello); });
       conn.on('data', d => { let m; try { m = typeof d === 'string' ? JSON.parse(d) : d; } catch (e) { return; } this.onMsg(m); });
-      conn.on('close', () => { if (this.conn === conn && this.role === 'client') this.onMsg({ t: 'closed' }); });
+      conn.on('close', () => { if (this.conn === conn && (this.role === 'client' || this.relay)) this.onMsg({ t: 'closed' }); });
     });
     peer.on('error', e => {
       if (this.peer !== peer) return;
@@ -105,24 +117,25 @@ const Net = {
     for (const pid in this.conns) { try { this.conns[pid].close(); } catch (e) { /* */ } }
     if (this.peer) { try { this.peer.destroy(); } catch (e) { /* */ } }
     this.ws = null; this.peer = null; this.conn = null; this.conns = {}; this.open = false; this.mode = null;
-    this.role = null; this.room = null; this.players = {};
+    this.role = null; this.room = null; this.players = {}; this.relay = false; this.arcas = {}; this.roster = {}; this.mySh = 1;
     if (typeof S !== 'undefined' && S) S.crew.forEach(c => { if (c.owner && c.owner !== 'host') c.owner = null; });
     if (!silent) U.lobby = null;
   },
   onMsg(m) {
     switch (m.t) {
-      case 'room': this.role = 'host'; this.room = m.code; U.screen = 'lobby'; U.lobby = Object.assign({}, U.lobby, { err: '', busy: false }); break;
+      case 'room': this.role = 'host'; this.hubShip = (U.lobby && U.lobby.ship) || 1; this.mySh = this.hubShip; this.room = m.code; U.screen = 'lobby'; U.lobby = Object.assign({}, U.lobby, { err: '', busy: false }); break;
       case 'error': this.err(m.msg); break;
       // ---- host ----
       case 'join': {
         if (this.role !== 'host') return;
         const ship = Math.max(1, Math.min(4, +m.ship || 1));
-        if (ship > 1) return this.joinArca(m, ship); // Arca-2/3/4: entra como colono da nave escolhida
+        if (!this.relay && ship !== this.hubShip) return this.joinOther(m, ship); // outra Arca: o 1º vira Comandante dela
         const taken = Object.values(this.players).map(p => p.role);
         const free = ROLES.find(r => !taken.includes(r.id));
         if (!free) { this.send({ t: 'to', pid: m.pid, msg: { t: 'error', msg: 'Sala cheia (6 tripulantes).' } }); return; }
-        this.players[m.pid] = { name: String(m.name || 'Tripulante').slice(0, 14), role: free.id, avatar: m.avatar };
-        this.send({ t: 'to', pid: m.pid, msg: { t: 'welcome', crew: free.id, roleName: free.name, code: this.room } });
+        this.players[m.pid] = { name: String(m.name || 'Tripulante').slice(0, 14), role: free.id, avatar: m.avatar, pid: m.pid };
+        if (!this.relay) this.roster[m.pid] = { pid: m.pid, name: this.players[m.pid].name, ship: this.hubShip, roleName: free.name };
+        this.send({ t: 'to', pid: m.pid, msg: { t: 'welcome', crew: free.id, roleName: free.name, code: this.room, ship: this.relay ? this.mySh : this.hubShip, cmdName: this.relay ? null : null } });
         if (S) this.assignSeats();
         const nm = this.players[m.pid].name;
         const rn = l => (I18N_DICT[l] && I18N_DICT[l][free.name]) || free.name;
@@ -130,7 +143,20 @@ const Net = {
         if (S) toast(`${nm} entrou como ${free.name}.`);
         break;
       }
+      case 'relay': if (this.role === 'host' && !this.relay) this.onRelay(m); break;
       case 'leave': {
+        if (!this.relay) {
+          const r = this.roster[m.pid]; delete this.roster[m.pid];
+          if (r && r.ship !== this.hubShip) { // saiu alguém de outra Arca
+            const a = this.arcas[r.ship];
+            if (a && a.cmdPid === m.pid) { // o Comandante saiu: a Arca fecha
+              a.members.forEach(pid => this.sendTo(pid, { t: 'closed', msg: `O Comandante da Arca-${r.ship} saiu.` }));
+              delete this.arcas[r.ship];
+              Chat.sysAll(K(`O Comandante da Arca-${r.ship} saiu.`, `The Commander of Arca-${r.ship} left.`, `El Comandante de la Arca-${r.ship} salió.`), 'join');
+            } else if (a) { a.members = a.members.filter(x => x !== m.pid); this.sendTo(a.cmdPid, { t: 'leave', pid: m.pid }); }
+            return;
+          }
+        }
         const p = this.players[m.pid]; if (!p) return;
         delete this.players[m.pid];
         Chat.sysAll(K(`${p.name} saiu da sala.`, `${p.name} left the room.`, `${p.name} salió de la sala.`), 'join');
@@ -138,6 +164,7 @@ const Net = {
         break;
       }
       case 'pos': {
+        if (this.forwardToCmd(m)) return;
         const p = this.players[m.pid]; if (!p || !S) return;
         const c = crewById(p.role); if (!c || !c.alive) return;
         Object.assign(c, { x: clamp(+m.x || 0, 20, (S.scene === 'colony' ? COLONY_W : WORLD_W) - 20), deck: m.deck === 'L' ? 'L' : 'U', face: m.face > 0 ? 1 : -1, moving: !!m.moving, walkT: +m.walkT || 0, climb: +m.climb || 0, climbTo: m.climbTo === 'L' ? 'L' : 'U', jy: clamp(+m.jy || 0, 0, 40) });
@@ -145,6 +172,7 @@ const Net = {
         break;
       }
       case 'act': {
+        if (this.forwardToCmd(m)) return;
         const p = this.players[m.pid]; if (!p || !S) return;
         if (typeof m.type !== 'string' || !ACTIONS[m.type]) return;
         const blocked = ['cruise', 'fund', 'trade', 'ration', 'hibernate']; // decisões de gestão do Comandante; avançar de etapa (destino, pouso, migração) qualquer jogador pode
@@ -152,9 +180,16 @@ const Net = {
         applyAction(m.type, m.p, p.role);
         break;
       }
-      case 'chat': if (this.role === 'host') Chat.fromPlayer(m.pid, m.text); else if (this.role === 'client') Chat.fromNet(m.m); break;
+      case 'chat': if (m.m) Chat.fromNet(m.m); else if (this.role === 'host' && !this.relay) Chat.fromPlayer(m.pid, m.text); break; // o hub redistribui o chat da sala toda
       // ---- cliente ----
-      case 'welcome': U.lobby = Object.assign({}, U.lobby, { err: '', busy: false }); this.role = 'client'; this.room = m.code; U.me = m.crew; this.myRoleName = m.roleName; this.pendingShip = m.pendingShip || null; if (!S) U.screen = 'lobby'; break;
+      case 'welcome':
+        if (m.cmd) { // 1º jogador dessa Arca: vira Comandante e simula a nave dele; a sala só repassa as mensagens
+          U.lobby = Object.assign({}, U.lobby, { err: '', busy: false });
+          this.role = 'host'; this.relay = true; this.mySh = m.ship; this.room = m.code; this.players = {}; U.me = 'cmd'; this.myRoleName = 'Comandante'; U.screen = 'lobby';
+          break;
+        }
+        if (m.ship) this.mySh = m.ship; this.cmdName = m.cmdName || null;
+        U.lobby = Object.assign({}, U.lobby, { err: '', busy: false }); this.role = 'client'; this.room = m.code; U.me = m.crew; this.myRoleName = m.roleName; this.pendingShip = m.pendingShip || null; if (!S) U.screen = 'lobby'; break;
       case 'state': {
         if (this.role !== 'client') return;
         const keep = S && crewById(U.me);
@@ -166,30 +201,61 @@ const Net = {
         U.screen = 'game';
         break;
       }
-      case 'closed': { const was = this.role; this.leave(true); if (was === 'client') { S = null; U.screen = 'lobby'; this.err(T('O Comandante fechou a sala.')); } break; }
+      case 'closed': { const was = this.role; this.leave(true); if (was === 'client' || this.relay || was === 'host') { if (was === 'client' || was === 'host') { S = null; U.screen = 'lobby'; this.err(m.msg ? T(m.msg) : T('O Comandante fechou a sala.')); } } break; }
     }
   },
-  // ---- Arcas: jogadores de outro grupo entram escolhendo a nave (Arca-2, 3 ou 4) ----
-  joinArca(m, ship) {
-    const nm = String(m.name || 'Colono').slice(0, 14);
-    this.players[m.pid] = { name: nm, role: null, ship, avatar: m.avatar, pid: m.pid };
-    const shipName = 'Arca-' + ship;
-    Chat.sysAll(K(`${nm} entrou pela ${shipName}.`, `${nm} joined through ${shipName}.`, `${nm} entró por la ${shipName}.`), 'join');
-    if (!this.claim(m.pid)) this.send({ t: 'to', pid: m.pid, msg: { t: 'welcome', crew: null, roleName: shipName, code: this.room, pendingShip: ship } });
+  // ---------- várias Arcas na mesma sala ----------
+  // O criador da sala (hub) é Comandante da nave que escolheu. O 1º jogador a entrar em cada outra
+  // Arca vira Comandante dela: o navegador dele simula a viagem daquela nave (como um "host") e a
+  // sala só repassa as mensagens. Os demais jogadores da Arca viram tripulantes.
+  rosterName(pid) { const r = this.roster[pid]; return r ? r : null; },
+  sendTo(pid, msg) {
+    if (this.mode === 'ws') { if (this.ws && this.ws.readyState === 1) this.ws.send(JSON.stringify({ t: 'to', pid, msg })); return; }
+    const c = this.conns[pid]; if (c && c.open) try { c.send(JSON.stringify(msg)); } catch (e) { /* */ }
   },
-  claim(pid) {
-    const p = this.players[pid]; if (!p || p.role || !S || !S.colony || !S.colony.people) return false;
-    const person = S.colony.people.find(x => x.ship === p.ship && !x.owner && x.alive);
-    if (!person) return false;
-    person.owner = pid; person.name = p.name; person.csleep = null; person.goal = null;
-    person.avatar = Object.assign({}, DEFAULT_AVATAR, p.avatar || {}, { name: p.name });
-    p.role = person.id; person.spawnT = 0;
-    this.send({ t: 'to', pid: p.pid != null ? p.pid : pid, msg: { t: 'welcome', crew: person.id, roleName: person.roleName, code: this.room } }); // pid original (número no servidor próprio)
-    Chat.sysAll(K(`${p.name} desceu da Arca-${p.ship}!`, `${p.name} came down from Arca-${p.ship}!`, `¡${p.name} bajó de la Arca-${p.ship}!`), 'join');
-    S.v++;
-    return true;
+  sendMembers(pids, msg) {
+    if (!pids.length) return;
+    if (this.mode === 'ws') { for (const pid of pids) this.sendTo(pid, msg); return; }
+    const str = JSON.stringify(msg);
+    for (const pid of pids) { const c = this.conns[pid]; if (c && c.open) try { c.send(str); } catch (e) { /* */ } }
   },
-  claimPending(n) { for (const pid in this.players) { const p = this.players[pid]; if (p.ship === n && !p.role) this.claim(pid); } },
+  // pids (do transporte) dos tripulantes da nave do próprio hub
+  shipMembers() { return Object.keys(this.players).map(k => (this.players[k].pid != null ? this.players[k].pid : k)); },
+  joinOther(m, ship) {
+    const nm = String(m.name || 'Tripulante').slice(0, 14);
+    if (Object.keys(this.roster).length >= 27) return this.sendTo(m.pid, { t: 'error', msg: 'Sala cheia (28 pessoas).' });
+    const a = this.arcas[ship];
+    this.roster[m.pid] = { pid: m.pid, name: nm, ship, avatar: m.avatar };
+    if (!a) { // primeira pessoa nessa Arca: vira o Comandante dela
+      this.arcas[ship] = { cmdPid: m.pid, members: [], cmdName: nm };
+      this.roster[m.pid].cmd = true; this.roster[m.pid].roleName = 'Comandante';
+      this.sendTo(m.pid, { t: 'welcome', cmd: true, ship, code: this.room, roleName: 'Comandante' });
+      Chat.sysAll(K(`${nm} é o Comandante da Arca-${ship}.`, `${nm} is the Commander of Arca-${ship}.`, `${nm} es el Comandante de la Arca-${ship}.`), 'join');
+      return;
+    }
+    this.sendTo(a.cmdPid, { t: 'join', pid: m.pid, name: nm, avatar: m.avatar }); // o Comandante da Arca atribui a função
+  },
+  // mensagem enviada pelo Comandante de outra Arca para a sua tripulação (m.pid = quem enviou; m.to = destino)
+  onRelay(m) {
+    const r = this.roster[m.pid]; if (!r || !r.cmd) return;
+    const a = this.arcas[r.ship]; if (!a) return;
+    if (m.k === 'bcast') return this.sendMembers(a.members, m.msg);
+    if (m.k !== 'to' || m.to == null) return;
+    const msg = m.msg || {};
+    if (msg.t === 'welcome' && msg.crew) { // função atribuída: o jogador passa a fazer parte da Arca
+      if (!a.members.includes(m.to)) a.members.push(m.to);
+      const rr = this.roster[m.to]; if (rr) rr.roleName = msg.roleName;
+      msg.ship = r.ship; msg.cmdName = r.name;
+    }
+    if (a.members.includes(m.to) || msg.t === 'welcome' || msg.t === 'error') this.sendTo(m.to, msg);
+  },
+  // hub: mensagem de um tripulante de outra Arca vai para o Comandante dela
+  forwardToCmd(m) {
+    if (this.relay) return false;
+    const r = this.roster[m.pid]; if (!r || r.ship === this.hubShip) return false;
+    const a = this.arcas[r.ship]; if (!a || r.cmd) return true;
+    this.sendTo(a.cmdPid, m); return true;
+  },
   assignSeats() {
     if (!S) return;
     for (const pid in this.players) {
@@ -201,7 +267,7 @@ const Net = {
     if (!this.ready()) return;
     if (this.role === 'host' && S) {
       this.sendT -= dt;
-      if (this.sendT <= 0) { this.sendT = 0.2; this.send({ t: 'bcast', msg: { t: 'state', S } }); }
+      if (this.sendT <= 0) { this.sendT = 0.2; if (this.relay) this.send({ t: 'bcast', msg: { t: 'state', S } }); else this.sendMembers(this.shipMembers(), { t: 'state', S }); }
     }
     if (this.role === 'client' && S && (S.scene === 'ship' || S.scene === 'colony')) {
       this.posT -= dt;
