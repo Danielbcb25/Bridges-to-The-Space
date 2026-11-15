@@ -471,34 +471,19 @@ function shuffleStable(arr, seed) { const a = arr.slice(); let s = seed; for (le
 function thermalPanel() {
   const th = S.thermal; if (!th) return '';
   const tcol = th.T > 26 ? 'red' : th.T < 18 ? 'cyan' : 'green';
-  const scene = ['Alerta de calor', 'Alerta de calor', 'A estrela se aproxima', 'Rasgo no isolamento', 'Sobrecarga elétrica', 'Entrada na sombra'][th.scene] || '';
-  const res = [['energia', 'kWh'], ['combustivel', 'kg'], ['escudo', 'mm'], ['plantacao', 'kg'], ['dados', 'GB'], ['agua', 'L'], ['oxigenio', 'kg']];
-  const thermo = (label, v, min, max, cls) => `<div class="thermo"><div class="tube"><i class="${cls}" style="height:${clamp((v - min) / (max - min), 0, 1) * 100}%"></i></div><b>${fmt(v, 0)}°</b><small>${label}</small></div>`;
-  const acts = Object.keys(TH_ACTIONS).map(k => {
-    const a = TH_ACTIONS[k]; const h = thHint(k);
-    const dis = th.disabled[k];
-    const active = th.act[k] > 0 || (k === 'rep' && th.repaired) || (k === 'equip' && th.equipOff);
-    const hintTxt = h.level === 'ok' ? 'confiante' : h.level === 'warn' ? 'alerta leve' : 'problema!';
-    const ded = byRole(a.role).some(available);
-    return `<div class="tact ${active ? 'active' : ''} ${dis ? 'dis' : ''}">
-      <div class="th-h"><b>${a.name}</b><span class="light ${h.level}" title="${hintTxt}"></span>${h.band ? `<em class="band">chance ${h.band}</em>` : ''}</div>
-      <small>${k === 'equip' && th.equipOff ? 'Religar: rolagem necessária' : a.cost()}${active && th.act[k] > 0 ? ` · ativo ${Math.ceil(th.act[k])}s` : ''}${k === 'shut' && th.shutMode ? ' · ' + th.shutMode : ''}</small>
-      <div class="row">${k === 'shut' ? `<button class="btn tiny" data-act="thAct" data-p='${J({ k, mode: 'abrir' })}' ${dis ? 'disabled' : ''}>Abrir</button><button class="btn tiny" data-act="thAct" data-p='${J({ k, mode: 'fechar' })}' ${dis ? 'disabled' : ''}>Fechar</button>`
-        : `<button class="btn tiny" data-act="thAct" data-p='${J({ k })}' ${dis || (k === 'rep' && (!th.rip || th.repaired)) ? 'disabled' : ''}>${k === 'equip' ? (th.equipOff ? 'Religar' : 'Desligar') : k === 'rep' ? 'Reparar' : 'Ativar'}</button>
-           <button class="btn tiny ghost" data-act="thAct" data-p='${J({ k, dedic: true })}' ${dis || !ded || (k === 'rep' && (!th.rip || th.repaired)) ? 'disabled' : ''} title="Tripulante certo dedicado: +2">+ dedicado</button>`}
-        <button class="btn tiny ghost" data-act="thMaint" data-p='${J({ k })}' ${th.maint[k] ? 'disabled' : ''} title="Gasta 1 min do tripulante: +1">${th.maint[k] ? '✔ manut.' : 'manutenção'}</button>
-        ${th.olhar ? `<button class="btn tiny ghost" data-act="thOlhar" data-p='${J({ k })}' title="Olhar estratégico">👁</button>` : ''}
-      </div></div>`;
-  }).join('');
-  return `<div class="evp thermal">
-    <h2>🌡 Regulação Térmica <small>${scene}</small></h2>
+  const scene = th.scene >= 5 ? 'Entrada na sombra' : th.scene >= 4 ? 'Sobrecarga elétrica' : th.scene >= 2 ? 'A estrela se aproxima' : 'Alerta de calor';
+  const thermo = (label, v, min, max, cls) => `<div class="thermo"><div class="tube"><i class="${cls}" style="height:${clamp((v - min) / (max - min), 0, 1) * 100}%"></i></div><b>${fmt(v, 0)}°</b><small>${esc(L(label))}</small></div>`;
+  const hint = th.T > 24 ? ['red', '🔥 ' + L('Está esquentando: feche as cortinas e ligue o resfriador.')] : th.T < 20 ? ['cyan', '❄ ' + L('Está esfriando: desligue o resfriador e ligue o aquecedor.')] : ['green', '✔ ' + L('Temperatura boa. Fique de olho.')];
+  const ctrl = k => { const c = TH_CTRL[k]; const on = th.on[k];
+    const state = k === 'shut' ? (on ? L('FECHADAS') : L('ABERTAS')) : (on ? L('LIGADO') : L('DESLIGADO'));
+    return `<button class="thc ${on ? 'on' : ''}" data-act="thToggle" data-p='${J({ k })}'><span class="ic">${c.icon}</span><b>${esc(L(c.name))}</b><em>${state}</em><small>${esc(L(c.what))}</small><small class="${k === 'shut' ? 'green' : 'orange'}">${esc(L(c.cost))}</small></button>`; };
+  return `<div class="evp thermal simple">
+    <h2>🌡 ${esc(L('Regulação Térmica'))} <small>${esc(L(scene))}</small></h2>
     <div class="timer">${bar(S.event.t, th.D, 'time')}<b>${Math.floor(S.event.t / 60)}:${String(Math.floor(S.event.t % 60)).padStart(2, '0')}</b></div>
-    <div class="thermos">${thermo('Sol', th.sun, -160, 130, 'hot')}${thermo('Sombra', th.shade, -160, 130, 'cold')}<div class="thermo main"><div class="tube"><i class="${tcol}" style="height:${clamp((th.T - 0) / 50, 0, 1) * 100}%"></i><span class="band-safe"></span></div><b class="${tcol}">${fmt(th.T, 1)}°</b><small>Interior</small></div>
-      <div class="thres">${res.map(([k, u]) => `<div><span>${RES_META.find(m => m.id === k).name}</span>${bar(S.res[k], S.cap[k])}<b>${fmt(S.res[k], 1)} ${u}</b></div>`).join('')}<div><span>Moral</span>${bar(moralIndex(), 100)}<b>${fmt(moralIndex(), 0)} pts</b></div></div></div>
-    <p class="small">${L('Meta: manter o interior entre <b>18 °C e 26 °C</b>.')} ${th.rip && !th.repaired ? '<span class="red">' + L('Rasgo no isolamento aberto!') + '</span>' : ''} ${th.equipOff ? '<span class="orange">' + L('Equipamentos desligados (sem pesquisa).') + '</span>' : ''}</p>
-    ${th.pendingReroll ? `<div class="reroll"><b>${TH_ACTIONS[th.pendingReroll.k].name} falhou!</b> Usar Sangue-frio? <button class="btn tiny primary" data-act="thReroll">Rolar de novo</button><button class="btn tiny" data-act="thAcceptFail">Aceitar</button></div>` : ''}
-    <div class="tacts">${acts}</div>
-    <div class="evlog">${th.msgs.slice(-5).map(m => `<div>${esc(m)}</div>`).join('')}</div>
+    <div class="thermos">${thermo('Sol', th.sun, -160, 130, 'hot')}${thermo('Sombra', th.shade, -160, 130, 'cold')}<div class="thermo main"><div class="tube"><i class="${tcol}" style="height:${clamp((th.T - 0) / 50, 0, 1) * 100}%"></i><span class="band-safe"></span></div><b class="${tcol}">${fmt(th.T, 1)}°</b><small>${esc(L('Interior'))}</small></div>
+      <div class="thres"><div><span>⚡ ${esc(L('Energia'))}</span>${bar(S.res.energia, S.cap.energia)}<b>${fmt(S.res.energia, 1)} kWh</b></div><p class="small">${L('Meta: manter o interior entre <b>18 °C e 26 °C</b>.')}</p><p class="small ${hint[0]}">${esc(hint[1])}</p></div></div>
+    <div class="thctrls">${ctrl('heat')}${ctrl('cool')}${ctrl('shut')}</div>
+    <div class="evlog">${th.msgs.slice(-3).map(m => `<div>${esc(m)}</div>`).join('')}</div>
   </div>`;
 }
 
