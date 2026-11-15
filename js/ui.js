@@ -419,6 +419,7 @@ function eventPanel() {
 
 function puzzleHTML(ev) {
   const pz = ev.puzzle;
+  if (pz.by && me() && pz.by !== me().id) { const o = crewById(pz.by); return `<div class="puzzle"><p class="small">🔒 ${esc(o ? o.name : '')} ${esc(L(K('chegou primeiro e está resolvendo este passo.', 'got here first and is solving this step.', 'llegó primero y está resolviendo este paso.')))}</p></div>`; }
   if (pz.kind === 'filtros') {
     return `<div class="puzzle"><h4>Filtros de ar (CDRA)</h4><p class="small">Inspecione os filtros (custa tempo) e troque o entupido pelo reserva.</p><div class="filters">${Array.from({ length: pz.n }, (_, i) => {
       const seen = pz.seen.includes(i); const bad = seen && i === pz.bad;

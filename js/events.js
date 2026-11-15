@@ -103,6 +103,8 @@ ACTIONS.doStep = (p, actor) => {
   if (!step.optional && step !== curStep(ev)) return toast('Faça os passos na ordem.', 'warn');
   if (!actor.alive || actor.status === 'incapacitado') return;
   if (!atStation(actor, step.station, 26)) return toast(`Vá até: ${STATIONS[step.station].name}.`, 'warn');
+  // quem apertar primeiro fica com o passo: os outros jogadores não podem repetir (nem resolver o mesmo quebra-cabeça)
+  if (S.crew.some(o => o.id !== actor.id && o.alive && ((o.task && o.task.key === 'evStep' && o.task.data && o.task.data.step === step.id) || (ev.puzzle && ev.puzzle.step === step.id && ev.puzzle.by === o.id)))) return toast('Outro tripulante já está cuidando deste passo.', 'warn');
   if (step.role && !roleMatches(actor, step.role) && step.roleOnly) return toast('Este passo precisa de um ' + step.role + '.', 'warn');
   actor.task = { station: step.station, dur: step.dur, t: 0, label: step.label, key: 'evStep', data: { ev: ev.id, step: step.id }, ev: ev.id };
 };
@@ -132,7 +134,7 @@ TASK_DONE.evStep = (c, d) => {
   step.claimed = null;
   if (step.puzzle) {
     const human = c.owner && c.owner !== 'bot';
-    if (human) { ev.puzzle = makePuzzle(step.puzzle, ev, step); ev.puzzle.step = step.id; ev.puzzle.by = c.id; return; }
+    if (human) { if (ev.puzzle) return; ev.puzzle = makePuzzle(step.puzzle, ev, step); ev.puzzle.step = step.id; ev.puzzle.by = c.id; return; }
     // bot resolve com rolagem
     let mod = roleMatches(c, step.role) ? 3 : 0;
     if (has('tEng') && roleMatches(c, 'engenheiro')) mod++;
@@ -178,6 +180,7 @@ function puzzleDone(ev) {
 ACTIONS.puzzle = (p, actor) => {
   const ev = S.event; if (!ev || !ev.puzzle) return;
   const pz = ev.puzzle;
+  if (pz.by && actor && actor.id !== pz.by) return toast('Só quem chegou primeiro ao console resolve este passo.', 'warn');
   switch (pz.kind) {
     case 'filtros':
       if (p.op === 'inspect' && !pz.seen.includes(p.i)) { pz.seen.push(p.i); ev.t -= 2; }

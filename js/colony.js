@@ -130,9 +130,11 @@ function buildReqErr(id, lvl) {
 function taskSpec(p) {
   const C = S.colony;
   if (p.k === 'build') {
-    const id = p.b, lvl = (C.b[id] || 0) + 1, c = CCOST[id] && CCOST[id][lvl];
+    const id = p.b, lvl = (C.b[id] || 0) + 1;
+    const simple = id === 'habitat' && S.journey === 'curta'; // Jornada Curta: habitat simplificado (barato, rápido, sem peça nem pré-requisito)
+    const c = simple ? (CCOST[id] && CCOST[id][lvl] && { kwh: 6, agua: 10, dur: 7 }) : CCOST[id] && CCOST[id][lvl];
     if (!c) return null;
-    const imp = buildReqErr(id, lvl);
+    const imp = simple ? null : buildReqErr(id, lvl);
     return { bid: id, cost: Object.assign({}, c), role: CROLE[id], err: imp, label: K('Construir: ' + L(CBUILD[id].name), 'Build: ' + L(CBUILD[id].name), 'Construir: ' + L(CBUILD[id].name)) };
   }
   if (p.k === 'fab') { const c = { kwh: has('impressora') ? 5 : 8, agua: 15, dur: has('impressora') ? 5 : 8 }; return { bid: 'lab', cost: c, role: 'engenheiro', label: 'Fabricar uma peça (impressão 3D)' }; }
@@ -531,7 +533,7 @@ function buildBlock(id) {
     estufa: '+5 kg de comida por dia por nível (mais com solo analisado e agricultor).',
     torre: 'Permite transmitir dados à Terra; níveis melhoram o sinal.',
     pista: 'Necessária para receber naves; níveis aumentam a chance de um pouso seguro.',
-    habitat: '+20 camas por nível: é preciso ter cama para cada colono.' }[id];
+    habitat: S.journey === 'curta' ? K('Habitat simples: +20 camas por nível, barato e rápido de montar (sem peças).', 'Simple habitat: +20 beds per level, cheap and quick to build (no parts).', 'Hábitat simple: +20 camas por nivel, barato y rápido de montar (sin piezas).') : '+20 camas por nível: é preciso ter cama para cada colono.' }[id];
   return `<p class="small">${esc(L(eff))}</p><p>${esc(L('Nível'))}: <b>${lv}/${max}</b> ${bar(lv, max)}</p>${lv < max ? taskBtns({ k: 'build', b: id }) : `<p class="green">✔ ${esc(L('Nível máximo'))}</p>`}`;
 }
 function colonyPanel(id) {
