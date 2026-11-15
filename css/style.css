@@ -593,3 +593,12 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .massbar{height:6px;background:#1a2342;margin:3px 0 5px}.massbar i{display:block;height:100%}
 .orbitbox{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.orbitinfo{flex:1;min-width:180px;font-size:.85em}
 .quizcats{margin:8px 0}
+/* órbita em 3 passos */
+.stage-panel .lead { font-size: 1.05em; margin: 0.2em 0 0.5em; }
+.pstep { display: flex; gap: 0.6em; align-items: flex-start; border: 2px solid #2b3a78; padding: 0.4em 0.6em; margin: 0.35em 0; background: rgba(8, 14, 44, 0.7); }
+.pstep.done { border-color: #3fbf6a; }
+.pnum { min-width: 1.6em; height: 1.6em; display: flex; align-items: center; justify-content: center; font-family: var(--sk); background: #2f5bd7; color: #fff; }
+.pstep.done .pnum { background: #3fbf6a; }
+.pstep b { display: block; font-family: var(--sk); } .pstep > div > small { display: block; color: var(--muted); margin-bottom: 0.25em; }
+.pbtns { display: flex; flex-wrap: wrap; gap: 0.3em; }
+.pres { flex-basis: 100%; font-size: 0.88em; } .pres span { color: var(--muted); } .pres.bad { color: #ff8a8a; }
