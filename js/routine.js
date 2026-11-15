@@ -31,6 +31,7 @@ const CHORE_MISS = {
 const CHORE_MISS_TXT = { rota: 'a nave desviou um pouco', suporte: 'o Suporte à vida desgastou', horta: 'as plantas ficaram sem água', lixo: 'o lixo acumulou', cardapio: 'a tripulação reclamou da comida', tanques: 'os tanques desgastaram', radio: 'a comunicação desgastou', motor: 'o motor desgastou', saude: 'a moral caiu', pesquisa: 'perdemos dados', dormir: 'você está mais cansado' };
 function routinePenalty() {
   const r = S && S.routine; if (!r || r.day !== S.day || S.scene !== 'ship' || S.tutorial < 4 || Net.role === 'client') return;
+  if (r.hadEvent || evActive()) return; // dia com missão: a rotina estava pausada
   const miss = r.items.filter(x => !x.done);
   miss.forEach(x => CHORE_MISS[x.id] && CHORE_MISS[x.id]());
   if (miss.length) toast('⚠ Rotina incompleta: ' + miss.map(x => CHORE_MISS_TXT[x.id]).join(' · '), 'warn');
@@ -39,8 +40,16 @@ function routinePenalty() {
 const ROUTINE_DAY1 = ['suporte', 'horta', 'lixo', 'radio'];
 const ROUTINE_SIZE = 3;
 
+// missão (desafio) em andamento: a rotina fica pausada
+const evActive = () => !!(S && S.event && S.event.phase !== 'result');
 function routineNew() {
   if (!S || Net.role === 'client') return;
+  // se um desafio tomou o dia, o que ficou pendente continua no dia seguinte (sem punição)
+  const prev = S.routine;
+  if (prev && prev.hadEvent && prev.day < S.day) {
+    const left = prev.items.filter(x => !x.done);
+    if (left.length) { S.routine = { day: S.day, items: left.map(x => ({ id: x.id, done: false })), bonus: false, carried: true }; return; }
+  }
   const ok = id => !CHORES[id].need || CHORES[id].need();
   let ids;
   if (S.day <= 1) ids = ROUTINE_DAY1.filter(ok);
@@ -63,11 +72,12 @@ function routineNew() {
 function routineGet() {
   if (!S || S.scene !== 'ship') return null;
   if ((!S.routine || S.routine.day !== S.day) && Net.role !== 'client') routineNew();
+  if (S.routine && evActive() && Net.role !== 'client') S.routine.hadEvent = true;
   return S.routine;
 }
 // chamado pelo host depois de cada ação (e quando alguém abre o painel de uma estação)
 function routineHook(type, p, actor) {
-  const r = S && S.routine; if (!r || S.scene !== 'ship' || r.day !== S.day) return;
+  const r = S && S.routine; if (!r || S.scene !== 'ship' || r.day !== S.day || evActive()) return;
   for (const it of r.items) {
     if (it.done) continue;
     const ch = CHORES[it.id]; if (!ch) continue;
@@ -110,7 +120,8 @@ function routineBox() {
   return `<div class="goals routine ${ev ? 'paused' : ''}"><b>${ev ? '⚠ ' + esc(L('EMERGÊNCIA')) : esc(L('ROTINA')) + ' · ' + esc(L('DIA')) + ' ' + S.day} <small>${done}/${r.items.length}</small></b>
     ${ev ? `<div class="evline">${esc(T((EVENT_INFO[ev.type] || {}).title || ''))}</div><div class="muted small">${esc(L('Rotina pausada: resolva o desafio primeiro.'))}</div>` : ''}
     ${rows.map(x => `<div class="${x.done ? 'done' : x === cur ? 'cur' : ''}">${x.done ? '☑' : x === cur ? '▶' : '☐'} ${x.icon} ${esc(L(x.t))}${x === cur && x.how ? `<div class="how">${esc(L(x.how))}</div>` : ''}</div>`).join('')}
-    ${!ev && !r.bonus && S.tutorial >= 4 ? `<div class="muted small">⏳ ${Math.max(0, Math.floor(24 - S.dayT / S.dayLen * 24))}h · ${esc(L('o que não for feito hoje tem consequência'))}</div>` : ''}
+    ${!ev && r.hadEvent && !r.bonus && r.items.length ? `<div class="muted small">⏸ ${esc(L('Hoje teve missão: o que faltar passa para amanhã.'))}</div>` : ''}
+    ${!ev && !r.bonus && !r.hadEvent && S.tutorial >= 4 ? `<div class="muted small">⏳ ${Math.max(0, Math.floor(24 - S.dayT / S.dayLen * 24))}h · ${esc(L('o que não for feito hoje tem consequência'))}</div>` : ''}
     ${!ev && !r.items.length ? `<div class="muted small">☕ ${esc(L('Nenhuma tarefa hoje. Acelere o tempo (Shift+S) se quiser.'))}</div>` : ''}
     ${!ev && r.bonus ? `<div class="green small">✔ ${esc(L('Rotina completa. Acelere o tempo (Shift+S) até o próximo desafio.'))}</div>` : ''}</div>`;
 }

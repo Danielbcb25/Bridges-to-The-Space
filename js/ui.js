@@ -90,8 +90,8 @@ function titleScreen() {
     <div class="tbox tr"><div class="lbl cyan">▣ MISSÃO ATUAL</div><div class="small">Explorar o planeta</div><div class="cyan">Pontes01</div></div>
     <div class="logo"><h1>PONTES<span>01</span></h1><div class="sub">— EXPLORAÇÃO ESPACIAL —</div></div>
     <div class="menu">
-      ${U.playMenu ? `${(() => { const sv = GameSave.summary(); return sv ? `<button class="mbtn" data-ui="continueGame">▶ ${esc(L('CONTINUAR'))}</button>` : ''; })()}
-      <button class="mbtn" data-ui="journey">✦ NOVA JORNADA</button>
+      ${U.playMenu ? `<button class="mbtn" data-ui="journey">✦ NOVA JORNADA</button>
+      ${(() => { const sv = GameSave.summary(); return sv ? `<button class="mbtn" data-ui="continueGame">▶ ${esc(L('CONTINUAR'))}</button>` : ''; })()}
       ${GameSave.list().length ? `<button class="mbtn" data-ui="saves">📂 ${esc(L(K('JOGOS SALVOS', 'SAVED GAMES', 'PARTIDAS GUARDADAS')))} <small>${GameSave.list().length}</small></button>` : ''}
       <button class="mbtn" data-ui="playMenu">◀ ${esc(L('VOLTAR'))}</button>` : `<button class="mbtn primary" data-ui="playMenu">▶ ${esc(L('JOGAR'))}</button>
       <button class="mbtn" data-ui="lobby">👥 MULTIPLAYER</button>
