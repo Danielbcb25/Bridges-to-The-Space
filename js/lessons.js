@@ -140,7 +140,7 @@ const MORE_LESSONS = {
   sol: { fact: K('Um dia em Marte, chamado "sol", dura 24 horas e 37 minutos. As equipes dos rovers chegam a viver no "horário marciano".', 'A day on Mars, called a "sol", lasts 24 hours and 37 minutes. Rover teams even live on "Mars time".', 'Un día en Marte, llamado "sol", dura 24 horas y 37 minutos. Los equipos de los rovers llegan a vivir en "hora marciana".'), ref: 'Um dia marciano (sol) dura aproximadamente…' },
   ingenuity: { fact: K('Em 2021, o helicóptero Ingenuity fez o primeiro voo motorizado e controlado em outro planeta, em Marte.', 'In 2021 the Ingenuity helicopter made the first powered, controlled flight on another planet: Mars.', 'En 2021 el helicóptero Ingenuity hizo el primer vuelo motorizado y controlado en otro planeta: Marte.'), ref: 'O que foi o Ingenuity?' },
   margins: { fact: K('Missões espaciais guardam margens de massa, energia e orçamento, porque imprevistos acontecem e o projeto cresce durante o desenvolvimento.', 'Space missions keep margins of mass, power and budget, because surprises happen and designs grow during development.', 'Las misiones espaciales guardan márgenes de masa, energía y presupuesto, porque ocurren imprevistos y el diseño crece durante el desarrollo.'), ref: 'Por que as missões mantêm margens (folgas) de massa, energia e orçamento?' },
-  phases: { fact: K('Toda missão espacial passa por fases: Pré-Fase A e Fase A (conceito), B e C (projeto e construção), D (testes e lançamento), E (operações no espaço) e F (encerramento).', 'Every space mission goes through phases: Pre-Phase A and Phase A (concept), B and C (design and build), D (test and launch), E (operations in space) and F (closeout).', 'Toda misión espacial pasa por fases: Pre-Fase A y Fase A (concepto), B y C (diseño y construcción), D (pruebas y lanzamiento), E (operaciones en el espacio) y F (cierre).'), ref: 'Em qual fase a missão já está no espaço, coletando e enviando ciência?' },
+  phases: { fact: K('Numa missão científica, tudo começa pelas perguntas: elas definem os objetivos, depois os instrumentos e, por fim, a nave. O projeto da missão nasce da ciência.', 'In a science mission, everything starts with the questions: they define the objectives, then the instruments and finally the spacecraft. Mission design starts from the science.', 'En una misión científica todo empieza por las preguntas: ellas definen los objetivos, luego los instrumentos y, por último, la nave. El diseño de la misión nace de la ciencia.'), ref: 'Numa missão científica, o que deve vir primeiro?' },
   horta: { fact: K('Já se plantou comida no espaço: astronautas cultivaram e comeram alface na Estação Espacial, e em 2021 colheram pimentas por lá.', 'Food has already been grown in space: astronauts grew and ate lettuce on the Space Station, and in 2021 they harvested chili peppers there.', 'Ya se cultivó comida en el espacio: los astronautas cultivaron y comieron lechuga en la Estación Espacial, y en 2021 cosecharon chiles allí.'),
     quiz: Q('gp:horta', '', ['Que alimento os astronautas já cultivaram e comeram na Estação Espacial?', 'Which food have astronauts grown and eaten on the Space Station?', '¿Qué alimento ya cultivaron y comieron los astronautas en la Estación Espacial?'],
       [['Alface', 'Lettuce', 'Lechuga'], ['Melancia', 'Watermelon', 'Sandía'], ['Café', 'Coffee', 'Café'], ['Nada: plantas não crescem no espaço', 'Nothing: plants cannot grow in space', 'Nada: las plantas no crecen en el espacio']], 0,
@@ -157,6 +157,7 @@ const CHORE_LESSON = { suporte: 'oxigenio', horta: 'horta', lixo: 'lixo', radio:
 // mostra a lição do tema (uma vez por jornada; fora dos desafios, no máximo uma a cada 25 s)
 function teach(key, force) {
   if (!S || !ALL_LESSONS[key] || (typeof Net !== 'undefined' && Net.role === 'client')) return;
+  if (Save.data.settings.curios === false && !(typeof Net !== 'undefined' && Net.role)) return; // desligadas no solo
   S.lessons = S.lessons || [];
   if (S.lessons.some(x => x.ev === key)) return;
   const now = Date.now(); // relógio de parede: vale na nave, na estação, no planeta e na colônia
@@ -167,6 +168,7 @@ function teach(key, force) {
 // cartão do computador: só conta a curiosidade (as perguntas ficam no Quiz da tela inicial)
 function lessonCard() {
   if (!S || !S.lessonLast || !['ship', 'colony', 'station', 'planet', 'migration', 'detour'].includes(S.scene) || (S.event && S.event.phase !== 'result')) return '';
+  if (Save.data.settings.curios === false) return ''; // desligadas nas configurações
   const rec = S.lessonLast; const ls = lessonOf(rec); if (!ls || !ls.fact) return '';
   if (Date.now() - rec.at > 45000 || U.lessonHide === rec.at) return '';
   if (U.lessonMarked !== rec.at) { // primeira vez na tela: marca o tema para o Quiz e o computador fala
