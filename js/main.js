@@ -207,8 +207,8 @@ window.addEventListener('keydown', e => {
   }
   if (S.scene === 'colony') {
     if ((e.code === 'KeyE' || e.code === 'Space') && me() && me().csleep) { act('cWake'); return; }
-    if (e.code === 'Space') { if (U.panel && U.panel.startsWith('c:')) UIH.closePanel(); else spaceAction(); }
-    if (e.code === 'KeyE') { if (U.panel && U.panel.startsWith('c:')) UIH.closePanel(); else interact(); }
+    if (e.code === 'Space') { if (U.panel && U.panel !== 'menu') UIH.closePanel(); else if (!U.panel) spaceAction(); }
+    if (e.code === 'KeyE') { if (U.panel && U.panel !== 'menu') UIH.closePanel(); else if (!U.panel) interact(); } // qualquer painel aberto: E fecha; sem painel: interage
     if (e.code === 'KeyT') { U.panel === 'crew' ? UIH.closePanel() : UIH.panel('crew'); }
     if (e.code === 'KeyF') { U.panel === 'fund' ? UIH.closePanel() : UIH.panel('fund'); }
     return;

@@ -563,36 +563,30 @@ ACTIONS.shelter = () => {
 };
 
 // ===================== REGULAÇÃO TÉRMICA =====================
-const TH_ACTIONS = {
-  rot: { name: 'Girar a nave', short: 'Rotação', need: 5, role: 'navegador', station: 'ponte', cost: () => `−${has('motorEf') ? 15 : 20} kg comb.`, sys: 'propulsao' },
-  rad: { name: 'Radiadores', short: 'Radiadores', need: 4, role: 'engenheiro', station: 'termico', cost: () => '−6 kWh', sys: 'termico' },
-  heat: { name: 'Aquecedores', short: 'Aquecedores', need: 4, role: 'engenheiro', station: 'termico', cost: () => `−${thHeatCost()} kWh`, sys: 'suporte' },
-  rep: { name: 'Reparar o isolamento', short: 'Reparo', need: 3, role: 'engenheiro', station: 'eclusa', cost: () => L(K('−4,8 kWh e engenheiro 1 min', '−4.8 kWh and engineer 1 min', '−4,8 kWh e ingeniero 1 min')), sys: 'termico' },
-  shut: { name: 'Persianas térmicas', short: 'Persianas', need: 6, role: 'engenheiro', station: 'termico', cost: () => '−3 kWh', sys: 'termico' },
-  equip: { name: 'Desligar equipamentos', short: 'Equipamentos', need: 5, role: 'pesquisador', station: 'lab', cost: () => (S.thermal && S.thermal.equipOff ? 'religar (sem custo)' : '+6 kWh e −3 moral'), sys: 'avionica' },
+// Três controles simples para manter o interior entre 18 e 26 °C:
+// aquecedor (esquenta, gasta energia), resfriador (esfria, gasta energia)
+// e cortinas térmicas (fechadas barram o Sol e seguram o calor na sombra).
+const TH_CTRL = {
+  heat: { icon: '🔥', name: 'Aquecedor', what: 'Esquenta o interior. Use quando esfriar (na sombra).', cost: 'gasta energia' },
+  cool: { icon: '❄', name: 'Resfriador', what: 'Joga o calor para fora pelos radiadores. Use quando esquentar.', cost: 'gasta energia' },
+  shut: { icon: '🪟', name: 'Cortinas térmicas', what: 'Fechadas, barram o calor do Sol e seguram o calor na sombra.', cost: 'não gasta energia' },
 };
-function thHeatCost() { let c = has('aquecEf') ? 9 : 12; if (S.thermal && S.thermal.shutOk) c -= 3; return c; }
+const TH_KWH = { heat: 0.25, cool: 0.2 }; // kWh por segundo ligado
 
 EV.termico = {
   time: 60, points: 0, noTimer: true, customEnd: true,
-  tip: 'Poucas soluções, bem combinadas. Preparem-se antes.', ai: 'girar a nave cedo e abrir radiadores no pico.',
+  tip: 'Feche as cortinas e ligue o resfriador no calor; na sombra, aquecedor.', ai: 'fechar as cortinas e ligar o resfriador no pico de calor.',
   setup(ev) {
     const D = 60; // fase térmica de 1 minuto
     ev.t = ev.dur = D;
     ev.steps = [];
-    S.thermal = {
-      D, el: 0, T: 22, sun: 30, shade: -60, scene: 0, rip: false, ripLoss: 0, repaired: false, overload: false, shadow: false,
-      act: { rot: 0, rad: 0, heat: 0, shut: 0 }, weak: {}, disabled: {}, shutMode: null, equipOff: false, equipDelay: 0,
-      last: null, fails: 0, anyFail: false, maint: {}, dedic: {}, kwh: 0, fuel: 0, plantsLost: 0, outT: 0, plantT: 0,
-      sangue: has('sangue'), olhar: has('olhar'), clear: null, pendingReroll: null, startE: S.res.energia, startShield: S.res.escudo,
-      startData: S.res.dados, msgs: [], sunMult: 1, panic: false, gbLost: 0,
-    };
+    S.thermal = { D, el: 0, T: 22, sun: 30, shade: -60, scene: 0, overload: false, shadow: false,
+      on: { heat: false, cool: false, shut: false }, kwh: 0, fuel: 0, plantsLost: 0, outT: 0, plantT: 0, msgs: [] };
   },
   start(ev) {
-    const th = S.thermal;
     narrate('Atenção, tripulação. A nave está entrando em uma zona de calor extremo. No espaço não há ar para espalhar o calor. O lado voltado para a estrela esquenta sem parar, enquanto o outro lado congela. Mantenham a temperatura interna entre 18 e 26 graus.');
     sayRole('navegador', F('crew.c9'), 9);
-    thMsg('Cena 1 — Alerta de calor. Decisão: ligar a rotação agora ou esperar.');
+    thMsg('Alerta de calor: a nave vai esquentar. Prepare o resfriador e as cortinas.');
   },
   tick(ev, dt) { thermalTick(ev, dt); },
 };
@@ -602,227 +596,48 @@ function thMsg(t) { const th = S.thermal; if (!th) return; th.msgs.push(t); if (
 function thermalTick(ev, dt) {
   const th = S.thermal; if (!th) return;
   th.el += dt; ev.t = Math.max(0, th.D - th.el);
-  const dk = dt * (300 / th.D); // a física foi calibrada para 5 min: acelera na mesma proporção
   const p = th.el / th.D;
   const peak = has('pintura') ? 100 : 120;
-  // cenas
-  if (th.scene < 2 && p >= 0.12) {
-    th.scene = 2; thMsg('Cena 2 — A estrela se aproxima: o lado do Sol sobe para +' + peak + ' °C.');
-    sayRole('engenheiro1', F('crew.c10'), 8);
-    const need = thNeed('rot');
-    if (need >= 9 && roleAlive('navegador')) sayRole('navegador', F('crew.c11'));
-  }
-  if (th.scene < 3 && p >= 0.32) {
-    th.scene = 3;
-    if (!has('cobertor') || Math.random() < 0.5) {
-      th.rip = true; thMsg('Cena 3 — Rasgo no isolamento! Um micrometeoroide atingiu o cobertor térmico.');
-      const e = byRole('engenheiro').find(c => c.alive);
-      if (e) say(e, thNeed('rep') >= 9 ? '(respiração pesada) O isolamento rasgou... preciso sair para consertar, mas vou ficar exposto.' : 'O isolamento rasgou. Preciso sair para consertar, mas vou ficar exposto.', 8);
-    } else thMsg('Cena 3 — Um micrometeoroide bateu no cobertor multicamadas, mas ele aguentou.');
-  }
-  if (th.scene < 4 && p >= 0.48) {
-    th.scene = 4; th.overload = true; thMsg('Cena 4 — Sobrecarga elétrica: os equipamentos geram calor interno.');
-    sayRole('pesquisador', F('crew.c12'), 8);
-  }
-  if (th.scene < 5 && p >= 0.66) {
-    th.scene = 5; th.shadow = true; th.overload = false; thMsg('Cena 5 — Entrada na sombra: a temperatura cai rápido.');
-    sayRole('paramedico', F('crew.c13'), 8);
-  }
+  if (th.scene < 2 && p >= 0.12) { th.scene = 2; thMsg('A estrela se aproxima: o lado do Sol sobe para +' + peak + ' °C. Feche as cortinas.'); sayRole('engenheiro1', F('crew.c10'), 8); }
+  if (th.scene < 4 && p >= 0.45) { th.scene = 4; th.overload = true; thMsg('Sobrecarga elétrica: os equipamentos esquentam a nave. Ligue o resfriador.'); sayRole('pesquisador', F('crew.c12'), 8); }
+  if (th.scene < 5 && p >= 0.66) { th.scene = 5; th.shadow = true; th.overload = false; thMsg('Entrada na sombra: vai esfriar rápido. Desligue o resfriador e ligue o aquecedor.'); sayRole('paramedico', F('crew.c13'), 8); }
   // temperaturas externas
-  let sunT = th.shadow ? -60 : (th.scene >= 2 ? peak : 60);
-  let shadeT = th.shadow ? -150 : (th.scene >= 2 ? -120 : -100);
-  th.sun += (sunT - th.sun) * Math.min(1, dk * 0.08 * th.sunMult);
-  th.shade += (shadeT - th.shade) * Math.min(1, dk * 0.08);
-  // efeitos ativos
-  for (const k in th.act) if (th.act[k] > 0) { th.act[k] -= dt; if (th.act[k] <= 0) { th.act[k] = 0; th.weak[k] = false; if (k === 'shut') th.shutMode = null; thMsg(`${TH_ACTIONS[k].name}: efeito terminou.`); } }
-  if (th.sunMult > 1) th.sunMult = Math.max(1, th.sunMult - dk * 0.02);
-  const rot = th.act.rot > 0 ? (th.weak.rot ? 0.75 : 0.45) : 1;
-  const ripF = th.rip && !th.repaired ? 1.6 : 1;
-  const heatIn = Math.max(0, th.sun - 20) * 0.06 * rot * ripF * th.sunMult;
-  const shutClosed = th.act.shut > 0 && th.shutMode === 'fechar';
-  const shutOpen = th.act.shut > 0 && th.shutMode === 'abrir';
-  const coldLoss = Math.max(0, 20 - th.shade) * (th.shadow ? 0.03 : 0.012) * rot * ripF * (shutClosed ? (th.weak.shut ? 0.75 : 0.5) : 1);
-  let equip = th.equipOff ? 0 : (th.overload ? 8 : 3);
-  if (has('fusao')) equip += 2;
-  const conflict = th.act.rad > 0 && th.act.heat > 0;
-  const rad = th.act.rad > 0 ? (th.weak.rad ? 4 : 9) * (conflict ? 0.5 : 1) : 0;
-  const heat = th.act.heat > 0 ? (th.weak.heat ? 5 : 10) * (conflict ? 0.5 : 1) : 0;
-  const Teq = 22 + heatIn - coldLoss + equip - rad + heat - (shutOpen ? (th.weak.shut ? 2 : 4) : 0);
+  const sunT = th.shadow ? -60 : (th.scene >= 2 ? peak : 60);
+  const shadeT = th.shadow ? -150 : (th.scene >= 2 ? -120 : -100);
+  th.sun += (sunT - th.sun) * Math.min(1, dt * 0.4);
+  th.shade += (shadeT - th.shade) * Math.min(1, dt * 0.4);
+  // gasto de energia dos aparelhos ligados (desligam sozinhos sem energia)
+  for (const k of ['heat', 'cool']) {
+    if (!th.on[k]) continue;
+    const need = TH_KWH[k] * dt;
+    if (S.res.energia < need) { th.on[k] = false; thMsg('Sem energia: ' + TH_CTRL[k].name + ' desligou.'); continue; }
+    addRes('energia', -need, 'Regulação térmica'); th.kwh += need; S.stats.thermalKwh += need;
+  }
+  const closed = th.on.shut;
+  const heatIn = Math.max(0, th.sun - 20) * 0.06 * (closed ? 0.3 : 1);
+  const coldLoss = Math.max(0, 20 - th.shade) * (th.shadow ? 0.06 : 0.012) * (closed ? 0.5 : 1);
+  const equip = (th.overload ? 8 : 3) + (has('fusao') ? 2 : 0);
+  const Teq = 22 + heatIn - coldLoss + equip - (th.on.cool ? 12 : 0) + (th.on.heat ? 12 : 0);
   th.Teq = Teq;
-  th.T += (Teq - th.T) * Math.min(1, dk * 0.05);
-  // escudo perdendo espessura com o rasgo aberto
-  if (th.rip && !th.repaired && th.ripLoss < 7.5) { const l = Math.min(7.5 - th.ripLoss, dk * 0.06); th.ripLoss += l; addRes('escudo', -l, 'Rasgo no isolamento'); }
-  // plantação sofre fora da faixa
-  const out = th.T > 26 || th.T < 18;
-  if (out) {
-    th.outT += dt; th.plantT += dk;
+  th.T += (Teq - th.T) * Math.min(1, dt * 0.25);
+  // plantação e tripulação sofrem fora da faixa
+  if (th.T > 26 || th.T < 18) {
+    th.outT += dt; th.plantT += dt * 5;
     const every = has('tAgr') ? 12 : 7;
     if (th.plantT >= every && th.plantsLost < 18) { th.plantT = 0; th.plantsLost += 1; addRes('plantacao', -1, 'Temperatura fora da faixa'); }
   }
-  if (th.T > 32 || th.T < 12) for (const c of alive()) c.humor = clamp(c.humor - dk * 0.15, 0, 100);
-  if (th.equipDelay > 0) { th.equipDelay -= dt; if (th.equipDelay <= 0) { th.equipOff = false; S.equipOff = false; thMsg('Equipamentos religados após o atraso.'); } }
-  if (th.pendingReroll) { th.pendingReroll.t -= dt; if (th.pendingReroll.t <= 0) { const pr = th.pendingReroll; th.pendingReroll = null; thFailure(pr.k); } }
+  if (th.T > 32 || th.T < 12) for (const c of alive()) c.humor = clamp(c.humor - dt * 0.75, 0, 100);
   if (th.el >= th.D) thermalEnd(ev);
 }
-
-function thMods(k) {
-  const th = S.thermal; const list = [];
-  const a = TH_ACTIONS[k];
-  if (th.dedic[k]) list.push([has('delegar') ? 3 : 2, 'tripulante dedicado']);
-  if (th.maint[k]) list.push([1, 'manutenção preventiva']);
-  if (th.last === k) list.push([-2, 'desgaste (uso seguido)']);
-  if (S.res.escudo < 25) list.push([-2, 'escudo < 25 mm']);
-  if (moralIndex() < 40) list.push([-2, 'moral baixa']);
-  if (S.res.energia < 12 && (k === 'rad' || k === 'heat')) list.push([-3, 'energia < 12 kWh']);
-  if ((th.T > 40 || th.T < 10) && k === 'shut') list.push([-2, 'temperatura extrema']);
-  if (th.anyFail) list.push([-1, 'outra solução já falhou']);
-  if (k === 'rot') { if (has('propReforco')) list.push([2, 'propulsores reforçados']); if (has('tNav')) list.push([1, 'navegador treinado']); if (S.setup.origin === 'astronauta') list.push([1, 'ex-astronauta']); }
-  if (k === 'rad') { if (has('radiadoresRed')) list.push([2, 'radiadores redundantes']); if (th.rotOk) list.push([1, 'sinergia com a rotação']); if (th.act.heat > 0) list.push([-2, 'conflito com aquecedores']); if (th.act.shut > 0 && th.shutMode === 'fechar') list.push([-1, 'persianas fechadas']); if (has('fusao')) list.push([-1, 'calor do reator']); }
-  if (k === 'heat') { if (th.shutOk) list.push([1, 'sinergia com persianas']); if (th.act.rad > 0) list.push([-2, 'conflito com radiadores']); }
-  if (k === 'rep') { if (has('cobertor')) list.push([1, 'cobertor multicamadas']); if (S.setup.origin === 'engenheiro') list.push([1, 'engenheiro-chefe']); }
-  if (['rep', 'rad', 'shut'].includes(k) && has('tEng')) list.push([1, 'engenheiros treinados']);
-  if (effIndex() < 50) list.push([-1, 'eficiência baixa']);
-  if (th.exemplo && th.exemplo[k]) list.push([-1, 'líder no lugar do tripulante']);
-  return list;
-}
-function thNeed(k) { // número necessário no dado
-  if (!S.thermal) return 10;
-  const mod = thMods(k).reduce((s, m) => s + m[0], 0);
-  return clamp(TH_ACTIONS[k].need - mod, 2, 20);
-}
-function thHint(k) {
-  const n = thNeed(k);
-  const th = S.thermal;
-  let level = n <= 3 ? 'ok' : n <= 8 ? 'warn' : 'bad';
-  let band = null;
-  if (has('sensores') || (th.clear === k)) band = n <= 6 ? 'alta' : n <= 11 ? 'média' : 'baixa';
-  return { level, band, n };
-}
-
-ACTIONS.thAct = (p, actor) => {
+ACTIONS.thToggle = p => {
   const th = S.thermal; const ev = S.event;
-  if (!th || !ev || ev.phase !== 'run') return;
-  const k = p.k; const a = TH_ACTIONS[k];
-  if (th.disabled[k]) return toast(`${a.name} inutilizável até o fim da fase.`, 'warn');
-  if (th.pendingReroll) return;
-  // dedicado?
-  th.dedic[k] = false; th.exemplo = th.exemplo || {};
-  // o próprio jogador com a função certa conta como tripulante dedicado
-  if (actor && roleMatches(actor, a.role) && actor.alive && actor.status !== 'incapacitado') { th.dedic[k] = true; thMsg(`${actor.name} cuida pessoalmente: ${a.short} (tripulante dedicado).`); }
-  else if (p.dedic) {
-    const c = pickForRole(a.role);
-    if (c) { th.dedic[k] = true; callCrew(c, { station: a.station, dur: 12 * th.D / 300, label: a.name, key: 'thBusy' }, a.role); }
-    else if (has('exemplo')) { th.exemplo[k] = true; th.dedic[k] = true; thMsg('Exemplo em campo: o Comandante assume a função (−1).'); }
-    else thMsg('Nenhum ' + a.role + ' disponível para se dedicar.');
-  }
-  // custos
-  if (k === 'rot') { const f = has('motorEf') ? 15 : 20; if (S.res.combustivel < f) return toast('Combustível insuficiente.', 'warn'); addRes('combustivel', -f, 'Regulação térmica: rotação'); th.fuel += f; S.stats.thermalFuel += f; }
-  else if (k === 'equip') {
-    if (!th.equipOff) {
-      th.equipOff = true; S.equipOff = true; addRes('energia', 6, 'Equipamentos desligados'); th.kwh -= 6; moral(-3);
-      S.commDown = Math.max(S.commDown, 5);
-      thMsg('Equipamentos desligados: +6 kWh, comunicação cai, moral −3 e a pesquisa para.');
-      th.last = k; S.v++; return;
-    }
-  } else {
-    const kwh = { rad: 6, heat: thHeatCost(), rep: 4.8, shut: 3 }[k];
-    if (k === 'rep') { const eng = (actor && roleMatches(actor, 'engenheiro')) ? null : pickForRole('engenheiro'); if (!eng && !(actor && roleMatches(actor, 'engenheiro')) && !has('exemplo')) return toast('Nenhum engenheiro disponível para o reparo.', 'warn'); if (eng) callCrew(eng, { station: 'eclusa', dur: 12 * th.D / 300, label: 'Reparo do isolamento', key: 'thBusy' }, 'engenheiro'); }
-    if (S.res.energia < kwh) return toast('Energia insuficiente.', 'warn');
-    addRes('energia', -kwh, 'Regulação térmica: ' + a.short); th.kwh += kwh; S.stats.thermalKwh += kwh;
-  }
-  if (k === 'shut') th.shutMode = p.mode || (th.T > 22 ? 'abrir' : 'fechar');
-  thRoll(k);
-};
-TASK_DONE.thBusy = () => {};
-ACTIONS.thMaint = (p, actor) => {
-  const th = S.thermal; if (!th) return;
-  const k = p.k; const a = TH_ACTIONS[k];
-  const c = (actor && roleMatches(actor, a.role) && available(actor)) ? actor : pickForRole(a.role);
-  if (!c) return toast('Ninguém disponível para a manutenção.', 'warn');
-  const mt = { station: a.station, dur: 10 * th.D / 300, label: 'Manutenção preventiva: ' + a.short, key: 'thMaint', data: { k } };
-  if (c === actor) assignTask(c, mt); else callCrew(c, mt, a.role);
-  thMsg(`${c.name} faz manutenção preventiva em ${a.short} (1 min).`);
-};
-TASK_DONE.thMaint = (c, d) => { if (S.thermal) { S.thermal.maint[d.k] = true; thMsg(`Manutenção preventiva concluída: ${TH_ACTIONS[d.k].short} +1.`); } };
-ACTIONS.thOlhar = (p) => { const th = S.thermal; if (!th || !th.olhar) return; th.olhar = false; th.clear = p.k; thMsg('Olhar estratégico: a pista de ' + TH_ACTIONS[p.k].short + ' ficou mais clara.'); };
-ACTIONS.thReroll = () => {
-  const th = S.thermal; if (!th || !th.pendingReroll || !th.sangue) return;
-  const k = th.pendingReroll.k; th.pendingReroll = null; th.sangue = false;
-  thMsg('Sangue-frio: o Comandante rola de novo.');
-  thRoll(k, true);
-};
-ACTIONS.thAcceptFail = () => { const th = S.thermal; if (!th || !th.pendingReroll) return; const k = th.pendingReroll.k; th.pendingReroll = null; thFailure(k); };
-
-function thRoll(k, isReroll) {
-  const th = S.thermal; const a = TH_ACTIONS[k];
-  const mods = thMods(k); const mod = mods.reduce((s, m) => s + m[0], 0);
-  const r = d20(); const total = r + mod;
-  const need = k === 'equip' ? 5 : a.need;
-  const ok = r === 20 || (r !== 1 && total >= need);
-  th.lastRoll = { k, r, mod, need, ok };
-  if (Save.data.settings.showDice) thMsg(`[d20=${r} ${mod >= 0 ? '+' : ''}${mod} = ${total} vs ${need}]`);
-  th.maint[k] = false;
-  th.last = k;
-  if (ok) {
-    if (k === 'rot') { th.act.rot = 90 * th.D / 300; th.rotOk = true; thMsg('Rotação funcionando: o calor se distribui (técnica do “espetinho”).'); sayRole('navegador', F('crew.c14')); }
-    if (k === 'rad') { th.act.rad = 60 * th.D / 300; thMsg('Radiadores abertos: o calor sai por radiação.'); }
-    if (k === 'heat') { th.act.heat = 60 * th.D / 300; thMsg('Aquecedores ligados.'); }
-    if (k === 'rep') { th.repaired = true; thMsg('Isolamento reparado: o escudo para de perder espessura.'); sayRole('engenheiro2', F('crew.c15')); }
-    if (k === 'shut') { th.act.shut = 60 * th.D / 300; th.shutOk = true; thMsg(`Persianas ${th.shutMode === 'abrir' ? 'abertas: soltando calor' : 'fechadas: segurando calor'}.`); }
-    if (k === 'equip') { th.equipOff = false; S.equipOff = false; thMsg('Equipamentos religados com sucesso.'); }
-    S.v++; return;
-  }
-  // falhou
-  if (th.sangue && !isReroll) { th.pendingReroll = { k, t: 8 }; thMsg(`${a.name} falhou! (Sangue-frio disponível: rolar de novo?)`); S.v++; return; }
-  thFailure(k);
-}
-function thFailure(k) {
-  const th = S.thermal; const a = TH_ACTIONS[k];
-  th.anyFail = true; th.fails++;
-  const loss = has('voz') ? 1 : 2; moral(-loss);
-  const panicAt = has('voz2') ? 3 : 2;
-  if (th.fails >= panicAt && !th.panic) { th.panic = true; moral(-10); thMsg('PÂNICO NA TRIPULAÇÃO! Moral −10.'); }
-  const sev = d10();
-  const g = sev === 1 ? 'grave' : sev <= 4 ? 'média' : 'leve';
-  let txt = '';
-  if (k === 'rot') {
-    if (g === 'leve') { th.act.rot = 40 * th.D / 300; th.weak.rot = true; th.sunMult = 1.3; txt = 'Gira pouco: o lado do Sol esquenta mais rápido.'; }
-    if (g === 'média') { addRes('plantacao', -6, 'Propulsor travado'); th.plantsLost += 6; txt = 'Propulsor travado! Plantação −6 kg.'; sayRole('navegador', F('crew.c16')); }
-    if (g === 'grave') { th.disabled.rot = true; th.act.rot = 0; addRes('combustivel', -50, 'Propulsor queimado'); th.fuel += 50; damageSys('propulsao', 15); txt = 'Propulsor queimou: sem controle de rotação e −50 kg de combustível.'; }
-  }
-  if (k === 'rad') {
-    if (g === 'leve') { th.act.rad = 60 * th.D / 300; th.weak.rad = true; txt = 'Radiadores soltam menos calor: a temperatura sobe devagar.'; }
-    if (g === 'média') { moral(-5); addRes('dados', -20, 'Perda de fluido do radiador'); th.gbLost += 20; txt = 'Perda de fluido: moral −5 e dados −20 GB.'; }
-    if (g === 'grave') { th.disabled.rad = true; th.act.rad = 0; txt = 'Vazamento do fluido: radiador inutilizável até o fim da fase.'; }
-  }
-  if (k === 'heat') {
-    if (g === 'leve') { th.act.heat = 60 * th.D / 300; th.weak.heat = true; txt = 'Aquecedores esquentam de forma irregular.'; }
-    if (g === 'média') { S.commDown = 60 * th.D / 300; moral(-5); txt = 'Curto-circuito: comunicação cai por 1 min e moral −5.'; }
-    if (g === 'grave') { const m = has('extintores') ? 0.5 : 1; addRes('energia', -9 * m, 'Incêndio pequeno'); addRes('oxigenio', -9 * m, 'Incêndio pequeno'); th.kwh += 9 * m; txt = `Incêndio pequeno: −${9 * m} kWh e −${9 * m} kg de oxigênio.`; S.shake = 0.4; }
-  }
-  if (k === 'rep') {
-    if (g === 'leve') { addRes('escudo', -2.5, 'Conserto fraco'); txt = 'Conserto fraco: escudo −2,5 mm.'; }
-    if (g === 'média') { addRes('escudo', -7.5, 'Conserto falhou'); txt = 'Escudo −7,5 mm.'; }
-    if (g === 'grave') {
-      const e = byRole('engenheiro').find(c => c.alive);
-      if (e) { e.status = 'incapacitado'; e.statusT = th.D - th.el + 20; e.task = null; }
-      addRes('medicos', -(has('tMed') ? 1 : 2), 'Atendimento do engenheiro');
-      txt = 'Acidente: o engenheiro foi ferido! O paramédico gasta recursos médicos. (Ninguém morre.)';
-    }
-  }
-  if (k === 'shut') {
-    if (g === 'leve') { th.act.shut = 60 * th.D / 300; th.weak.shut = true; txt = 'Persianas abrem só um pouco.'; }
-    if (g === 'média') { th.act.shut = 60 * th.D / 300; th.shutMode = 'abrir'; addRes('agua', -60, 'Persianas travadas (água congelou)'); txt = 'Persianas travaram abertas: a água congela (−60 L).'; }
-    if (g === 'grave') { addRes('escudo', -5, 'Persianas danificaram o casco'); damageSys('casco', 5); txt = 'Persianas travaram e danificaram o casco: escudo −5 mm.'; }
-  }
-  if (k === 'equip') {
-    if (g === 'leve') { th.equipDelay = 60 * th.D / 300; txt = 'Atraso de 1 min para religar.'; }
-    if (g === 'média') { const l = has('tPesq') ? 15 : 30; addRes('dados', -l, 'Perda de dados'); th.gbLost += l; th.equipOff = false; S.equipOff = false; txt = `Perda de dados: −${l} GB.`; }
-    if (g === 'grave') { const l = Math.max(0, S.res.dados - th.startData); addRes('dados', -l, 'Dados da fase perdidos'); th.gbLost += l; S.commDown = 120 * th.D / 300; th.equipOff = false; S.equipOff = false; txt = 'Perdemos os dados da fase e a comunicação com a Terra por 2 min.'; }
-  }
-  thMsg(`✖ ${a.name} falhou (${g}): ${txt}`);
+  if (!th || !ev || ev.phase !== 'run' || !TH_CTRL[p.k]) return;
+  const k = p.k;
+  if (k !== 'shut' && !th.on[k] && S.res.energia < 1) return toast('Energia insuficiente.', 'warn');
+  th.on[k] = !th.on[k];
+  thMsg(k === 'shut' ? (th.on.shut ? 'Cortinas fechadas.' : 'Cortinas abertas.') : TH_CTRL[k].name + (th.on[k] ? ' ligado.' : ' desligado.'));
   S.v++;
-}
+};
 
 function thermalEnd(ev) {
   const th = S.thermal;
@@ -832,15 +647,14 @@ function thermalEnd(ev) {
     grade = 'Crítico'; pts = 0; // falha não rende pontos
     const v = pick(alive().filter(c => c.id !== 'cmd')); if (v) { v.status = 'ferido'; v.statusT = 90; }
     S.fragile = true;
-  } else if (th.outT < th.D * 0.15 && th.fails <= 1 && E > 24) { grade = 'Excelente'; pts = 40; moral(10); }
+  } else if (th.outT < th.D * 0.15 && E > 24) { grade = 'Excelente'; pts = 40; moral(10); }
   else { grade = 'Sobrevivência'; pts = 25; }
   narrate('A zona de calor ficou para trás. Aqui no espaço, cada grau precisa ser controlado por nós, com energia, tempo e recursos limitados. Na Terra, a atmosfera faz isso sozinha, de graça.');
   const text = `Resultado: ${grade}. Custo para manter a temperatura: ${fmt(th.kwh)} kWh de energia, ${fmt(th.fuel, 0)} kg de combustível. Plantação perdida: ${fmt(th.plantsLost, 0)} kg. Tempo fora da faixa segura: ${fmt(th.outT, 0)} s.`;
   ev.data.grade = grade;
-  ev.data.report = { kwh: th.kwh, fuel: th.fuel, plants: th.plantsLost, outT: th.outT, fails: th.fails, gb: th.gbLost };
+  ev.data.report = { kwh: th.kwh, fuel: th.fuel, plants: th.plantsLost, outT: th.outT, fails: 0, gb: 0 };
   endEvent(grade !== 'Crítico', { text, points: pts, grade, ok: grade !== 'Crítico' });
   S.event.result.points = pts;
-  if (S.thermal) { S.equipOff = false; }
 }
 
 // ===================== ESTÁGIOS: ESTAÇÃO, PLANETA E MIGRAÇÃO =====================

@@ -581,3 +581,11 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .lesson-card { z-index: 30; }
 .game[data-scene=station] .lesson-card, .game[data-scene=planet] .lesson-card, .game[data-scene=migration] .lesson-card, .game[data-scene=detour] .lesson-card { left: 0.6em; right: auto; bottom: 4.2em; }
 .opt.rec { border-color: var(--yellow); box-shadow: 0 0 10px rgba(255, 210, 63, 0.45); }
+/* regulação térmica simples: 3 controles */
+.thctrls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4em; margin: 0.4em 0; }
+.thc { display: flex; flex-direction: column; align-items: center; gap: 0.15em; text-align: center; background: rgba(8, 14, 44, 0.9); border: 3px solid #2b3a78; color: #fff; padding: 0.45em 0.4em; font: inherit; cursor: pointer; }
+.thc .ic { font-size: 1.8em; } .thc b { font-family: var(--sk); } .thc em { font-style: normal; color: var(--muted); font-family: var(--sk); font-size: 0.9em; }
+.thc small { font-size: 0.8em; color: #bcd3ff; }
+.thc.on { border-color: var(--yellow); box-shadow: 0 0 12px rgba(255, 210, 63, 0.45); } .thc.on em { color: var(--yellow); }
+.thc:hover { border-color: var(--cyan); }
+.evp.thermal.simple .thres p { margin: 0.25em 0; }

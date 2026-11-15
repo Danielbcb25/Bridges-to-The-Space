@@ -514,7 +514,7 @@ function colonyHud() {
     <div class="btns"><button class="btn small" data-ui="panel" data-arg="fund">[F] ${esc(L('Fundo'))} ${S.fund|0}</button><button class="btn small" data-ui="panel" data-arg="c:nave">${esc(L('Controle'))}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div></div>`;
 }
 function ctaskBar(bid) {
-  const ws = S.crew.filter(c => c.alive && c.ctask && c.ctask.bid === bid);
+  const ws = (typeof colonyAll === 'function' ? colonyAll() : S.crew).filter(c => c.alive && c.ctask && c.ctask.bid === bid);
   return ws.map(c => `<div class="alert info">⏳ ${esc(c.name)}: ${esc(L(c.ctask.label))} ${bar(c.ctask.t, c.ctask.dur)} ${Math.abs(c.x - CBUILD[bid].x) < 70 ? '' : '<b class="orange">' + esc(L('(longe do local)')) + '</b>'}</div>`).join('');
 }
 function taskBtns(p) {
