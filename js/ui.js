@@ -41,7 +41,13 @@ function setHTML(id, html) {
   U.cache[id] = html;
   const el = document.getElementById(id);
   if (el) {
+    // guarda a rolagem dos painéis: o conteúdo é trocado a cada atualização e o scroll voltaria ao topo
+    const SCR = '.panel, .scroll, .evp, .stage-panel, .modal-bg, .side, .report-list, .evlog';
+    const keep = []; el.querySelectorAll(SCR).forEach((n, i) => { if (n.scrollTop > 0) keep.push([i, n.className, n.scrollTop]); });
+    const top0 = el.scrollTop;
     el.innerHTML = pixelEmoji(I18n.dom(html));
+    if (keep.length) { const list = el.querySelectorAll(SCR); for (const [i, cls, t] of keep) { const n = list[i] && list[i].className === cls ? list[i] : null; if (n) n.scrollTop = t; } }
+    if (top0) el.scrollTop = top0;
     const od = U.openDet; // mantém abertas as seções "Mais opções" etc. entre atualizações
     if (od) el.querySelectorAll('details').forEach(d => { const s = d.querySelector('summary'); if (s && od[s.textContent.trim()]) d.open = true; });
   }
