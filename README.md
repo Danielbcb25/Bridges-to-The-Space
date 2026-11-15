@@ -81,3 +81,5 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - **Escolha de planeta**: depois de um erro, os outros planetas ficam travados e Pontes-01b fica destacado com uma seta; sem clique em 5 s, a nave segue sozinha para a escolha do local de pouso.
 - **Regulação Térmica**: depois de falhar, o painel mostra o passo a passo de cada fase.
 - **Relatório final** enxuto (mensagem, falas, recomeçar da missão e homenagem a Marcos Pontes) com o botão **Salvar relatório completo** (arquivo HTML com números, perdas, desafios e o que foi aprendido).
+- **Hidroponia traduzida**: "Colher", "Limpar bandeja", "Cuidar de todas", "estragou" e os demais textos da estufa agora mudam de idioma.
+- **Desempenho**: a interface é reconstruída até cerca de 10 vezes por segundo (ou logo após um clique/tecla), em vez de a cada quadro. Isso reduz o travamento em computadores mais lentos.

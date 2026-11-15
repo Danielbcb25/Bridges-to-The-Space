@@ -385,7 +385,7 @@
   "Cuida dos equipamentos científicos e dos dados; decide o que desligar na sobrecarga.": "Looks after the science equipment and data; decides what to switch off during an overload.",
   "Cuidado com o lixo espacial: é o único que gira em volta da gente!": "Beware space junk: the only trash that orbits around us!",
   "Cuidados na horta": "Garden care",
-  "Cuidar de todas": "Take care of all",
+  "Cuidar de todas": "Care for all",
   "Cuide dos recursos, enfrente os desafios e leve a nave até Pontes-01b. Use as estações com E.": "Look after resources, handle the challenges and bring the ship to Pontes-01b. Use stations with E.",
   "Cura feridos e doentes": "Heals the hurt and sick",
   "Curto": "Short",
@@ -776,7 +776,7 @@
   "Mandem outro tripulante pela eclusa, rápido!": "Send another crew member through the airlock, fast!",
   "Manga longa": "Long sleeve",
   "Manhã": "Morning",
-  "Mantenha luz, água e nutrientes no verde. A janela de colheita dura 1 minuto: colher tarde estraga. Diversificar protege contra pragas.": "Keep light, water and nutrients in the green. The harvest window lasts 1 minute: harvesting late spoils it. Diversifying protects against pests.",
+  "Mantenha luz, água e nutrientes no verde. A janela de colheita dura 1 minuto: colher tarde estraga. Diversificar protege contra pragas.": "Keep light, water and nutrients in the green. The harvest window lasts 1 minute: harvesting late spoils the crop. Growing a variety protects against pests.",
   "manutenção": "maintenance",
   "manutenção preventiva": "preventive maintenance",
   "Mapa de backup quando o painel enlouquece": "Backup map when the panel goes crazy",
@@ -919,7 +919,7 @@
   "Nível:": "Level:",
   "N₂ 74%, O₂ 19%, CO₂ 0,9%, pressão 0,93 atm — respirável com aclimatação.": "N₂ 74%, O₂ 19%, CO₂ 0.9%, pressure 0.93 atm — breathable after acclimatization.",
   "O abrigo ficou improvisado: energia −20 kWh e moral −6.": "The shelter was improvised: energy −20 kWh and morale −6.",
-  "O agricultor cuida das plantas quando pode.": "The farmer tends the plants when possible.",
+  "O agricultor cuida das plantas quando pode.": "The farmer looks after the plants when they can.",
   "O agricultor e os engenheiros morreram: não há como manter a nave nem plantar.": "The farmer and the engineers died: there is no way to keep the ship running or grow food.",
   "O ar da cidade": "City air",
   "O capacete é padrão para toda a tripulação.": "The helmet is standard for the whole crew.",
@@ -2053,7 +2053,14 @@
   "Leve chiado": "Slight wheezing",
   "Ir para Pontes-01b": "Go to Pontes-01b",
   "Rota automática para Pontes-01b. Escolha agora o local de pouso da colônia.": "Automatic route to Pontes-01b. Now choose the colony landing site.",
-  "Resultado": "Result"
+  "Resultado": "Result",
+  "Colher agora": "Harvest now",
+  "Limpar bandeja": "Clear tray",
+  "Plantar na bandeja": "Plant in tray",
+  "estragou": "spoiled",
+  "pronto": "ready",
+  "crescendo": "growing",
+  "COLHER": "HARVEST"
  },
  "patterns": [
   [

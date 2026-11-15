@@ -776,7 +776,7 @@
   "Mandem outro tripulante pela eclusa, rápido!": "¡Manden a otro tripulante por la esclusa, rápido!",
   "Manga longa": "Manga larga",
   "Manhã": "Mañana",
-  "Mantenha luz, água e nutrientes no verde. A janela de colheita dura 1 minuto: colher tarde estraga. Diversificar protege contra pragas.": "Mantenga luz, agua y nutrientes en verde. La ventana de cosecha dura 1 minuto: cosechar tarde la estropea. Diversificar protege contra las plagas.",
+  "Mantenha luz, água e nutrientes no verde. A janela de colheita dura 1 minuto: colher tarde estraga. Diversificar protege contra pragas.": "Mantén la luz, el agua y los nutrientes en verde. La ventana de cosecha dura 1 minuto: cosechar tarde estropea el cultivo. Diversificar protege contra las plagas.",
   "manutenção": "mantenimiento",
   "manutenção preventiva": "mantenimiento preventivo",
   "Mapa de backup quando o painel enlouquece": "Mapa de respaldo cuando el panel se vuelve loco",
@@ -1349,7 +1349,7 @@
   "Sem desvio a tempo: vários impactos no casco e na propulsão. Um meteoro furou o casco!": "Sin desvío a tiempo: varios impactos en el casco y la propulsión. ¡Un meteoro perforó el casco!",
   "Sem energia por dias: os sistemas pararam de vez e a nave não consegue mais seguir viagem.": "Sin energía durante días: los sistemas se apagaron del todo y la nave ya no puede seguir el viaje.",
   "Sem enfermaria: feridos graves podem morrer.": "Sin enfermería: los heridos graves pueden morir.",
-  "Sem estufa hidropônica nem kit de ervas. Não há bandejas de cultivo a bordo.": "Sin invernadero hidropónico ni kit de hierbas. No hay bandejas de cultivo a bordo.",
+  "Sem estufa hidropônica nem kit de ervas. Não há bandejas de cultivo a bordo.": "No hay invernadero hidropónico ni kit de hierbas. No hay bandejas de cultivo a bordo.",
   "Sem experiência, a retirada danificou o mecanismo.": "Sin experiencia, la extracción dañó el mecanismo.",
   "Sem filtro de ar reserva: risco alto em falhas do Suporte à Vida.": "Sin filtro de aire de reserva: riesgo alto en fallos del Soporte Vital.",
   "Sem gravidade a água não escorre: as raízes precisam de luz LED, nutrientes e ventilação controlados. E em outro mundo o solo pode ser tóxico — o solo de Marte tem percloratos, detectados pela sonda Phoenix em 2008. Por isso levamos um banco de sementes.": "Sin gravedad el agua no escurre: las raíces necesitan luz LED, nutrientes y ventilación controlados. Y en otro mundo el suelo puede ser tóxico: el suelo de Marte tiene percloratos, detectados por la sonda Phoenix en 2008. Por eso llevamos un banco de semillas.",
@@ -2054,7 +2054,14 @@
   "Leve chiado": "Leve silbido",
   "Ir para Pontes-01b": "Ir a Pontes-01b",
   "Rota automática para Pontes-01b. Escolha agora o local de pouso da colônia.": "Ruta automática a Pontes-01b. Elija ahora el lugar de aterrizaje de la colonia.",
-  "Resultado": "Resultado"
+  "Resultado": "Resultado",
+  "Colher agora": "Cosechar ahora",
+  "Limpar bandeja": "Limpiar bandeja",
+  "Plantar na bandeja": "Plantar en la bandeja",
+  "estragou": "estropeado",
+  "pronto": "listo",
+  "crescendo": "creciendo",
+  "COLHER": "COSECHAR"
  },
  "patterns": [
   [
