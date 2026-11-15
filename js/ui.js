@@ -116,7 +116,7 @@ function journeyScreen() {
     <p class="muted">Escolha o tamanho da expedição. Os 6 tripulantes que não forem jogadores são controlados por bots.</p>
     <div class="cards two">
       <button class="card big" data-ui="startGame" data-arg="completa"><h3>🚀 Jornada Completa</h3><p>≈ 30 dias de viagem · 9 desafios · as 5 etapas da campanha.</p><p class="muted">Cada dia dura 30 s. Recomendado para a experiência completa.</p></button>
-      <button class="card big" data-ui="startGame" data-arg="curta"><h3>⚡ Jornada Curta</h3><p>≈ 12 dias · 4 desafios · regulação térmica de 3 min.</p><p class="muted">Ideal para aulas e partidas rápidas.</p></button>
+      <button class="card big quick" data-ui="startGame" data-arg="curta"><i class="qtag">⚡ PARTIDA RÁPIDA</i><h3>⚡ Jornada Curta</h3><p>≈ 12 dias · 4 desafios.</p><p class="muted">Para jogar rápido: se errar um desafio, o jogo mostra a solução.</p></button>
     </div>
     <div class="row"><button class="btn" data-ui="title">◀ Voltar</button></div>
   </div>`;
@@ -269,6 +269,9 @@ function commsScreen() {
 }
 
 // ---------- montagem ----------
+// ícone de cada item da montagem (cards mais visuais, menos texto)
+const ITEM_ICON = { estufa: '🌱', reciclaAgua: '💧', biorreator: '🦠', reciclaLixo: '♻', hibernacao: '😴', solar: '☀', fusao: '⚛', escudoMag: '🧲', lab: '🔬', radar: '📡', sonda: '🛰', pouso: '🛬', mineradora: '⛏', sementes: '🌾', enfermaria: '✚', bemestar: '🧘', cupula: '🔭', impressora: '🖨', drone: '🚁', ia: '🤖',
+  tanqueExtra: '⛽', baterias: '🔋', cisterna: '🚰', cilindros: '🫁', sementesEstoque: '🌰', kitMedico: '🩹', pecas: '⚙', armazenamento: '💾', racaoExtra: '🍱', filtroReserva: '🧯', casco1: '🛡', geladeira: '🧊', antena: '📶' };
 function setupScreen() {
   const st = S.setup; const step = SETUP_STEPS[U.setupStep];
   const spent = setupCost(st), budget = setupBudget(), slots = setupSlots(st);
@@ -278,15 +281,15 @@ function setupScreen() {
     const locked = it.req && !st[list].includes(it.req);
     const slotFull = list === 'modules' && !on && slots + it.slots > SLOTS;
     const cant = !on && (it.pts > left || locked || slotFull);
-    return `<button class="opt ${on ? 'on' : ''} ${cant ? 'cant' : ''}" data-ui="setToggle" data-arg="${list}:${it.id}"><b>${esc(it.name)}</b><span>${esc(it.desc)}</span><em>${it.pts} pts${typeof massOfItem === 'function' && massOfItem(it.id) ? ' · ' + massOfItem(it.id) + ' kg' : ''}${it.slots ? ' · ' + it.slots + ' slot' + (it.slots > 1 ? 's' : '') : ''}${locked ? ' · requer anterior' : ''}${extra}</em></button>`;
+    return `<button class="opt ${on ? 'on' : ''} ${cant ? 'cant' : ''}" data-ui="setToggle" data-arg="${list}:${it.id}" title="${esc(T(it.desc))}"><b>${ITEM_ICON[it.id] || '▪'} ${esc(it.name)}</b><span class="idesc">${esc(it.desc)}</span><em>${it.pts} pts${typeof massOfItem === 'function' && massOfItem(it.id) ? ' · ' + massOfItem(it.id) + ' kg' : ''}${it.slots ? ' · ' + it.slots + ' slot' + (it.slots > 1 ? 's' : '') : ''}${locked ? ' · requer anterior' : ''}${extra}</em></button>`;
   };
   let body = '';
   switch (step.id) {
-    case 'mission': body = `<h4>${esc(T('Origem do Comandante'))}</h4><div class="opts">${ORIGINS.map(o => `<button class="opt ${st.origin === o.id ? 'on' : ''}" data-ui="setOrigin" data-arg="${o.id}"><b>${o.name}</b><span>${o.bonus}</span></button>`).join('')}</div>
-      <h4>${esc(T('Rota'))}</h4><div class="opts">${ROUTES.map(r => `<button class="opt ${st.route === r.id ? 'on' : ''}" data-ui="setRoute" data-arg="${r.id}"><b>${r.name}</b><span>${r.desc}</span></button>`).join('')}</div>`; break;
+    case 'mission': body = `<h4>🧭 ${esc(T('Rota'))}</h4><div class="opts">${ROUTES.map(r => `<button class="opt ${st.route === r.id ? 'on' : ''}" data-ui="setRoute" data-arg="${r.id}"><b>${{ rapida: '⚡', equilibrada: '⚖', segura: '🛡' }[r.id] || ''} ${r.name}</b><span>${r.desc}</span>${typeof ROUTE_DV !== 'undefined' ? `<em>Δv ${ROUTE_DV[r.id]} m/s</em>` : ''}</button>`).join('')}</div>
+      <details class="evinfo"><summary>👤 ${esc(T('Origem do Comandante'))}: <b>${esc(T((ORIGINS.find(o => o.id === st.origin) || {}).name || ''))}</b></summary><div class="opts">${ORIGINS.map(o => `<button class="opt ${st.origin === o.id ? 'on' : ''}" data-ui="setOrigin" data-arg="${o.id}"><b>${o.name}</b><span>${o.bonus}</span></button>`).join('')}</div></details>`; break;
     case 'modules': body = `<p class="muted small">${esc(L('5 slots · o reator de fusão ocupa 2'))}</p><div class="opts">${MODULES.map(m => item(m, 'modules')).join('')}</div>`; break;
     case 'supplies': body = `<div class="opts">${RESERVES.map(r => item(r, 'reserves')).join('')}${ESSENTIALS.map(([list, id]) => { const cat = list === 'pantry' ? PANTRY : UPGRADES; const it = cat.find(x => x.id === id); return it ? item(it, list) : ''; }).join('')}</div>`; break;
-    case 'report': body = `<div class="fund"><div class="bignum">${left}</div><p class="small">${L('pontos sobrando viram <b>fundo de contingência</b> para emergências na viagem.')}</p></div><div class="report-list">${readinessAlerts().map(a => `<div class="alert ${a[0]}">${esc(a[1])}</div>`).join('')}</div><div class="row"><button class="btn primary big" data-ui="launch">🚀 DECOLAR</button></div>`; break;
+    case 'report': body = `<div class="fund"><div class="bignum">${left}</div><p class="small">${L('pontos sobrando viram <b>fundo de contingência</b> para emergências na viagem.')}</p></div><div class="report-list">${(() => { const bad = readinessAlerts().filter(a => a[0] === 'bad').slice(0, 3); return bad.length ? bad.map(a => `<div class="alert bad">${esc(a[1])}</div>`).join('') : `<div class="alert good">✔ ${esc(L('Nave pronta para decolar.'))}</div>`; })()}</div><div class="row"><button class="btn primary big" data-ui="launch">🚀 DECOLAR</button></div>`; break;
   }
   return `<div class="setup">
     <div class="setup-side">
@@ -376,7 +379,7 @@ function hudBottom() {
   const p = S.progress;
   return call + `<div class="hud-bottom">
     <div class="track"><span class="lbl">TERRA</span><div class="line"><i style="width:${p * 100}%"></i><em class="mk st" style="left:50%">◆</em><em class="ship" style="left:${p * 100}%">▶</em></div><span class="lbl cyan">PONTES-01b</span></div>
-    <div class="prompt">${prompt}</div>
+    ${prompt ? `<button class="prompt big-prompt" data-ui="interactNow" ${m && m.task ? 'disabled' : ''}>${prompt}</button>` : '<div class="prompt"></div>'}
     <div class="btns"><button class="btn small" data-ui="panel" data-arg="report">[R] Relatório</button><button class="btn small" data-ui="panel" data-arg="crew">[T] Tripulação</button><button class="btn small" data-ui="panel" data-arg="fund">[F] Fundo ${S.fund}</button><button class="btn small" data-ui="panel" data-arg="menu">☰</button></div>
   </div>`;
 }
@@ -391,7 +394,7 @@ function eventPanel() {
   if (ev.phase === 'warn') {
     return `<div class="evp warn compact">${head('warn')}<div class="schips">${sysChips}${info.energy ? `<div class="schip"><span>⚡</span>${bar(S.res.energia, S.cap.energia)}</div>` : ''}</div>
       <details class="evinfo"><summary>ℹ ${esc(L('O que está acontecendo?'))}</summary><p class="small">${info.desc}</p></details>
-      <div class="row"><button class="btn primary big" data-act="eventGo">${esc(L('Enfrentar'))} ▶ <small>${Math.ceil(ev.warnT)}s</small></button></div></div>`;
+      <div class="row"><b class="yellow big">⏱ ${esc(L('Começa em'))} ${Math.ceil(ev.warnT)}s</b></div></div>`;
   }
   if (ev.phase === 'result') {
     const r = ev.result;
@@ -424,17 +427,19 @@ function eventPanel() {
     ${ev.puzzle ? puzzleHTML(ev) : ''}</div>`;
 }
 
+const AGUA_ORDER = ['Destilação', 'Filtração', 'Oxidação', 'Desinfecção'];
+const solBox = t => `<div class="solbox">💡 ${esc(L('Solução'))}: <b>${esc(t)}</b></div>`;
 function puzzleHTML(ev) {
   const pz = ev.puzzle;
   if (pz.by && me() && pz.by !== me().id) { const o = crewById(pz.by); return `<div class="puzzle"><p class="small">🔒 ${esc(o ? o.name : '')} ${esc(L(K('chegou primeiro e está resolvendo este passo.', 'got here first and is solving this step.', 'llegó primero y está resolviendo este paso.')))}</p></div>`; }
   if (pz.kind === 'filtros') {
     return `<div class="puzzle"><h4>Filtros de ar (CDRA)</h4><p class="small">Inspecione os filtros (custa tempo) e troque o entupido pelo reserva.</p><div class="filters">${Array.from({ length: pz.n }, (_, i) => {
-      const seen = pz.seen.includes(i); const bad = seen && i === pz.bad;
-      return `<div class="filter ${seen ? (bad ? 'bad' : 'ok') : ''}"><span>F${i + 1}</span><em>${seen ? esc(L(bad ? 'ENTUPIDO' : 'limpo')) : '?'}</em><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'inspect', i })}' ${seen ? 'disabled' : ''}>Inspecionar</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'swap', i })}'>Trocar</button></div>`;
-    }).join('')}</div></div>`;
+      const seen = pz.seen.includes(i); const bad = seen && i === pz.bad; const sol = pz.hint && i === pz.bad;
+      return `<div class="filter ${seen ? (bad ? 'bad' : 'ok') : ''} ${sol ? 'sol' : ''}"><span>F${i + 1}</span><em>${seen ? esc(L(bad ? 'ENTUPIDO' : 'limpo')) : '?'}</em><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'inspect', i })}' ${seen ? 'disabled' : ''}>Inspecionar</button><button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'swap', i })}'>Trocar</button></div>`;
+    }).join('')}</div>${pz.hint ? solBox(L('Troque o filtro') + ' F' + (pz.bad + 1)) : ''}</div>`;
   }
   if (pz.kind === 'mapa') {
-    return `<div class="puzzle"><h4>Recalibrar mapa estelar</h4><p class="small">Gire os setores até todas as setas apontarem para cima ↑ (para a estrela-guia).</p><div class="map3">${pz.tiles.map((t, i) => `<button class="tile" data-act="puzzle" data-p='${J({ i })}' style="transform:rotate(${t * 90}deg)">↑</button>`).join('')}</div></div>`;
+    return `<div class="puzzle"><h4>Recalibrar mapa estelar</h4><p class="small">Gire os setores até todas as setas apontarem para cima ↑ (para a estrela-guia).</p><div class="map3">${pz.tiles.map((t, i) => `<button class="tile" data-act="puzzle" data-p='${J({ i })}' style="transform:rotate(${t * 90}deg)">↑</button>`).join('')}</div>${pz.hint ? solBox(L('Clique em cada seta até ela apontar para cima ↑')) : ''}</div>`;
   }
   if (pz.kind === 'radio') {
     const msg = RADIO_MESSAGES[pz.msgIdx];
@@ -449,14 +454,14 @@ function puzzleHTML(ev) {
       ${q < 0.5 ? '<p class="small muted">Sintonize melhor para entender a mensagem.</p>' : `<p class="small">O que a base está tentando avisar?</p><div class="opts1">${shuffleStable(msg.options, pz.seed).map(o => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'answer', answer: o })}'>${esc(o)}</button>`).join('')}</div>`}</div>`;
   }
   if (pz.kind === 'agua') {
-    return `<div class="puzzle"><h4>Ciclo fechado de descontaminação</h4><p class="small">Clique nas etapas na ordem correta.</p><div class="row">${pz.options.map(o => `<button class="btn tiny ${pz.order.includes(o) ? 'on' : ''}" data-act="puzzle" data-p='${J({ stage: o })}' ${pz.order.includes(o) ? 'disabled' : ''}>${o}</button>`).join('')}</div><p>${esc(L('Sequência'))}: ${pz.order.map((o, i) => `${i + 1}. ${esc(T(o))}`).join(' → ') || '—'}</p></div>`;
+    return `<div class="puzzle"><h4>Ciclo fechado de descontaminação</h4><p class="small">Clique nas etapas na ordem correta.</p><div class="row">${pz.options.map(o => `<button class="btn tiny ${pz.order.includes(o) ? 'on' : ''} ${pz.hint && o === AGUA_ORDER[pz.order.length] ? 'sol' : ''}" data-act="puzzle" data-p='${J({ stage: o })}' ${pz.order.includes(o) ? 'disabled' : ''}>${o}</button>`).join('')}</div><p>${esc(L('Sequência'))}: ${pz.order.map((o, i) => `${i + 1}. ${esc(T(o))}`).join(' → ') || '—'}</p>${pz.hint ? solBox(AGUA_ORDER.map((o, i) => `${i + 1}. ${T(o)}`).join(' → ')) : ''}</div>`;
   }
   if (pz.kind === 'remedio') {
     const expired = S.day > S.meds.validUntil;
     return `<div class="puzzle"><h4>Aparelhos médicos</h4><div class="devs">${MED_DEVICES.map(d => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'device', dev: d.id })}'>${d.name}</button>${pz.seen[d.id] ? `<span class="reading">${esc(I18n.lang === 'en' ? T(pz.seen[d.id]).replace(/(\d),(\d)/g, '$1.$2') : T(pz.seen[d.id]))}</span>` : ''}`).join('')}</div>
       ${expired ? `<p class="red small">Estoque vencido! <button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'replace' })}'>Trocar lote (2 recursos)</button></p>` : ''}
-      <h4>Kit de remédios</h4><div class="row">${MEDICINES.map(m => `<button class="btn tiny" data-act="puzzle" data-p='${J({ op: 'give', med: m.id })}'>${m.name}</button>`).join('')}</div>
-      <p class="small muted">Referência: febre e ruído no pulmão → infecção; SpO₂ baixo → hipóxia; pressão alta e dor de cabeça → fluidos na cabeça; náusea → enjoo espacial; coceira e chiado → alergia.</p></div>`;
+      <h4>Kit de remédios</h4><div class="row">${MEDICINES.map(m => `<button class="btn tiny ${pz.hint && !expired && m.id === (DISEASES.find(d => d.id === ev.data.disease) || {}).med ? 'sol' : ''}" data-act="puzzle" data-p='${J({ op: 'give', med: m.id })}'>${m.name}</button>`).join('')}</div>
+      <p class="small muted">Referência: febre e ruído no pulmão → infecção; SpO₂ baixo → hipóxia; pressão alta e dor de cabeça → fluidos na cabeça; náusea → enjoo espacial; coceira e chiado → alergia.</p>${pz.hint ? solBox(expired ? L('Primeiro troque o lote vencido, depois dê o remédio.') : L('Dê este remédio') + ': ' + T((MEDICINES.find(m => m.id === (DISEASES.find(d => d.id === ev.data.disease) || {}).med) || {}).name || '')) : ''}</div>`;
   }
   if (pz.kind === 'substituto') {
     const v = S.event.data.victim;
@@ -478,16 +483,20 @@ function thermalPanel() {
   const tcol = th.T > 26 ? 'red' : th.T < 18 ? 'cyan' : 'green';
   const scene = th.scene >= 5 ? 'Entrada na sombra' : th.scene >= 4 ? 'Sobrecarga elétrica' : th.scene >= 2 ? 'A estrela se aproxima' : 'Alerta de calor';
   const thermo = (label, v, min, max, cls) => `<div class="thermo"><div class="tube"><i class="${cls}" style="height:${clamp((v - min) / (max - min), 0, 1) * 100}%"></i></div><b>${fmt(v, 0)}°</b><small>${esc(L(label))}</small></div>`;
-  const hint = th.T > 24 ? ['red', '🔥 ' + L('Está esquentando: feche as cortinas e ligue o resfriador.')] : th.T < 20 ? ['cyan', '❄ ' + L('Está esfriando: desligue o resfriador e ligue o aquecedor.')] : ['green', '✔ ' + L('Temperatura boa. Fique de olho.')];
-  const ctrl = k => { const c = TH_CTRL[k]; const on = th.on[k];
-    const state = k === 'shut' ? (on ? L('FECHADAS') : L('ABERTAS')) : (on ? L('LIGADO') : L('DESLIGADO'));
-    return `<button class="thc ${on ? 'on' : ''}" data-act="thToggle" data-p='${J({ k })}'><span class="ic">${c.icon}</span><b>${esc(L(c.name))}</b><em>${state}</em><small>${esc(L(c.what))}</small><small class="${k === 'shut' ? 'green' : 'orange'}">${esc(L(c.cost))}</small></button>`; };
+  const hint = th.T > 24 ? ['red', '🔥 ' + L('Está esquentando: ligue o resfriador.')] : th.T < 20 ? ['cyan', '❄ ' + L('Está esfriando: ligue o aquecedor.')] : ['green', '✔ ' + L('Temperatura boa. Fique de olho.')];
+  // o que deveria estar ligado agora (a dica vira um selo piscando no botão)
+  const want = { cool: th.T > 24, heat: th.T < 20 };
+  const ctrl = k => { const c = TH_CTRL[k]; const on = th.on[k]; const todo = on !== want[k];
+    const tag = todo ? `<i class="thtodo blink">▶ ${esc(L(want[k] ? 'LIGUE' : 'DESLIGUE'))}</i>` : '';
+    return `<button class="thc onoff ${on ? 'on' : ''} ${todo ? 'todo' : ''}" data-act="thToggle" data-p='${J({ k })}'>${tag}<span class="ic">${c.icon}</span><b>${esc(L(c.name))}</b><em class="onsw"><span class="led"></span>${on ? L('LIGADO') : L('DESLIGADO')}</em></button>`; };
+  // jornada curta: fora da faixa, a solução aparece bem grande
+  const fix = (th.T > 26 || th.T < 18) && S.journey === 'curta' ? `<div class="solbox blink">💡 ${esc(th.T > 26 ? L('LIGUE O RESFRIADOR ❄') : L('LIGUE O AQUECEDOR 🔥'))}</div>` : '';
   return `<div class="evp thermal simple">
     <h2>🌡 ${esc(L('Regulação Térmica'))} <small>${esc(L(scene))}</small></h2>
     <div class="timer">${bar(S.event.t, th.D, 'time')}<b>${Math.floor(S.event.t / 60)}:${String(Math.floor(S.event.t % 60)).padStart(2, '0')}</b></div>
     <div class="thermos">${thermo('Sol', th.sun, -160, 130, 'hot')}${thermo('Sombra', th.shade, -160, 130, 'cold')}<div class="thermo main"><div class="tube"><i class="${tcol}" style="height:${clamp((th.T - 0) / 50, 0, 1) * 100}%"></i><span class="band-safe"></span></div><b class="${tcol}">${fmt(th.T, 1)}°</b><small>${esc(L('Interior'))}</small></div>
       <div class="thres"><div><span>⚡ ${esc(L('Energia'))}</span>${bar(S.res.energia, S.cap.energia)}<b>${fmt(S.res.energia, 1)} kWh</b></div><p class="small">${L('Meta: manter o interior entre <b>18 °C e 26 °C</b>.')}</p><p class="small ${hint[0]}">${esc(hint[1])}</p></div></div>
-    <div class="thctrls">${ctrl('heat')}${ctrl('cool')}${ctrl('shut')}</div>
+    ${fix}<div class="thctrls two">${ctrl('heat')}${ctrl('cool')}</div>
     <div class="evlog">${th.msgs.slice(-3).map(m => `<div>${esc(m)}</div>`).join('')}</div>
   </div>`;
 }
@@ -562,49 +571,17 @@ function farmPanel() {
     <div class="trays">${grid}</div><div class="row"><button class="btn tiny" data-act="careAll">Cuidar de todas</button></div>${detail}
     <div class="kv"><span>Plantação (biomassa)</span><b>${fmt(S.res.plantacao, 1)} kg</b><span>Adubo</span><b>${fmt(S.adubo, 1)} kg</b></div>`;
 }
+// cozinha simples: comer e escolher o tamanho das porções
 function kitchenPanel() {
-  const fd = S.food; const tab = U.tab || 'cardapio';
-  const tabs = `<div class="tabs">${[['cardapio', 'Cardápio e mesa'], ['cozinhar', 'Cozinhar'], ['despensa', 'Despensa']].map(([k, n]) => `<button class="chip ${tab === k ? 'on' : ''}" data-ui="tab" data-arg="${k}">${n}</button>`).join('')}</div>`;
-  const avail = [['racao', 'Ração liofilizada']].concat(Object.keys(CROPS).filter(k => (fd.fresh[k] || 0) > 0.3).map(k => [k, CROPS[k].name + ' (fresco)'])).concat(fd.recipes.filter(r => (fd.dishes[r] || 0) > 0).map(r => [r, RECIPES.find(x => x.id === r).name + ` (${fd.dishes[r]} porções)`]));
-  if (tab === 'cardapio') {
-    const meals = ['Manhã', 'Tarde', 'Noite'];
-    const warn = [];
-    for (const c of alive()) for (const slot of fd.menu) {
-      const tags = RECIPES.find(r => r.id === slot) ? RECIPES.find(r => r.id === slot).tags : CROPS[slot] ? CROPS[slot].tags : [];
-      if (tags.some(t => c.allergy.includes(t))) warn.push(L(K(`${c.name} tem alergia a ${tagNames(c.allergy)}!`, `${c.name} is allergic to ${tagNames(c.allergy)}!`, `¡${c.name} es alérgico/a a ${tagNames(c.allergy)}!`)));
-    }
-    const per = { pleno: 0.2, reduzido: 0.133, minimo: 0.067 }[fd.racionamento] || 0.2;
-    const nEat = alive().filter(c => !c.hibernating).length || 1;
-    // tudo o que poderia ir ao prato: disponível agora ou com a dica de como conseguir
-    const foods = [{ k: 'racao', n: 'Ração liofilizada', ic: '🍱', ok: true, q: fmt(S.res.comida, 0) + ' kg' }]
-      .concat(Object.keys(CROPS).filter(k => !CROPS[k].needs || has(CROPS[k].needs)).map(k => { const hv = fd.fresh[k] || 0; const ok = hv >= per * nEat * 1.5; return { k, n: CROPS[k].name, ic: '🥬', ok, q: fmt(hv, 1) + ' kg', how: has('estufa') ? K(`Plante na Estufa (${CROPS[k].days} dias) e colha.`, `Plant it in the Greenhouse (${CROPS[k].days} days) and harvest.`, `Plántalo en el Invernadero (${CROPS[k].days} días) y cosecha.`) : 'Precisa do módulo Estufa.' }; }))
-      .concat(RECIPES.filter(r => fd.recipes.includes(r.id)).map(r => ({ k: r.id, n: r.name, ic: '🍲', ok: (fd.dishes[r.id] || 0) >= 1, q: (fd.dishes[r.id] || 0) + ' ' + L('porções'), how: 'Cozinhe na aba Cozinhar.' })));
-    const okF = foods.filter(f => f.ok), noF = foods.filter(f => !f.ok);
-    const hidden = RECIPES.length - fd.recipes.length;
-    const fo = foodOutlook(); const mm = me();
-    const status = `<div class="foodstat ${fo.days < 2 ? 'bad' : fo.days < fo.left ? 'warn' : 'ok'}"><div>🍱 <b>${fmt(S.res.comida, 0)} kg</b> ${esc(L('de ração'))} · ${esc(L('dura'))} ≈ <b>${fmt(fo.days, 0)}</b> ${esc(L('dias'))} <small class="muted">(${fmt(fo.perDay, 1)} kg/${esc(L('dia'))}, ${fo.n} ${esc(L('pessoas'))})</small>${S.stage === 1 ? ` · ${esc(L('viagem restante'))} ≈ <b>${fo.left}</b> ${esc(L('dias'))}` : ''}</div>
-      ${mm && mm.alive ? `<div class="sysline"><span>${esc(L('Sua fome'))}</span>${bar(mm.saciedade, 100)}<b>${fmt(mm.saciedade, 0)}%</b><button class="btn tiny primary" data-act="eat">🍴 ${esc(L('Comer agora'))}</button></div>` : ''}
-      <small class="muted">${esc(L('A tripulação come sozinha; você come quando tiver fome.'))}</small></div>`;
-    return tabs + status + `<h4>${esc(L('Tamanho das porções'))}</h4><div class="opts portions">${[['pleno', 'Normal', 1, 'tripulação mais feliz'], ['reduzido', 'Média', 1.5, 'equilibrada'], ['minimo', 'Mínima', 3, 'humor cai muito · risco de desmaio']].map(([k, n, mult, d]) => { const fo2 = foodOutlook(); const days = S.res.comida / (0.6 * fo2.n) * mult; const ok = days >= fo2.left; return `<button class="opt ${fd.racionamento === k ? 'on' : ''}" data-act="ration" data-p='${J({ level: k })}'><b>${esc(L(n))}</b><span class="big">${esc(L('comida dura'))} ≈ ${fmt(days, 0)} ${esc(L('dias'))}</span>${S.stage === 1 ? `<span class="${ok ? 'green' : 'red'}">${ok ? '✔ ' + esc(L('chega a Pontes-01b')) : '✖ ' + esc(L('acaba antes de chegar'))}</span>` : ''}<span>${esc(L(d))}</span></button>`; }).join('')}</div>
-      <h4>${esc(L('O que servir'))}</h4><div class="mchips">${okF.map(f => `<button class="chip ${fd.menu.every(x => x === f.k) ? 'on' : ''}" data-act="menuAll" data-p='${J({ item: f.k })}'>${f.ic} ${esc(T(f.n))} <small>${f.q}</small></button>`).join('')}</div>${okF.length <= 1 ? `<p class="small muted">${esc(L('Só ração por enquanto.'))} ${esc(L(has('estufa') ? 'Plante e colha na Estufa para ter comida fresca.' : 'Sem Estufa, a nave depende da ração.'))}</p>` : ''}
-      ${warn.length && roleAlive('paramedico') ? `<div class="alert bad">Paramédico: ${esc([...new Set(warn)].join(' '))}</div>` : ''}
-      <details class="evinfo"><summary>${esc(L('Mais opções da cozinha'))}</summary>
-      ${noF.length || hidden ? `<h4>🌱 ${esc(L('Como variar o cardápio'))}</h4><div class="prefs">${noF.map(f => `<div class="muted">${f.ic} <b>${esc(T(f.n))}</b> — ${esc(L(f.how))}</div>`).join('')}${hidden ? `<div class="muted">🍲 ${hidden} ${esc(L('receitas por descobrir: combine ingredientes na aba Cozinhar.'))}</div>` : ''}</div>` : ''}
-      <p class="small muted">${esc(L('Cada alimento dá energia (E), proteína (P) e vitaminas (V). Só ração deixa a tripulação sem vitaminas.'))} ${avail.map(([k, n]) => { const v = foodNutr(k); return `<span class="nchip">${esc(T(n.split(' (')[0]))}: E${v[0]} P${v[1]} V${v[2]}</span>`; }).join(' ')}</p>
-      <h4>A Mesa (refeição da noite)</h4><div class="opts">${[['completa', 'Mesa completa', 'todos param · humor +3 · sorteio de convivência'], ['revezamento', 'Revezamento', 'sistemas cobertos · humor +1'], ['posto', 'Comer no posto', 'sem tempo perdido · humor −1']].map(([k, n, d]) => `<button class="opt ${fd.mesa === k ? 'on' : ''}" data-act="mesa" data-p='${J({ mode: k })}'><b>${n}</b><span>${d}</span></button>`).join('')}</div>
-      <h4>Gostos da tripulação</h4><div class="prefs">${alive().map(c => `<div><b>${esc(c.name)}</b> <small>${esc(c.roleName)}</small><br>❤ ${esc(tagNames(c.likes)) || '—'} ${c.avoid.length ? '· ✖ ' + esc(tagNames(c.avoid)) : ''} ${c.allergy.length ? '· <span class="red">' + esc(L('alergia')) + ': ' + esc(tagNames(c.allergy)) + '</span>' : ''}</div>`).join('')}</div>
-      ${!fd.banquete ? `<div class="row"><button class="btn small" data-act="banquete">🎉 Banquete do Dia da Terra (4 kg, uma vez)</button></div>` : ''}</details>`;
-  }
-  if (tab === 'cozinhar') {
-    const ings = [['racao', 'Ração', S.res.comida]].concat(Object.keys(CROPS).map(k => [k, CROPS[k].name, fd.fresh[k] || 0]));
-    return tabs + `<p class="small">${has('cozinha') ? 'Cozinha equipada: fogão de indução e forno.' : 'Sem cozinha equipada: só receitas frias.'} Arraste (clique) 2 ou 3 ingredientes para a panela. Errar não pune: você só perde os ingredientes.</p>
-      <div class="ings">${ings.map(([k, n, q]) => `<button class="chip ${U.cook.includes(k) ? 'on' : ''}" data-ui="cookToggle" data-arg="${k}" ${q < 1 ? 'disabled' : ''}>${n} <small>${fmt(q, 1)} kg</small></button>`).join('')}</div>
-      <div class="pot">🍲 ${U.cook.map(k => k === 'racao' ? 'Ração' : CROPS[k].name).join(' + ') || 'panela vazia'}</div>
-      <div class="row"><button class="btn primary" data-ui="cook" ${U.cook.length < 2 ? 'disabled' : ''}>Cozinhar (−1 kWh, −2 L)</button><button class="btn" data-ui="cookClear">Esvaziar</button></div>
-      <h4>Livro de Receitas (${fd.recipes.length}/${RECIPES.length})</h4><div class="prefs">${RECIPES.map(r => fd.recipes.includes(r.id) ? `<div><b>${r.name}</b> — ${r.ing.map(i => i === 'racao' ? 'ração' : CROPS[i].name).join(' + ')} · humor +${r.humor}<br><small class="muted">${esc(r.fact)}</small></div>` : `<div class="muted">??? (receita não descoberta)</div>`).join('')}</div>`;
-  }
-  return tabs + `<div class="kv"><span>Ração liofilizada</span><b>${fmt(S.res.comida, 1)} kg</b>${Object.keys(CROPS).map(k => `<span>${CROPS[k].name}</span><b>${fmt(fd.fresh[k] || 0, 1)} kg</b>`).join('')}${Object.keys(fd.dishes).filter(k => fd.dishes[k] > 0).map(k => `<span>${RECIPES.find(r => r.id === k).name}</span><b>${fd.dishes[k]} ${esc(L('porções'))}</b>`).join('')}
-    <span>Comida produzida</span><b>${fmt(fd.produced, 1)} kg</b><span>Desperdiçada</span><b>${fmt(fd.wasted, 1)} kg</b><span>Validade do fresco</span><b>${has('geladeira') ? 6 : 3} dias</b></div>`;
+  const fd = S.food; const fo = foodOutlook(); const mm = me();
+  const ok = fo.days >= fo.left;
+  const eat = mm && mm.alive ? `<div class="kbig"><div class="kbar"><span>🍴 ${esc(L('Sua fome'))}</span>${bar(mm.saciedade, 100)}<b>${fmt(mm.saciedade, 0)}%</b></div><button class="btn primary big" data-act="eat">🍴 ${esc(L('Comer agora'))}</button></div>` : '';
+  const food = `<div class="foodstat ${fo.days < 2 ? 'bad' : ok ? 'ok' : 'warn'}"><b class="big">🍱 ${fmt(S.res.comida, 0)} kg</b> · ${esc(L('dura'))} ≈ <b>${fmt(fo.days, 0)}</b> ${esc(L('dias'))}${S.stage === 1 ? ` · ${esc(L('viagem restante'))} ≈ <b>${fo.left}</b> ${esc(L('dias'))} ${ok ? '✔' : '⚠'}` : ''}</div>`;
+  const opts = [['pleno', '🍲', 'Normal', 1], ['reduzido', '🥣', 'Média', 1.5], ['minimo', '🥄', 'Mínima', 3]].map(([k, ic, n, mult]) => {
+    const days = S.res.comida / (0.6 * fo.n) * mult; const reach = days >= fo.left;
+    return `<button class="opt port ${fd.racionamento === k ? 'on' : ''}" data-act="ration" data-p='${J({ level: k })}'><b>${ic} ${esc(L(n))}</b><span class="big">≈ ${fmt(days, 0)} ${esc(L('dias'))}</span>${S.stage === 1 ? `<span class="${reach ? 'green' : 'red'}">${reach ? '✔ ' + esc(L('chega a Pontes-01b')) : '✖ ' + esc(L('acaba antes de chegar'))}</span>` : ''}<small>${esc(L(k === 'pleno' ? 'tripulação mais feliz' : k === 'reduzido' ? 'equilibrada' : 'humor cai muito · risco de desmaio'))}</small></button>`;
+  }).join('');
+  return eat + food + `<h4>${esc(L('Tamanho das porções'))}</h4><div class="opts portions">${opts}</div>`;
 }
 
 // ---------- relatório, tripulação, fundo, menu ----------
@@ -676,12 +653,12 @@ function stationScreen() {
   let body = '';
   const dest = S.explore.dest; const dexo = EXOPLANETS.find(e => e.id === dest);
   if (tab === 'exo') {
-    body = `<p class="small">${esc(L(K('Dados reais do Exoplanet Archive (aproximados): já são mais de 6.000 exoplanetas confirmados. Critérios de habitabilidade: raio parecido com o da Terra (0,8–1,5 R⊕), temperatura de equilíbrio entre 200 e 300 K, estrela calma e distância alcançável. Cada análise custa ' + (has('lab') ? 5 : 10) + ' GB. Você pode escolher QUALQUER destino — até os errados — mas cada viagem gasta combustível, oxigênio, comida e dias.', 'Real data from the Exoplanet Archive (approximate): over 6,000 confirmed exoplanets so far. Habitability criteria: radius close to Earth\'s (0.8–1.5 R⊕), equilibrium temperature between 200 and 300 K, a calm star and a reachable distance. Each analysis costs ' + (has('lab') ? 5 : 10) + ' GB. You can pick ANY destination — even wrong ones — but every trip burns fuel, oxygen, food and days.', 'Datos reales del Exoplanet Archive (aproximados): ya hay más de 6.000 exoplanetas confirmados. Criterios de habitabilidad: radio parecido al de la Tierra (0,8–1,5 R⊕), temperatura de equilibrio entre 200 y 300 K, estrella tranquila y distancia alcanzable. Cada análisis cuesta ' + (has('lab') ? 5 : 10) + ' GB. Puede elegir CUALQUIER destino, incluso los equivocados, pero cada viaje gasta combustible, oxígeno, comida y días.')))}</p>
+    body = `<p class="small">${esc(L(K('Compare exoplanetas reais com Pontes-01b. Cada análise custa ' + (has('lab') ? 5 : 10) + ' GB. Só Pontes-01b pode receber a tripulação: escolha-o como destino.', 'Compare real exoplanets with Pontes-01b. Each analysis costs ' + (has('lab') ? 5 : 10) + ' GB. Only Pontes-01b can host the crew: pick it as the destination.', 'Compare exoplanetas reales con Pontes-01b. Cada análisis cuesta ' + (has('lab') ? 5 : 10) + ' GB. Solo Pontes-01b puede recibir a la tripulación: elíjalo como destino.')))}</p>
       <div class="exos">${EXOPLANETS.map(e => {
         const an = S.explore.analyzed.includes(e.id); const vis = S.explore.visited && S.explore.visited[e.id];
         const dist = typeof e.dist === 'number' ? fmt(e.dist, 1) + ' ' + L('anos-luz') : L('na rota');
         return `<div class="exo ${dest === e.id ? 'on' : ''} ${vis ? 'visited' : ''}"><b>${e.name}</b>${vis ? ` <em class="red">✖ ${esc(L('visitado: inabitável'))}</em>` : ''}${an || vis ? `<div class="kv small"><span>${esc(L('Distância'))}</span><b>${dist}</b><span>${esc(L('Raio/massa'))}</span><b>${e.radius}</b><span>${esc(L('Gravidade'))}</span><b>${EXO_GRAV[e.id] ? (I18n.lang === 'en' ? EXO_GRAV[e.id].replace(',', '.') : EXO_GRAV[e.id]) : '—'}</b><span>${esc(L('Temp. de equilíbrio'))}</span><b>${e.teq} K</b><span>${esc(L('Ano'))}</span><b>${e.period} ${esc(L('dias'))}</b><span>${esc(L('Distância orbital'))}</span><b>${e.sma} UA</b><span>${esc(L('Descoberta'))}</span><b>${esc(T(e.disc))}</b><span>${esc(L('Estrela'))}</span><b>${esc(T(e.star))}</b><span>ESI</span><b>${e.esi}</b></div><p class="small muted">${esc(T(e.issues))}</p>` : `<button class="btn tiny" data-act="analyzeExo" data-p='${J({ id: e.id })}'>${esc(L('Analisar'))}</button>`}
-        <button class="btn tiny ${dest === e.id ? 'primary' : ''}" data-act="setDest" data-p='${J({ id: e.id })}'>${dest === e.id ? '✔ ' : ''}${esc(L('Destino'))}</button></div>`;
+        ${e.id === 'pontes' ? `<button class="btn tiny ${dest === e.id ? 'primary' : ''}" data-act="setDest" data-p='${J({ id: e.id })}'>${dest === e.id ? '✔ ' : ''}${esc(L('Destino'))}</button>` : ''}</div>`;
       }).join('')}</div>`;
   } else body = tradeZone();
   let foot = '';
@@ -817,6 +794,8 @@ function renderUI() {
   }
   if (S && U.screen === 'game' && !hud && !['intro', 'launch', 'end'].includes(S.scene) && !(S.scene === 'earth' && U.comms)) hud = assistMini() + lessonCard();
   if (U.help && S && U.screen === 'game') modal = helpPanel();
+  if (S && U.screen === 'game') hud += `<button class="gear" data-ui="gearOpen" title="${esc(L('Configurações'))}">⚙</button>`;
+  if (U.settingsOpen && S && U.screen === 'game') modal = `<div class="modal-bg">${settingsScreen(true).replace('data-ui="closePanel"', 'data-ui="gearClose"').replace('</h2>', '</h2><div class="row" style="justify-content:center">' + LANGS.map(l => `<button class="chip ${I18n.lang === l.id ? 'on' : ''}" data-ui="setLang" data-arg="${l.id}">${l.label}</button>`).join('') + '</div>')}</div>`;
   if (U.voicePick) modal = voicePickPanel();
   sitePlayMode();
   const gameEl = document.getElementById('game'); const sc = S && U.screen === 'game' ? S.scene : 'menu'; if (gameEl.dataset.scene !== sc) gameEl.dataset.scene = sc;
@@ -840,6 +819,10 @@ UIH.title = () => { U.playMenu = false; U.screen = 'title'; Music.play('intro');
 UIH.journey = () => { U.screen = 'journey'; S = null; };
 UIH.history = () => { U.screen = 'history'; };
 UIH.settings = () => { U.screen = 'settings'; };
+UIH.gearOpen = () => { U.settingsOpen = true; };
+UIH.gearClose = () => { U.settingsOpen = false; };
+// clicar na barra de interação = apertar E
+UIH.interactNow = () => { if (S && S.scene === 'earth') cityInteract(); else interact(); };
 UIH.shop = () => { U.screen = 'shop'; S = S && S.scene === 'end' ? null : S; };
 UIH.lobby = () => { U.screen = 'lobby'; };
 UIH.buy = id => { const it = SHOP.find(i => i.id === id); if (!it || Save.owns(id) || Save.data.credits < it.price) return; Save.data.credits -= it.price; Save.data.owned.push(id); Save.write(); Sfx.ok(); };
