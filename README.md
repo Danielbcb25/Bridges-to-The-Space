@@ -38,11 +38,11 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 - Na colônia dá para **dormir** nos quartos dos habitats instalados (cada cúpula tem 2 camas; E no habitat → Quartos; E, Espaço, Esc ou uma seta acordam) e **comer** no refeitório (nave, habitat ou estufa). A barra de **fome cai 2x mais rápido** que a de **sono**, na nave e na colônia; os bots também vão comer e dormir sozinhos.
 - Quando um cargueiro de colonos (**Colonial-1, 2, 3**) pousa, os colonos descem como **bots**.
 
-## Multiplayer com várias Arcas (até 28 pessoas)
+## Multiplayer com várias Naves (até 28 pessoas)
 
-- Ao criar a sala você escolhe sua **Arca (1 a 4)** e é o **Comandante** dela. Quem entrar com o código escolhendo **outra Arca** e for o **primeiro** nela vira o **Comandante** dessa Arca; os próximos entram na tripulação (6 funções por Arca).
-- Cada Arca faz a **sua própria jornada** (montagem, viagem, desafios, colônia), simulada no navegador do respectivo Comandante; a sala só repassa as mensagens. O **chat é da sala toda** (com o nome da Arca). Total: 4 Arcas × (Comandante + 6) = **28 pessoas**.
-- Se o Comandante de uma Arca sair, a tripulação dela volta ao lobby e a Arca fica livre.
+- Ao criar a sala você escolhe sua **Nave (1 a 4)** e é o **Comandante** dela. Quem entrar com o código escolhendo **outra Nave** e for o **primeiro** nela vira o **Comandante** dessa Nave; os próximos entram na tripulação (6 funções por Nave).
+- Cada Nave faz a **sua própria jornada** (montagem, viagem, desafios, colônia), simulada no navegador do respectivo Comandante; a sala só repassa as mensagens. O **chat é da sala toda** (com o nome da Nave). Total: 4 Naves × (Comandante + 6) = **28 pessoas**.
+- Se o Comandante de uma Nave sair, a tripulação dela volta ao lobby e a Nave fica livre.
 
 ## O que tem
 
@@ -58,7 +58,7 @@ Sprites derivados de `.claude/Astronauta*.png`; trilha sonora com os MP3 da past
 ## Quiz NASA e fundo de contingência na colônia
 - **QUIZ NASA** (menu inicial): 8 perguntas por rodada com dados da NASA (fonte citada em cada resposta). Acerto = +5 ✦ (1ª vez) ou +1 ✦ (repetida); +2 ✦ se o tema foi lido na cidade; rodada perfeita +5 ✦. Os créditos vão para a Loja.
 - **Centro de Design de Missões NASA** (cidade): ciclo de vida de missões (fases A–F), revisões (PDR/CDR) e da ciência à nave. Texto escrito a partir de conhecimento público da NASA (não extraído do PDF indicado, que não pôde ser lido).
-- **Fundo de contingência** na colônia: tecla **F** ou botão no HUD (peça, tratamento médico, energia, água, ração); qualquer jogador (inclusive comandantes de outras Arcas) pode usar.
+- **Fundo de contingência** na colônia: tecla **F** ou botão no HUD (peça, tratamento médico, energia, água, ração); qualquer jogador (inclusive comandantes de outras Naves) pode usar.
 
 ## Engenharia de massa e gestão de órbita
 - **Massa na montagem**: cada módulo, melhoria e reserva tem massa (kg, mostrada ao lado do custo). A barra "⚖ Massa" mostra a massa de decolagem contra o limite do lançador (4600 kg) e o **Δv** pela equação do foguete (Δv = Isp·g₀·ln(m₀/m_f)) contra o que a rota pede (rápida 650, equilibrada 450, segura 380 m/s). Acima do limite não dá para decolar; Δv curto faz a nave gastar ~20% mais combustível. Em voo, a massa cai conforme os consumíveis acabam e o gasto de cruzeiro e de pouso acompanha a massa.
