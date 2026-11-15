@@ -133,7 +133,6 @@ function settingsScreen(inGame) {
     <label class="field">${esc(L('Voz'))} <select data-set="voice"><option value="">${esc(L('Automática (a mais natural)'))}</option>${Narrator.voices().map(v => `<option value="${esc(v.name)}" ${st.voice === v.name ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}</select> <button class="btn small" data-ui="voiceTest">🔊</button></label>
     <label class="field">${esc(L('Velocidade da voz'))} <input type="range" min="0.7" max="1.3" step="0.05" value="${st.voiceRate || 1}" data-set="voiceRate"></label>
     <label class="check"><input type="checkbox" data-set="showDice" ${st.showDice ? 'checked' : ''}> Modo professor: mostrar as rolagens dos dados</label>
-    <label class="check"><input type="checkbox" data-set="fastEarth" ${st.fastEarth ? 'checked' : ''}> Abertura na Terra mais curta (30 s)</label>
     <div class="row"><button class="btn" data-ui="${inGame ? 'closePanel' : 'title'}">◀ Voltar</button></div>
   </div>`;
 }

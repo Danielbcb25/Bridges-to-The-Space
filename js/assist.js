@@ -53,9 +53,7 @@ function assistSteps() {
     case 'intro': add('Assista à apresentação do modo de jogo (Espaço avança).', false, null, '🎬'); break;
     case 'earth': {
       const E = U.earth || { read: {} }; const rd = E.read || {};
-      const bvis = CITY_BUILDINGS.filter(b => rd[b.id + ':0']).length;
       add('Converse com a primeira moradora (Ms. Lia).', rd['npc:lia'], { earth: CITY_NPCS[0].x }, '💬');
-      add(KS(`Entre em 3 prédios da cidade (${Math.min(3, bvis)}/3).`, `Enter 3 city buildings (${Math.min(3, bvis)}/3).`, `Entre en 3 edificios de la ciudad (${Math.min(3, bvis)}/3).`), bvis >= 3, { earth: (CITY_BUILDINGS.find(b => !rd[b.id + ':0']) || CITY_BUILDINGS[0]).x }, '🏢');
       add('Vá até o foguete no fim da cidade e embarque (E).', U.comms, { earth: rocketX() }, '🚀');
       break;
     }

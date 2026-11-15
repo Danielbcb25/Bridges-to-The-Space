@@ -75,7 +75,7 @@ const cityCount = () => (U.earth ? Object.keys(U.earth.read).length : 0);
 const cityBonus = () => Math.min(3, Math.floor(cityCount() / 10));
 
 function cityInit() {
-  U.earth = { t: 0, limit: Save.data.settings.fastEarth ? 45 : 240, p: { x: 80, face: 1, moving: false, walkT: 0 }, read: {}, panel: null, tab: 0, dialog: null, diary: false };
+  U.earth = { t: 0, limit: 240, p: { x: 80, face: 1, moving: false, walkT: 0 }, read: {}, panel: null, tab: 0, dialog: null, diary: false };
   U.comms = 0;
 }
 // foguete da missão no fim da cidade: embarcar nele começa a jornada
