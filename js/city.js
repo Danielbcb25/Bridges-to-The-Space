@@ -1,6 +1,6 @@
 // ============================================================
 //  A TERRA EM COLAPSO — cidade explorável (história inicial)
-//  8 edifícios com painéis educativos (dados da NASA), 8 NPCs com
+//  8 edifícios com painéis educativos (dados reais), 8 NPCs com
 //  diálogos; o foguete no fim da rua começa a missão.
 // ============================================================
 'use strict';
@@ -8,38 +8,38 @@
 const CITY_BUILDINGS = [
   { id: 'casa', x: 140, w: 84, h: 66, col: '#5a4a3a', roof: '#3a2f26', icon: '🏠', name: 'Seu apartamento',
     tabs: [
-      { t: 'Noticiário', b: 'O telejornal repete: IQA 312, 46 °C, racionamento de água nível 4. Cientistas lembram que satélites da NASA observam a Terra todos os dias — do CO₂ no ar ao gelo nos polos. A atmosfera tem hoje mais de 420 ppm de CO₂, contra ≈ 280 ppm antes da era industrial (NASA/NOAA).' },
-      { t: 'Janela', b: 'Da janela, a névoa cobre os prédios. Desde o fim do século XIX a temperatura média global subiu ≈ 1,2 °C (NASA GISS), e o nível do mar sobe cerca de 3,4 mm por ano em média desde 1993 — hoje mais rápido. O gelo do Ártico no fim do verão diminui ≈ 12% por década.' },
+      { t: 'Noticiário', b: 'O telejornal repete: IQA 312, 46 °C, racionamento de água nível 4. Cientistas lembram que satélites observam a Terra todos os dias — do CO₂ no ar ao gelo nos polos. A atmosfera tem hoje mais de 420 ppm de CO₂, contra ≈ 280 ppm antes da era industrial.' },
+      { t: 'Janela', b: 'Da janela, a névoa cobre os prédios. Desde o fim do século XIX a temperatura média global subiu ≈ 1,2 °C, e o nível do mar sobe cerca de 3,4 mm por ano em média desde 1993 — hoje mais rápido. O gelo do Ártico no fim do verão diminui ≈ 12% por década.' },
       { t: 'Mochila', b: 'Você separa o que levar: uma foto, uma semente, o rádio antigo. Colocar 1 kg em órbita custa milhares de dólares — por isso, numa nave, tudo precisa ter função. Quanto mais leve a carga, mais longe a nave chega.' },
     ] },
-  { id: 'missao', x: 262, w: 92, h: 70, col: '#2f4a5e', roof: '#1c3040', icon: '🛰', name: K('Centro de Design de Missões NASA', 'NASA Mission Design Center', 'Centro de Diseño de Misiones NASA'),
+  { id: 'missao', x: 262, w: 92, h: 70, col: '#2f4a5e', roof: '#1c3040', icon: '🛰', name: K('Centro de Design de Missões', 'Mission Design Center', 'Centro de Diseño de Misiones'),
     tabs: [
-      { t: K('Fases da missão', 'Mission phases', 'Fases de la misión'), b: K('Uma missão da NASA segue um ciclo de vida: Pré-Fase A (estudos de conceito), Fase A (conceito e desenvolvimento de tecnologia), Fase B (projeto preliminar), Fase C (projeto final e construção), Fase D (integração, testes e lançamento), Fase E (operações) e Fase F (encerramento).', 'A NASA mission follows a lifecycle: Pre-Phase A (concept studies), Phase A (concept and technology development), Phase B (preliminary design), Phase C (final design and build), Phase D (integration, test and launch), Phase E (operations) and Phase F (closeout).', 'Una misión de la NASA sigue un ciclo de vida: Pre-Fase A (estudios de concepto), Fase A (concepto y desarrollo tecnológico), Fase B (diseño preliminar), Fase C (diseño final y construcción), Fase D (integración, pruebas y lanzamiento), Fase E (operaciones) y Fase F (cierre).') },
+      { t: K('Fases da missão', 'Mission phases', 'Fases de la misión'), b: K('Uma missão espacial segue um ciclo de vida: Pré-Fase A (estudos de conceito), Fase A (conceito e desenvolvimento de tecnologia), Fase B (projeto preliminar), Fase C (projeto final e construção), Fase D (integração, testes e lançamento), Fase E (operações) e Fase F (encerramento).', 'A space mission follows a lifecycle: Pre-Phase A (concept studies), Phase A (concept and technology development), Phase B (preliminary design), Phase C (final design and build), Phase D (integration, test and launch), Phase E (operations) and Phase F (closeout).', 'Una misión espacial sigue un ciclo de vida: Pre-Fase A (estudios de concepto), Fase A (concepto y desarrollo tecnológico), Fase B (diseño preliminar), Fase C (diseño final y construcción), Fase D (integración, pruebas y lanzamiento), Fase E (operaciones) y Fase F (cierre).') },
       { t: K('Revisões', 'Reviews', 'Revisiones'), b: K('Entre as fases existem revisões, como a PDR (Revisão Preliminar de Projeto) e a CDR (Revisão Crítica de Projeto). Elas funcionam como portões: se o projeto não está maduro, a missão não avança. Errar no papel é barato; errar no espaço, não.', 'Between phases there are reviews, like the PDR (Preliminary Design Review) and CDR (Critical Design Review). They work as gates: if the design is not mature, the mission does not move on. Mistakes on paper are cheap; in space they are not.', 'Entre fases hay revisiones, como la PDR (Revisión Preliminar de Diseño) y la CDR (Revisión Crítica de Diseño). Son puertas: si el diseño no está maduro, la misión no avanza. Errar en papel es barato; en el espacio, no.') },
       { t: K('Da ciência à nave', 'From science to spacecraft', 'De la ciencia a la nave'), b: K('Tudo começa com perguntas científicas. Delas saem os objetivos, os requisitos e, só então, os instrumentos e a nave. Os engenheiros mantêm margens de massa, energia e orçamento — porque imprevistos acontecem. É a mesma lógica do seu fundo de contingência!', 'It all starts with science questions. From them come objectives, requirements and only then the instruments and spacecraft. Engineers keep margins of mass, power and budget — because surprises happen. It is the same logic as your contingency fund!', 'Todo empieza con preguntas científicas. De ellas salen los objetivos, los requisitos y solo después los instrumentos y la nave. Los ingenieros mantienen márgenes de masa, energía y presupuesto — porque ocurren imprevistos. ¡Es la misma lógica de su fondo de contingencia!') },
     ] },
   { id: 'mercado', x: 383, w: 100, h: 58, col: '#4a5a6a', roof: '#2a3a52', icon: '💧', name: 'Mercado da Água',
     tabs: [
-      { t: 'A fila', b: 'Racionamento nível 4: 20 litros por pessoa por dia, para beber, cozinhar e se lavar. Na ISS a água também é contada gota a gota — mas lá ela é reciclada: em 2023 o sistema alcançou 98% de recuperação, transformando até suor e urina em água potável (NASA).' },
-      { t: 'Aquíferos', b: 'Os satélites GRACE e GRACE-FO da NASA medem minúsculas variações na gravidade para descobrir quanta água subterrânea e gelo cada região ganha ou perde. A Groenlândia perde cerca de 270 bilhões de toneladas de gelo por ano; a Antártida, cerca de 150 bilhões.' },
+      { t: 'A fila', b: 'Racionamento nível 4: 20 litros por pessoa por dia, para beber, cozinhar e se lavar. Na ISS a água também é contada gota a gota — mas lá ela é reciclada: em 2023 o sistema alcançou 98% de recuperação, transformando até suor e urina em água potável.' },
+      { t: 'Aquíferos', b: 'Os satélites GRACE e GRACE-FO medem minúsculas variações na gravidade para descobrir quanta água subterrânea e gelo cada região ganha ou perde. A Groenlândia perde cerca de 270 bilhões de toneladas de gelo por ano; a Antártida, cerca de 150 bilhões.' },
       { t: 'Peso da água', b: '1 litro de água pesa 1 kg. Levar 600 litros numa nave significa 600 kg a mais para lançar e frear. Por isso quem recicla viaja mais longe: no jogo, o reciclador de ciclo fechado vale ouro.' },
     ] },
   { id: 'observatorio', x: 652, w: 96, h: 78, col: '#3a4468', roof: '#24304f', icon: '🔭', name: 'Observatório Pontes',
     tabs: [
       { t: 'Trânsito', b: 'Quando um planeta passa na frente da estrela, o brilho cai um pouquinho. Foi assim que o telescópio Kepler (2009–2018) encontrou mais de 2.600 planetas. O satélite TESS (2018) continua a busca em estrelas próximas.' },
       { t: 'Velocidade radial', b: 'A gravidade do planeta faz a estrela “balançar”, e a cor da luz muda de leve (efeito Doppler). Assim foi achado Proxima Centauri b, em 2016, a 4,2 anos-luz. Com a tecnologia atual, uma sonda como a Voyager 1 levaria cerca de 75 mil anos para chegar lá.' },
-      { t: 'Zona habitável', b: 'É a faixa em que a água pode ficar líquida na superfície. Mas não basta: contam a atmosfera, o campo magnético e as erupções da estrela. O NASA Exoplanet Archive já lista mais de 6.000 exoplanetas confirmados — poucos parecem habitáveis.' },
+      { t: 'Zona habitável', b: 'É a faixa em que a água pode ficar líquida na superfície. Mas não basta: contam a atmosfera, o campo magnético e as erupções da estrela. O Exoplanet Archive já lista mais de 6.000 exoplanetas confirmados — poucos parecem habitáveis.' },
       { t: 'Pontes-01b', b: 'Os observatórios do mundo se uniram e encontraram Pontes-01b: raio ≈ 1,04 vezes o da Terra, temperatura de equilíbrio ≈ 268 K e uma estrela calma. O telescópio James Webb estuda a luz que atravessa atmosferas distantes para descobrir seus gases. Pontes-01b é a nossa melhor — e única — esperança.' },
     ] },
   { id: 'clinica', x: 921, w: 92, h: 62, col: '#6a5a5a', roof: '#4a3a3a', icon: '✚', name: 'Clínica Respira',
     tabs: [
-      { t: 'O ar da cidade', b: 'Índice de qualidade do ar acima de 300 é “perigoso”. A NASA mede poluentes do espaço — o instrumento TEMPO (lançado em 2023) faz uma medição por hora sobre a América do Norte. Na nave, o ar também é um recurso: a filtragem precisa ser vigiada.' },
+      { t: 'O ar da cidade', b: 'Índice de qualidade do ar acima de 300 é “perigoso”. Satélites medem poluentes do espaço — o instrumento TEMPO (lançado em 2023) faz uma medição por hora sobre a América do Norte. Na nave, o ar também é um recurso: a filtragem precisa ser vigiada.' },
       { t: 'Corpo sem peso', b: 'Sem gravidade os ossos perdem de 1% a 1,5% de massa por mês e os músculos enfraquecem; os fluidos sobem para a cabeça (rosto inchado, dor de cabeça). Por isso os astronautas treinam cerca de 2 horas por dia. O paramédico da sua nave vai lidar com isso.' },
       { t: 'Radiação', b: 'Na Terra recebemos ≈ 3 mSv por ano. Na ISS, um astronauta recebe cerca de 80 mSv em 6 meses; fora da proteção do campo magnético da Terra é ainda mais. Tempestades solares exigem um abrigo blindado — no jogo, os dormitórios.' },
     ] },
   { id: 'controle', x: 1190, w: 108, h: 80, col: '#34506a', roof: '#1e3248', icon: '📡', name: 'Centro de Controle da Missão',
     tabs: [
-      { t: 'Rede de Espaço Profundo', b: 'A DSN da NASA tem três complexos — Goldstone (EUA), Madri (Espanha) e Canberra (Austrália) — separados por ≈ 120° de longitude. Assim, enquanto a Terra gira, sempre há uma antena gigante enxergando a sua nave.' },
+      { t: 'Rede de Espaço Profundo', b: 'A DSN tem três complexos — Goldstone (EUA), Madri (Espanha) e Canberra (Austrália) — separados por ≈ 120° de longitude. Assim, enquanto a Terra gira, sempre há uma antena gigante enxergando a sua nave.' },
       { t: 'Atraso do sinal', b: 'O rádio viaja à velocidade da luz, mas o espaço é enorme: de Marte o sinal leva de 3 a 22 minutos; da Voyager 1, quase um dia inteiro. Por isso a nave precisa de autonomia: a Terra aconselha, mas o Comandante decide.' },
       { t: 'Sua tripulação', b: 'Seis especialistas vão com você: paramédico, navegador, agricultor/engenheiro genético, dois engenheiros e o pesquisador chefe. Cada um tem gostos, alergias e humor. Cuide de todos: tripulantes felizes trabalham melhor — e nesta missão, mortes derrubam a moral de todo mundo.' },
     ] },
@@ -51,8 +51,8 @@ const CITY_BUILDINGS = [
     ] },
   { id: 'sementes', x: 1695, w: 104, h: 54, col: '#4a6a4a', roof: '#35523a', icon: '🌱', name: 'Banco de Sementes',
     tabs: [
-      { t: 'Alface no espaço', b: 'Em 2015, no experimento Veggie, astronautas da ISS comeram alface cultivada em órbita. Plantas dão comida, oxigênio e ainda ajudam o psicológico de quem passa meses longe de casa (NASA).' },
-      { t: 'Pimentas', b: 'Em 2021 a NASA colheu pimentas Hatch na ISS (Plant Habitat-04). A comida da nave é sem graça; um toque de pimenta melhora o humor — e no jogo, o Navegador adora apimentado!' },
+      { t: 'Alface no espaço', b: 'Em 2015, no experimento Veggie, astronautas da ISS comeram alface cultivada em órbita. Plantas dão comida, oxigênio e ainda ajudam o psicológico de quem passa meses longe de casa.' },
+      { t: 'Pimentas', b: 'Em 2021 astronautas colheram pimentas Hatch na ISS (Plant Habitat-04). A comida da nave é sem graça; um toque de pimenta melhora o humor — e no jogo, o Navegador adora apimentado!' },
       { t: 'Sem gravidade, sem solo', b: 'Sem gravidade a água não escorre: as raízes precisam de luz LED, nutrientes e ventilação controlados. E em outro mundo o solo pode ser tóxico — o solo de Marte tem percloratos, detectados pela sonda Phoenix em 2008. Por isso levamos um banco de sementes.' },
     ] },
   { id: 'alistamento', x: 1958, w: 110, h: 84, col: '#3a4f7a', roof: '#22345a', icon: '🚀', name: 'Centro de Alistamento Pontes-01b',

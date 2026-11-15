@@ -36,7 +36,7 @@ const CREW_NAMES = ['Ana', 'Bruno', 'Carla', 'Davi', 'Elisa', 'Felipe', 'Gabi', 
 const FOOD_TAGS = ['sopa', 'apimentado', 'salada', 'carne', 'batata', 'pao', 'doce', 'diferente', 'algas', 'soja'];
 
 // ---------------- Sistemas da nave (8) ----------------
-// Dados internos inspirados em números públicos da NASA (ISS / ECLSS)
+// Dados internos inspirados em números públicos (ISS / ECLSS)
 const DMG_PCT = { Baixo: 10, Médio: 20, Alto: 30 }; // % de integridade descontada a cada ocorrência de dano
 const SYSTEMS = {
   casco: { name: 'Casco e Blindagem', dmg: 'Baixo', station: 'aviônica', desc: 'Estrutura externa de proteção contra impactos e radiação cósmica.' },
@@ -48,7 +48,7 @@ const SYSTEMS = {
   comunicacao: { name: 'Sistema de Comunicação', dmg: 'Médio', station: 'antena', desc: 'Antenas e transceptores de longo alcance com o Controle da Missão.' },
   acoplamento: { name: 'Módulos de Acoplamento', dmg: 'Médio', station: 'eclusa', desc: 'Eclusa, portas e trajes para atividades extraveiculares.' },
 };
-// Números de referência (NASA, ISS ECLSS) usados na simulação
+// Números de referência usados na simulação
 const NASA = {
   o2PorPessoaDia: 0.84,      // kg de O2 por astronauta/dia
   aguaPorPessoaDia: 3.0,     // L (bebida, comida, higiene)
@@ -179,7 +179,7 @@ const CROPS = {
   algas: { name: 'Algas', days: 3, yield: 4, water: 15, tags: ['algas'], humor: -1, color: '#2fa88a', needs: 'biorreator' },
 };
 const RECIPES = [
-  { id: 'salada', name: 'Salada fresca', ing: ['alface', 'pimenta'], humor: 3, energy: 0, tags: ['salada', 'diferente'], fact: 'Já foram cultivadas alfaces em órbita, nos experimentos Veggie da NASA na ISS.' },
+  { id: 'salada', name: 'Salada fresca', ing: ['alface', 'pimenta'], humor: 3, energy: 0, tags: ['salada', 'diferente'], fact: 'Já foram cultivadas alfaces em órbita, nos experimentos Veggie na ISS.' },
   { id: 'ensopado', name: 'Ensopado da Terra', ing: ['racao', 'batata', 'soja'], humor: 4, energy: 1.5, tags: ['carne', 'batata', 'soja', 'sopa'], cook: true, fact: 'Refeições quentes e familiares ajudam a manter o ânimo em missões longas.' },
   { id: 'paoAlgas', name: 'Pão de algas', ing: ['algas', 'batata'], humor: 2, energy: 1, tags: ['pao', 'algas'], cook: true, fact: 'Algas crescem rápido e servem de comida de emergência.' },
   { id: 'tortilha', name: 'Tortilha recheada', ing: ['racao', 'soja', 'pimenta'], humor: 3, energy: 1, tags: ['apimentado', 'soja', 'pao'], cook: true, fact: 'Na ISS usam tortilhas no lugar do pão: migalhas flutuam e podem entrar nos equipamentos.' },
@@ -210,7 +210,7 @@ const SHOP = [
   { id: 'cascoExtra', cat: 'upgrade', name: 'Placas de casco extras', price: 90, desc: 'Casco começa mais resistente (+asteroides)' },
 ];
 
-// ---------------- Exoplanetas (dados reais — NASA Exoplanet Archive, aproximados) ----------------
+// ---------------- Exoplanetas (dados reais — Exoplanet Archive, aproximados) ----------------
 const EXOPLANETS = [
   { id: 'proxb', name: 'Proxima Centauri b', dist: 4.2, radius: '~1.1 (massa mín. 1,07 M⊕)', teq: 234, period: 11.2, star: 'Anã vermelha M5.5 com fortes erupções', esi: 0.87, disc: '2016 · velocidade radial', sma: 0.049, issues: 'Erupções estelares intensas podem ter removido a atmosfera; provável rotação travada.',
     trip: { days: 5, fuel: 120, o2: 14, food: 8, moral: -8, dados: 40, type: 'rock', outcome: { pt: 'A estrela Proxima Centauri lança erupções que podem ser centenas de vezes mais intensas que as do nosso Sol. O sensor mostra um solo seco e sem atmosfera: a radiação é letal na superfície.', en: 'Proxima Centauri throws flares that can be hundreds of times stronger than our Sun\'s. Sensors show dry ground and almost no atmosphere: the surface radiation is deadly.', es: 'Próxima Centauri lanza llamaradas que pueden ser cientos de veces más intensas que las de nuestro Sol. Los sensores muestran suelo seco y casi sin atmósfera: la radiación en superficie es letal.' } } },

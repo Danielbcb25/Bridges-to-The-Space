@@ -11,19 +11,19 @@ const CBUILD = {
   nave: { x: 150, icon: '🚀', name: 'Nave pousada · Controle da Colônia',
     fact: 'O pouso em Marte da Perseverance (2021) usou o “guindaste aéreo” e levou cerca de 7 minutos da atmosfera ao solo, sem nenhum controle ao vivo: o sinal demora minutos para chegar da Terra.' },
   lab: { x: 360, icon: '🔬', name: 'Laboratório de campo e oficina',
-    fact: 'O instrumento MOXIE, a bordo do rover Perseverance, produziu oxigênio a partir do CO₂ da atmosfera de Marte: 122 gramas no total, o suficiente para um cachorro pequeno respirar por cerca de 10 horas (NASA). É o princípio do uso de recursos locais (ISRU).' },
+    fact: 'O instrumento MOXIE, a bordo do rover Perseverance, produziu oxigênio a partir do CO₂ da atmosfera de Marte: 122 gramas no total, o suficiente para um cachorro pequeno respirar por cerca de 10 horas. É o princípio do uso de recursos locais (ISRU).' },
   solar: { x: 580, icon: '☀', name: 'Campo solar',
     fact: 'A Estação Espacial Internacional tem painéis solares com área maior que a de uma quadra de tênis e gera energia da ordem de 100 kW em plena luz do Sol. Mas ela passa pela sombra da Terra a cada órbita (~90 min): por isso tem baterias.' },
   agua: { x: 800, icon: '💧', name: 'Estação de água',
-    fact: 'Em 2023 a ISS alcançou 98% de recuperação de água: urina, suor e até a umidade da respiração viram água potável de novo (NASA). A sonda Phoenix confirmou gelo de água em Marte em 2008.' },
+    fact: 'Em 2023 a ISS alcançou 98% de recuperação de água: urina, suor e até a umidade da respiração viram água potável de novo. A sonda Phoenix confirmou gelo de água em Marte em 2008.' },
   estufa: { x: 1020, icon: '🌱', name: 'Estufa colonial',
-    fact: 'Astronautas da ISS já cultivaram e comeram alface (2015, experimento Veggie) e colheram pimentas Hatch (2021, Plant Habitat-04). Plantas também produzem O₂ e ajudam o psicológico da tripulação (NASA).' },
+    fact: 'Astronautas da ISS já cultivaram e comeram alface (2015, experimento Veggie) e colheram pimentas Hatch (2021, Plant Habitat-04). Plantas também produzem O₂ e ajudam o psicológico da tripulação.' },
   torre: { x: 1240, icon: '📡', name: 'Torre de comunicação',
-    fact: 'A Rede de Espaço Profundo da NASA (DSN) tem 3 complexos — Goldstone (EUA), Madri (Espanha) e Canberra (Austrália) — separados por cerca de 120°, para que sempre um deles enxergue a nave enquanto a Terra gira. Em 2023 o teste DSOC enviou dados por laser a 267 Mbps de 31 milhões de km.' },
+    fact: 'A Rede de Espaço Profundo (DSN) tem 3 complexos — Goldstone (EUA), Madri (Espanha) e Canberra (Austrália) — separados por cerca de 120°, para que sempre um deles enxergue a nave enquanto a Terra gira. Em 2023 o teste DSOC enviou dados por laser a 267 Mbps de 31 milhões de km.' },
   pista: { x: 1470, icon: '🛬', name: 'Pista de pouso e farol',
-    fact: 'Pousar exige um alvo conhecido: a NASA escolheu a cratera Jezero, em Marte, depois de anos de imagens de satélite. Sinais de rádio e faróis ajudam a guiar o pouso final.' },
+    fact: 'Pousar exige um alvo conhecido: os cientistas escolheram a cratera Jezero, em Marte, depois de anos de imagens de satélite. Sinais de rádio e faróis ajudam a guiar o pouso final.' },
   habitat: { x: 1720, icon: '🏠', name: 'Habitat e domos',
-    fact: 'Na simulação CHAPEA da NASA, quatro voluntários viveram 378 dias em um habitat impresso em 3D (“Mars Dune Alpha”, 2023–2024) para estudar o isolamento, a comida e o trabalho em equipe.' },
+    fact: 'Na simulação CHAPEA, quatro voluntários viveram 378 dias em um habitat impresso em 3D (“Mars Dune Alpha”, 2023–2024) para estudar o isolamento, a comida e o trabalho em equipe.' },
 };
 const CSHORT = { nave: 'Nave', lab: 'Laboratório', solar: 'Campo solar', agua: 'Água', estufa: 'Estufa', torre: 'Torre', pista: 'Pista', habitat: 'Habitat' };
 const CORDER = ['nave', 'lab', 'solar', 'agua', 'estufa', 'torre', 'pista', 'habitat'];
@@ -307,7 +307,7 @@ function tickColony(dt) {
     const due = C.pendingAck.filter(a => a.t <= 0); C.pendingAck = C.pendingAck.filter(a => a.t > 0);
     due.forEach(a => colonyMsg(a.k, 'mc'));
   }
-  // curiosidades da NASA
+  // curiosidades
   C.nextFact -= dt;
   if (C.nextFact <= 0) { C.nextFact = 80 + Math.random() * 40; const f = CFACTS[C.factN++ % CFACTS.length]; if (typeof Chat !== 'undefined') Chat.sysAll(f, 'fact'); }
   // fim?
@@ -329,7 +329,8 @@ function moveColonyHuman(c, dt) {
   const L_ = keys.ArrowLeft || keys.KeyA, R_ = keys.ArrowRight || keys.KeyD;
   if (L_ || R_) U.clickTarget = null;
   let dx = (R_ ? 1 : 0) - (L_ ? 1 : 0);
-  if (!dx && U.clickTarget) { const d = U.clickTarget.x - c.x; if (Math.abs(d) < 3) U.clickTarget = null; else dx = Math.sign(d); }
+  if (L_ || R_) U.cOpen = null;
+  if (!dx && U.clickTarget) { const d = U.clickTarget.x - c.x; if (Math.abs(d) < 3) { U.clickTarget = null; if (U.cOpen && !U.panel) { U.cOpen = null; colonyInteract(); } } else dx = Math.sign(d); }
   if (dx) { c.x = clamp(c.x + dx * (c.status === 'ferido' ? 40 : 75) * (keys.ShiftLeft || keys.ShiftRight ? RUN_MULT : 1) * dt, 24, COLONY_W - 24); c.face = dx; c.moving = true; c.walkT += dt; }
   else c.moving = false;
   c.deck = 'L'; c.tx = c.x;
@@ -342,8 +343,13 @@ function nearBuilding(c) {
 function colonyInteract() {
   const c = me(); if (!c || !c.alive || !S.colony) return;
   if (S.colony.tut === 0) return act('cTut');
-  const b = nearBuilding(c); if (!b) return;
-  U.panel = 'c:' + b; U.tab = null;
+  const b = nearBuilding(c);
+  if (!b) { // longe de tudo: anda até o prédio mais próximo e abre ao chegar
+    let best = null, bd = 320; for (const id of CORDER) { const d = Math.abs(CBUILD[id].x - c.x); if (d < bd) { bd = d; best = id; } }
+    if (best) { U.clickTarget = { x: CBUILD[best].x }; U.cOpen = best; }
+    return;
+  }
+  U.cOpen = null; U.panel = 'c:' + b; U.tab = null;
 }
 
 // ---------- desenho ----------

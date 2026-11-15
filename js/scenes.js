@@ -122,7 +122,7 @@ function buildEarth() {
   const far = [], near = [], props = [], npcs = [];
   for (let x = 0; x < EARTH_W + 200; x += 18 + rnd() * 20) far.push({ x, w: 16 + rnd() * 26, h: 40 + rnd() * 70 });
   for (let x = 40; x < EARTH_W; x += 70 + rnd() * 60) near.push({ x, w: 40 + rnd() * 40, h: 70 + rnd() * 70, chim: rnd() < 0.4, col: pick(['#3b3328', '#2f2a24', '#46392a', '#353038']) });
-  const signs = ['AR PÉSSIMO • IQA 312', 'ÁGUA: RACIONAMENTO NÍVEL 4', 'TEMPERATURA: 46 °C', 'USE MÁSCARA', 'CO₂: 420+ ppm (NASA)', 'MAR: +10 cm DESDE 1993', 'COLÔNIA EM MARTE: VAGAS ESGOTADAS', '6.000+ EXOPLANETAS CONFIRMADOS', 'PROJETO PONTES-01b: ALISTAMENTO'];
+  const signs = ['AR PÉSSIMO • IQA 312', 'ÁGUA: RACIONAMENTO NÍVEL 4', 'TEMPERATURA: 46 °C', 'USE MÁSCARA', 'CO₂: 420+ ppm', 'MAR: +10 cm DESDE 1993', 'COLÔNIA EM MARTE: VAGAS ESGOTADAS', '6.000+ EXOPLANETAS CONFIRMADOS', 'PROJETO PONTES-01b: ALISTAMENTO'];
   // placas nos vãos entre os prédios da cidade (longe das portas e das pessoas)
   const signX = [40, 255, 525, 820, 1070, 1265, 1515, 1765, 1885];
   signs.forEach((t, i) => props.push({ type: 'sign', x: signX[i] != null ? signX[i] : 120 + i * 372, t }));
