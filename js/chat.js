@@ -176,7 +176,7 @@ const Chat = {
       case 'fuel': return resLine('combustivel', L('kg de combustível'));
       case 'moral': return pre + L('A moral da equipe está em ') + fmt(moralIndex(), 0) + '. ' + (c.humor < 40 ? L('Eu mesmo ando meio pra baixo…') : L('Eu estou bem!'));
       case 'goal': return pre + this.goalLine();
-      case 'help': return pre + L('Pergunte “status”, “água”, “comida”, “moral”, “objetivo” ou fale com a “Controle” para curiosidades.');
+      case 'help': return pre + L('Pergunte “status”, “água”, “comida”, “moral”, “objetivo” ou fale com o “Controle” para curiosidades.');
       case 'joke': return pre + pick([L('Por que o astronauta terminou o namoro? Precisava de espaço!'), L('Cuidado com o lixo espacial: é o único que gira em volta da gente!')]);
       case 'thanks': return pre + L('De nada, Comandante!');
       case 'hi': return pre + L('Olá! Pronto para o que der e vier.');

@@ -578,3 +578,5 @@ img.pxe { width: 1.15em; height: 1.15em; image-rendering: pixelated; image-rende
 .opt.bad{border-color:#ff6a6a;background:rgba(180,50,50,.25)}
 .quizfb{margin:8px 0;text-align:left}
 
+.lesson-card { z-index: 30; }
+.game[data-scene=station] .lesson-card, .game[data-scene=planet] .lesson-card, .game[data-scene=migration] .lesson-card, .game[data-scene=detour] .lesson-card { left: 0.6em; right: auto; bottom: 4.2em; }

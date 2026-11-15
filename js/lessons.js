@@ -109,27 +109,64 @@ const END_LESSONS = [
   () => K('2024 foi o ano mais quente já registrado na Terra. Cuidar do único planeta habitável que conhecemos ainda é a missão mais importante.', '2024 was the warmest year on record on Earth. Taking care of the only habitable planet we know is still the most important mission.', '2024 fue el año más cálido registrado en la Tierra. Cuidar el único planeta habitable que conocemos sigue siendo la misión más importante.'),
 ];
 
-function lessonOf(rec) { return rec && rec.ev ? EV_LESSONS[rec.ev] : null; }
+function lessonOf(rec) { return rec && rec.ev ? ALL_LESSONS[rec.ev] : null; }
 
-// depois de cada desafio: escolhe a lição (o tema do desafio; se já viu, uma do Quiz)
+// depois de cada desafio: a lição do tema daquele desafio
 {
   const _close = closeEvent;
-  closeEvent = function () {
-    const ev = S && S.event; const type = ev && ev.type;
-    _close();
-    if (!type || !S) return;
-    S.lessons = S.lessons || [];
-    let rec = null;
-    if (EV_LESSONS[type] && !S.lessons.some(x => x.ev === type)) rec = { ev: type };
-    if (!rec) return;
-    rec.at = S.journeyTime || 0; S.lessons.push(rec); S.lessonLast = rec; S.v++;
-  };
+  closeEvent = function () { const ev = S && S.event; const type = ev && ev.type; _close(); if (type) teach(type, true); };
 }
+// consertos, tarefas da rotina e etapas da viagem também ensinam
+{
+  const _rep = TASK_DONE.repair; TASK_DONE.repair = (c, d) => { _rep(c, d); if (d && SYS_LESSON[d.sys]) teach(SYS_LESSON[d.sys]); };
+  const _hook = routineHook; routineHook = function (type, p, actor) { const r = S && S.routine; const before = r ? r.items.filter(x => x.done).map(x => x.id) : []; _hook(type, p, actor); if (!r) return; const now = r.items.filter(x => x.done && !before.includes(x.id)); if (now[0] && CHORE_LESSON[now[0].id]) teach(CHORE_LESSON[now[0].id]); };
+  const _fund = ACTIONS.fund; ACTIONS.fund = (p, a) => { _fund(p, a); teach('margins'); };
+  const _st = enterStation; enterStation = function () { _st(); teach('iss', true); };
+  const _pl = enterPlanet; enterPlanet = function () { _pl(); teach('marsAtm', true); };
+  const _col = startColony; startColony = function (a, b) { _col(a, b); teach('marsGrav', true); };
+  const _lv = leaveStation; leaveStation = function () { _lv(); teach('webb', true); };
+}
+// ---------- mais temas: ligados a consertos, tarefas e etapas da viagem ----------
+// fato + pergunta do Quiz (pelo texto da pergunta já existente, ou uma nova)
+const qRef = pt => QUIZ_BANK.find(q => q.q.pt === pt);
+const MORE_LESSONS = {
+  voyager: { fact: K('A Voyager 1, lançada em 1977, entrou no espaço interestelar em 2012 e é o objeto feito por humanos mais distante da Terra.', 'Voyager 1, launched in 1977, entered interstellar space in 2012 and is the most distant human-made object from Earth.', 'La Voyager 1, lanzada en 1977, entró en el espacio interestelar en 2012 y es el objeto humano más lejano de la Tierra.'), ref: 'Qual sonda lançada em 1977 chegou ao espaço interestelar em 2012?' },
+  webb: { fact: K('O Telescópio Espacial James Webb fica no ponto L2, a cerca de 1,5 milhão de km da Terra. Lá o escudo solar mantém os instrumentos infravermelhos bem frios.', 'The James Webb Space Telescope sits at point L2, about 1.5 million km from Earth. There its sunshield keeps the infrared instruments very cold.', 'El Telescopio Espacial James Webb está en el punto L2, a cerca de 1,5 millones de km de la Tierra. Allí el escudo solar mantiene fríos los instrumentos infrarrojos.'), ref: 'Onde fica o Telescópio Espacial James Webb?' },
+  iss: { fact: K('A Estação Espacial Internacional orbita a cerca de 400 km de altura e dá uma volta na Terra a cada 90 minutos, a uns 28.000 km/h.', 'The International Space Station orbits about 400 km up and circles Earth every 90 minutes, at about 28,000 km/h.', 'La Estación Espacial Internacional orbita a unos 400 km de altura y da una vuelta a la Tierra cada 90 minutos, a unos 28.000 km/h.'), ref: 'A que altitude orbita a Estação Espacial Internacional?' },
+  marsAtm: { fact: K('A atmosfera de Marte tem cerca de 95% de dióxido de carbono. O experimento MOXIE, no rover Perseverance, conseguiu fabricar oxigênio a partir dela.', 'Mars\'s atmosphere is about 95% carbon dioxide. The MOXIE experiment on the Perseverance rover managed to make oxygen from it.', 'La atmósfera de Marte tiene cerca de 95 % de dióxido de carbono. El experimento MOXIE del rover Perseverance logró fabricar oxígeno a partir de ella.'), ref: 'Qual gás compõe cerca de 95% da atmosfera de Marte?' },
+  marsGrav: { fact: K('A gravidade em Marte é cerca de 38% da gravidade da Terra: quem pesa 100 kg aqui "pesaria" uns 38 kg lá.', 'Gravity on Mars is about 38% of Earth\'s: someone who weighs 100 kg here would "weigh" about 38 kg there.', 'La gravedad en Marte es cerca del 38 % de la terrestre: quien pesa 100 kg aquí "pesaría" unos 38 kg allá.'), ref: 'A gravidade na superfície de Marte é aproximadamente…' },
+  sol: { fact: K('Um dia em Marte, chamado "sol", dura 24 horas e 37 minutos. As equipes dos rovers chegam a viver no "horário marciano".', 'A day on Mars, called a "sol", lasts 24 hours and 37 minutes. Rover teams even live on "Mars time".', 'Un día en Marte, llamado "sol", dura 24 horas y 37 minutos. Los equipos de los rovers llegan a vivir en "hora marciana".'), ref: 'Um dia marciano (sol) dura aproximadamente…' },
+  ingenuity: { fact: K('Em 2021, o helicóptero Ingenuity fez o primeiro voo motorizado e controlado em outro planeta, em Marte.', 'In 2021 the Ingenuity helicopter made the first powered, controlled flight on another planet: Mars.', 'En 2021 el helicóptero Ingenuity hizo el primer vuelo motorizado y controlado en otro planeta: Marte.'), ref: 'O que foi o Ingenuity?' },
+  margins: { fact: K('Missões espaciais guardam margens de massa, energia e orçamento, porque imprevistos acontecem e o projeto cresce durante o desenvolvimento.', 'Space missions keep margins of mass, power and budget, because surprises happen and designs grow during development.', 'Las misiones espaciales guardan márgenes de masa, energía y presupuesto, porque ocurren imprevistos y el diseño crece durante el desarrollo.'), ref: 'Por que as missões mantêm margens (folgas) de massa, energia e orçamento?' },
+  phases: { fact: K('Toda missão espacial passa por fases: Pré-Fase A e Fase A (conceito), B e C (projeto e construção), D (testes e lançamento), E (operações no espaço) e F (encerramento).', 'Every space mission goes through phases: Pre-Phase A and Phase A (concept), B and C (design and build), D (test and launch), E (operations in space) and F (closeout).', 'Toda misión espacial pasa por fases: Pre-Fase A y Fase A (concepto), B y C (diseño y construcción), D (pruebas y lanzamiento), E (operaciones en el espacio) y F (cierre).'), ref: 'Em qual fase a missão já está no espaço, coletando e enviando ciência?' },
+  horta: { fact: K('Já se plantou comida no espaço: astronautas cultivaram e comeram alface na Estação Espacial, e em 2021 colheram pimentas por lá.', 'Food has already been grown in space: astronauts grew and ate lettuce on the Space Station, and in 2021 they harvested chili peppers there.', 'Ya se cultivó comida en el espacio: los astronautas cultivaron y comieron lechuga en la Estación Espacial, y en 2021 cosecharon chiles allí.'),
+    quiz: Q('gp:horta', '', ['Que alimento os astronautas já cultivaram e comeram na Estação Espacial?', 'Which food have astronauts grown and eaten on the Space Station?', '¿Qué alimento ya cultivaron y comieron los astronautas en la Estación Espacial?'],
+      [['Alface', 'Lettuce', 'Lechuga'], ['Melancia', 'Watermelon', 'Sandía'], ['Café', 'Coffee', 'Café'], ['Nada: plantas não crescem no espaço', 'Nothing: plants cannot grow in space', 'Nada: las plantas no crecen en el espacio']], 0,
+      ['Com luz de LED, água e nutrientes medidos, plantas crescem mesmo em microgravidade.', 'With LED light, water and measured nutrients, plants grow even in microgravity.', 'Con luz LED, agua y nutrientes medidos, las plantas crecen incluso en microgravedad.']) },
+};
+for (const [k, v] of Object.entries(MORE_LESSONS)) {
+  if (v.ref) { v.quiz = qRef(v.ref); if (!v.quiz) { delete MORE_LESSONS[k]; continue; } if (!v.quiz.l) v.quiz.l = 'gp:' + k; } // sem tema → ganha um para valer bônus
+  if (!QUIZ_BANK.includes(v.quiz)) QUIZ_BANK.push(v.quiz);
+}
+const ALL_LESSONS = Object.assign({}, EV_LESSONS, MORE_LESSONS);
+// o que ensina o quê
+const SYS_LESSON = { comunicacao: 'radio', suporte: 'oxigenio', propulsao: 'voyager', tanques: 'combVaz', termico: 'termico', casco: 'asteroides', avionica: 'painel', acoplamento: 'traje' };
+const CHORE_LESSON = { suporte: 'oxigenio', horta: 'horta', lixo: 'lixo', radio: 'radio', motor: 'voyager', saude: 'doenca', pesquisa: 'webb', rota: 'painel', tanques: 'contaminacao', cardapio: 'horta', dormir: 'doenca' };
+// mostra a lição do tema (uma vez por jornada; fora dos desafios, no máximo uma a cada 25 s)
+function teach(key, force) {
+  if (!S || !ALL_LESSONS[key] || (typeof Net !== 'undefined' && Net.role === 'client')) return;
+  S.lessons = S.lessons || [];
+  if (S.lessons.some(x => x.ev === key)) return;
+  const now = Date.now(); // relógio de parede: vale na nave, na estação, no planeta e na colônia
+  if (!force && S.lessonLast && now - S.lessonLast.at < 25000) return;
+  const rec = { ev: key, at: now }; S.lessons.push(rec); S.lessonLast = rec; S.v++;
+}
+
 // cartão do computador: só conta a curiosidade (as perguntas ficam no Quiz da tela inicial)
 function lessonCard() {
-  if (!S || !S.lessonLast || !['ship', 'colony'].includes(S.scene) || (S.event && S.event.phase !== 'result')) return '';
+  if (!S || !S.lessonLast || !['ship', 'colony', 'station', 'planet', 'migration', 'detour'].includes(S.scene) || (S.event && S.event.phase !== 'result')) return '';
   const rec = S.lessonLast; const ls = lessonOf(rec); if (!ls || !ls.fact) return '';
-  if ((S.journeyTime || 0) - rec.at > 40 || U.lessonHide === rec.at) return '';
+  if (Date.now() - rec.at > 45000 || U.lessonHide === rec.at) return '';
   if (U.lessonMarked !== rec.at) { U.lessonMarked = rec.at; learnMark(ls.quiz.l); } // vale bônus no Quiz
   return `<div class="lesson-card"><button class="x" data-ui="lessonClose">✕</button><b>💻 ${esc(L('Você sabia?'))}</b><p>${esc(L(ls.fact))}</p><small class="muted">${esc(L('Tema aprendido: vale bônus no Quiz da tela inicial.'))}</small></div>`;
 }

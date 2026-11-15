@@ -23,12 +23,12 @@ function moveHuman(c, dt) {
   const up = keys.ArrowUp || keys.KeyW, down = keys.ArrowDown || keys.KeyS;
   const pilot = S.event && S.event.puzzle && S.event.puzzle.kind === 'pilot';
   if (pilot) return;
-  if (c.climb > 0) { stepMove(c, dt); return; }
+  if (c.climb > 0) { stepMove(c, dt); if (c.climb <= 0 && U.eAfterClimb) { U.eAfterClimb = false; interact(); } return; }
   if (L || Rr || up || down) { U.autopilot = null; U.clickTarget = null; U.afterArrive = null; } // teclado tem prioridade sobre o mouse
   if (U.autopilot) {
     const st = STATIONS[U.autopilot];
     c.tx = st.x; c.tdeck = st.deck; stepMove(c, dt);
-    if (atStation(c, U.autopilot, 2)) { U.autopilot = null; if (U.afterArrive) { const a = U.afterArrive; U.afterArrive = null; act(a.type, a.p); } }
+    if (atStation(c, U.autopilot, 2)) { U.autopilot = null; if (U.afterArrive) { const a = U.afterArrive; U.afterArrive = null; if (a.type === 'open') interact(); else act(a.type, a.p); } }
     return;
   }
   if (U.clickTarget) { c.tx = U.clickTarget.x; c.tdeck = U.clickTarget.deck; stepMove(c, dt); if (!c.moving) U.clickTarget = null; return; }
@@ -43,11 +43,19 @@ function moveHuman(c, dt) {
 
 function interact() {
   if (S && S.scene === 'colony' && !U.panel) return colonyInteract();
-  if (!S || S.scene !== 'ship' || U.panel) return;
+  if (!S || S.scene !== 'ship') return;
+  if (U.panel && !STATIONS[U.panel]) UIH.closePanel(); // relatório/tripulação abertos: E vai para o console
+  if (U.panel) return;
   const c = me(); if (!c || !c.alive) return;
+  if (c.climb > 0) { U.eAfterClimb = true; return; } // na escada: interage ao chegar
   const ev = S.event;
   if (ev && ev.type === 'lixo' && ev.phase === 'run' && S.trash.some(t => t.deck === c.deck && Math.abs(t.x - c.x) < 16)) { act('pickTrash'); Sfx.pick(); return; }
-  let near = stationNear(c); if (!near) return;
+  let near = stationNear(c);
+  if (!near) { // nenhum console nesta sala: vai até o mais próximo do mesmo andar e abre
+    let bd = 260; for (const id in STATIONS) { const st = STATIONS[id]; if (st.deck !== c.deck) continue; const d = Math.abs(st.x - c.x); if (d < bd) { bd = d; near = id; } }
+    if (near) { U.autopilot = near; U.afterArrive = { type: 'open' }; }
+    return;
+  }
   // durante um desafio, se o console do passo atual fica nesta sala, ele tem prioridade
   if (ev && ev.phase === 'run') {
     const room = ROOMS.find(r => r.deck === c.deck && c.x >= r.x0 && c.x <= r.x1);
@@ -181,6 +189,7 @@ window.addEventListener('keydown', e => {
   keys[e.code] = true;
   const inGame = S && U.screen === 'game';
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (inGame || U.screen === 'story')) e.preventDefault();
+  if (inGame && ['Space', 'Enter', 'KeyE'].includes(e.code) && e.target && e.target.tagName === 'BUTTON') { e.preventDefault(); e.target.blur(); }
   if (e.code === 'Escape') { escAll() || (inGame && ['ship', 'colony'].includes(S.scene) && UIH.panel('menu')); return; }
   if (U.screen === 'story') { if (['Space', 'Enter', 'ArrowRight'].includes(e.code)) UIH.storyNext(); return; }
   if (!inGame) return;

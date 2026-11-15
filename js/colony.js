@@ -329,7 +329,8 @@ function moveColonyHuman(c, dt) {
   const L_ = keys.ArrowLeft || keys.KeyA, R_ = keys.ArrowRight || keys.KeyD;
   if (L_ || R_) U.clickTarget = null;
   let dx = (R_ ? 1 : 0) - (L_ ? 1 : 0);
-  if (!dx && U.clickTarget) { const d = U.clickTarget.x - c.x; if (Math.abs(d) < 3) U.clickTarget = null; else dx = Math.sign(d); }
+  if (L_ || R_) U.cOpen = null;
+  if (!dx && U.clickTarget) { const d = U.clickTarget.x - c.x; if (Math.abs(d) < 3) { U.clickTarget = null; if (U.cOpen && !U.panel) { U.cOpen = null; colonyInteract(); } } else dx = Math.sign(d); }
   if (dx) { c.x = clamp(c.x + dx * (c.status === 'ferido' ? 40 : 75) * (keys.ShiftLeft || keys.ShiftRight ? RUN_MULT : 1) * dt, 24, COLONY_W - 24); c.face = dx; c.moving = true; c.walkT += dt; }
   else c.moving = false;
   c.deck = 'L'; c.tx = c.x;
@@ -342,8 +343,13 @@ function nearBuilding(c) {
 function colonyInteract() {
   const c = me(); if (!c || !c.alive || !S.colony) return;
   if (S.colony.tut === 0) return act('cTut');
-  const b = nearBuilding(c); if (!b) return;
-  U.panel = 'c:' + b; U.tab = null;
+  const b = nearBuilding(c);
+  if (!b) { // longe de tudo: anda até o prédio mais próximo e abre ao chegar
+    let best = null, bd = 320; for (const id of CORDER) { const d = Math.abs(CBUILD[id].x - c.x); if (d < bd) { bd = d; best = id; } }
+    if (best) { U.clickTarget = { x: CBUILD[best].x }; U.cOpen = best; }
+    return;
+  }
+  U.cOpen = null; U.panel = 'c:' + b; U.tab = null;
 }
 
 // ---------- desenho ----------

@@ -29,7 +29,7 @@ const QUIZ_BANK = [
     [['24 h 37 min', '24 h 37 min', '24 h 37 min'], ['12 horas', '12 hours', '12 horas'], ['30 horas', '30 hours', '30 horas'], ['48 horas', '48 hours', '48 horas']], 0,
     ['Equipes de rovers vivem em "tempo marciano" para operar a missão.', 'Rover teams live on "Mars time" to operate the mission.', 'Los equipos de los rovers viven en "hora marciana" para operar la misión.']),
   Q('', 'Mars Exploration',
-    ['O que foi o Ingenuity,?', 'What was Ingenuity?', '¿Qué fue Ingenuity,?'],
+    ['O que foi o Ingenuity?', 'What was Ingenuity?', '¿Qué fue Ingenuity?'],
     [['Um helicóptero que voou em Marte (2021)', 'A helicopter that flew on Mars (2021)', 'Un helicóptero que voló en Marte (2021)'], ['Um satélite da Lua', 'A Moon satellite', 'Un satélite de la Luna'], ['Um telescópio espacial', 'A space telescope', 'Un telescopio espacial'], ['Uma estação em órbita', 'An orbiting station', 'Una estación en órbita']], 0,
     ['Foi o primeiro voo controlado e motorizado em outro planeta.', 'It was the first powered, controlled flight on another planet.', 'Fue el primer vuelo motorizado y controlado en otro planeta.']),
   Q('casa:0', 'Climate Change',

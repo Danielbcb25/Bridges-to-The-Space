@@ -34,6 +34,8 @@ function bar(v, max, cls = '', inverse = false) {
   const lvl = inverse ? (p > 0.7 ? 'bad' : p > 0.4 ? 'warn' : 'ok') : (p < 0.2 ? 'bad' : p < 0.4 ? 'warn' : 'ok');
   return `<span class="bar ${cls} ${lvl}"><i style="width:${(p * 100).toFixed(1)}%"></i></span>`;
 }
+// o foco que fica num botão depois do clique faria Espaço/Enter apertarem o botão de novo em vez de agir no jogo
+function dropFocus() { const a = document.activeElement; if (a && a !== document.body && !['INPUT', 'SELECT', 'TEXTAREA'].includes(a.tagName)) a.blur(); }
 function setHTML(id, html) {
   if (U.cache[id] === html) return;
   U.cache[id] = html;
@@ -680,7 +682,7 @@ function stationScreen() {
   let body = '';
   const dest = S.explore.dest; const dexo = EXOPLANETS.find(e => e.id === dest);
   if (tab === 'exo') {
-    body = `<p class="small">${esc(L(K('Dados reais Exoplanet Archive (aproximados): já são mais de 6.000 exoplanetas confirmados. Critérios de habitabilidade: raio parecido com o da Terra (0,8–1,5 R⊕), temperatura de equilíbrio entre 200 e 300 K, estrela calma e distância alcançável. Cada análise custa ' + (has('lab') ? 5 : 10) + ' GB. Você pode escolher QUALQUER destino — até os errados — mas cada viagem gasta combustível, oxigênio, comida e dias.', 'Real data from the Exoplanet Archive (approximate): over 6,000 confirmed exoplanets so far. Habitability criteria: radius close to Earth\'s (0.8–1.5 R⊕), equilibrium temperature between 200 and 300 K, a calm star and a reachable distance. Each analysis costs ' + (has('lab') ? 5 : 10) + ' GB. You can pick ANY destination — even wrong ones — but every trip burns fuel, oxygen, food and days.', 'Datos reales del Exoplanet Archive (aproximados): ya hay más de 6.000 exoplanetas confirmados. Criterios de habitabilidad: radio parecido al de la Tierra (0,8–1,5 R⊕), temperatura de equilibrio entre 200 y 300 K, estrella tranquila y distancia alcanzable. Cada análisis cuesta ' + (has('lab') ? 5 : 10) + ' GB. Puede elegir CUALQUIER destino, incluso los equivocados, pero cada viaje gasta combustible, oxígeno, comida y días.')))}</p>
+    body = `<p class="small">${esc(L(K('Dados reais do Exoplanet Archive (aproximados): já são mais de 6.000 exoplanetas confirmados. Critérios de habitabilidade: raio parecido com o da Terra (0,8–1,5 R⊕), temperatura de equilíbrio entre 200 e 300 K, estrela calma e distância alcançável. Cada análise custa ' + (has('lab') ? 5 : 10) + ' GB. Você pode escolher QUALQUER destino — até os errados — mas cada viagem gasta combustível, oxigênio, comida e dias.', 'Real data from the Exoplanet Archive (approximate): over 6,000 confirmed exoplanets so far. Habitability criteria: radius close to Earth\'s (0.8–1.5 R⊕), equilibrium temperature between 200 and 300 K, a calm star and a reachable distance. Each analysis costs ' + (has('lab') ? 5 : 10) + ' GB. You can pick ANY destination — even wrong ones — but every trip burns fuel, oxygen, food and days.', 'Datos reales del Exoplanet Archive (aproximados): ya hay más de 6.000 exoplanetas confirmados. Criterios de habitabilidad: radio parecido al de la Tierra (0,8–1,5 R⊕), temperatura de equilibrio entre 200 y 300 K, estrella tranquila y distancia alcanzable. Cada análisis cuesta ' + (has('lab') ? 5 : 10) + ' GB. Puede elegir CUALQUIER destino, incluso los equivocados, pero cada viaje gasta combustible, oxígeno, comida y días.')))}</p>
       <div class="exos">${EXOPLANETS.map(e => {
         const an = S.explore.analyzed.includes(e.id); const vis = S.explore.visited && S.explore.visited[e.id];
         const dist = typeof e.dist === 'number' ? fmt(e.dist, 1) + ' ' + L('anos-luz') : L('na rota');
@@ -806,7 +808,7 @@ function renderUI() {
       case 'end': scr = endScreen(); break;
     }
   }
-  if (S && U.screen === 'game' && !hud && !['intro', 'launch', 'end'].includes(S.scene) && !(S.scene === 'earth' && U.comms)) hud = assistMini();
+  if (S && U.screen === 'game' && !hud && !['intro', 'launch', 'end'].includes(S.scene) && !(S.scene === 'earth' && U.comms)) hud = assistMini() + lessonCard();
   if (U.help && S && U.screen === 'game') modal = helpPanel();
   sitePlayMode();
   const gameEl = document.getElementById('game'); const sc = S && U.screen === 'game' ? S.scene : 'menu'; if (gameEl.dataset.scene !== sc) gameEl.dataset.scene = sc;
@@ -927,7 +929,7 @@ function bindUI() {
     Music.unlock(); Sfx.ensure();
     if (t.dataset.act) { let p = {}; try { p = t.dataset.p ? JSON.parse(t.dataset.p) : {}; } catch (er) { /* */ } act(t.dataset.act, p); }
     else { const fn = UIH[t.dataset.ui]; if (fn) { Sfx.click(); fn(t.dataset.arg); } }
-    e.preventDefault();
+    e.preventDefault(); dropFocus();
   };
   // mouse: age ao pressionar. Toque: age ao soltar, se o dedo não rolou (assim rolar uma lista não aperta botões)
   let tap = null;
@@ -947,7 +949,7 @@ function bindUI() {
   });
   layer.addEventListener('pointermove', e => { if (tap && e.pointerId === tap.id && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 12) tap = null; });
   layer.addEventListener('pointercancel', () => { tap = null; });
-  layer.addEventListener('pointerup', e => { if (tap && e.pointerId === tap.id) { const s = tap.sig; tap = null; runSig(s); e.preventDefault(); } });
+  layer.addEventListener('pointerup', e => { if (tap && e.pointerId === tap.id) { const s = tap.sig; tap = null; runSig(s); e.preventDefault(); dropFocus(); } });
   layer.addEventListener('click', e => { if (e.detail === 0) handle(e); });
   layer.addEventListener('input', e => {
     const t = e.target;
