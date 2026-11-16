@@ -73,7 +73,7 @@ function assistSteps() {
         ['Defina o cardápio na Cozinha (andar de baixo).', 'cozinha', '🍳', 4],
       ];
       tut.forEach(([t, st, ic, n]) => add(t, S.tutorial >= n, st ? { st } : null, ic));
-      add(KS(`Leve a nave até Pontes-01b (${Math.round(S.progress * 100)}%). Use ⏩ (Shift+S) para acelerar.`, `Take the ship to Pontes-01b (${Math.round(S.progress * 100)}%). Use ⏩ (Shift+S) to speed up.`, `Lleve la nave a Pontes-01b (${Math.round(S.progress * 100)}%). Use ⏩ (Shift+S) para acelerar.`), false, null, '🪐');
+      add(KS(`Leve a nave até Pontes-01b (${Math.round(S.progress * 100)}%).`, `Take the ship to Pontes-01b (${Math.round(S.progress * 100)}%).`, `Lleve la nave a Pontes-01b (${Math.round(S.progress * 100)}%).`), false, null, '🪐');
       break;
     }
     case 'station':

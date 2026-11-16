@@ -3,9 +3,9 @@
 //  • Durante um desafio só ficam o painel do evento e a rotina:
 //    some a barra de dicas do computador, o "Você sabia?" e o
 //    aviso de fome (voltam quando o desafio acaba).
-//  • Parado por 5 s na nave (sem desafio, sem painel aberto e sem
-//    tarefa pendente da rotina), o tempo vai para 10x até o próximo
-//    evento, como o Shift+S. Qualquer tecla ou clique volta ao normal.
+//  • Sem nada para fazer por 5 s na nave ou na colônia (sem desafio,
+//    painel, tarefa pendente ou fome), o tempo vai para 10x até o
+//    próximo evento, sem aviso — mesmo andando pela nave.
 // ============================================================
 'use strict';
 
@@ -32,28 +32,22 @@ const inChallenge = () => !!(S && S.event && S.event.phase !== 'result');
     for (const c of alive()) if (c.hungryWarned && c.saciedade < HUNGRY) c.hungryWarned = false;
   };
 
-  // ---------- tempo automático quando o jogador fica parado ----------
-  U.lastInput = performance.now();
-  const wake = e => {
-    if (e && e.type === 'keydown' && e.code === 'KeyS' && e.shiftKey) { if (S) S.autoFast = false; U.lastInput = performance.now(); return; } // Shift+S: o jogador assume
-    U.lastInput = performance.now();
-    if (S && S.autoFast) { S.autoFast = false; if (S.fast) { S.fast = 0; toastLocal(K('▶ Tempo normal.', '▶ Normal time.', '▶ Tiempo normal.')); } }
-  };
-  document.addEventListener('keydown', wake, true);
-  document.addEventListener('pointerdown', wake, true);
-  document.addEventListener('wheel', wake, { capture: true, passive: true });
-
+  // ---------- tempo automático: nada para fazer por 5 s → 10x até o próximo evento ----------
+  // (andar não interrompe; só um desafio, uma tarefa, a fome ou um painel aberto. Shift+S para o normal vale até o próximo evento.)
+  document.addEventListener('keydown', e => { if (S && e.code === 'KeyS' && e.shiftKey) { S.autoFast = false; setTimeout(() => { if (S && !S.fast) S.fastOptOut = true; }, 0); } }, true);
+  document.addEventListener('pointerdown', e => { const t = e.target && e.target.closest && e.target.closest('[data-ui=fast]'); if (t && S) { S.autoFast = false; setTimeout(() => { if (S && !S.fast) S.fastOptOut = true; }, 0); } }, true);
   const routinePending = () => { const r = S.routine; return !!(r && r.day === S.day && r.items.some(x => !x.done)); };
+  let idleSince = null;
   setInterval(() => {
-    if (!S || U.screen !== 'game' || S.paused || (typeof Net !== 'undefined' && Net.role === 'client')) return;
-    if (S.autoFast && (!S.fast || inChallenge())) S.autoFast = false; // o evento chegou (ou alguém mudou o tempo)
-    if (S.fast || inChallenge()) return;
-    if (!['ship', 'colony'].includes(S.scene)) return;
-    if (U.panel || U.help || U.qmenu || U.qset || (typeof Chat !== 'undefined' && Chat.open)) return;
-    const m = me(); if (m && (m.task || m.ctask || (m.saciedade != null && m.saciedade < 40 && S.scene === 'ship'))) return;
-    if (S.scene === 'ship' && routinePending()) return; // ainda tem tarefa do dia: não pula o tempo do jogador
-    if ((performance.now() - U.lastInput) / 1000 < IDLE_FAST_AFTER) return;
-    S.fast = 10; S.autoFast = true;
-    toastLocal(K('⏩ Parado por 5 s: tempo 10x até o próximo evento (qualquer tecla volta ao normal).', '⏩ Idle for 5 s: time 10x until the next event (any key returns to normal).', '⏩ Inactivo 5 s: tiempo 10x hasta el próximo evento (cualquier tecla vuelve a lo normal).'));
+    if (!S || U.screen !== 'game' || S.paused || (typeof Net !== 'undefined' && Net.role === 'client')) { idleSince = null; return; }
+    if (inChallenge()) { S.autoFast = false; S.fastOptOut = false; idleSince = null; return; } // o evento chegou: volta ao normal
+    const m = me();
+    const busy = !['ship', 'colony'].includes(S.scene) || U.panel || U.help || U.qmenu || U.qset || (typeof Chat !== 'undefined' && Chat.open)
+      || (m && (m.task || m.ctask || (m.saciedade != null && m.saciedade < 40 && S.scene === 'ship')))
+      || (S.scene === 'ship' && routinePending());
+    if (busy) { idleSince = null; if (S.autoFast && S.fast) { S.fast = 0; S.autoFast = false; } return; }
+    if (S.fast || S.fastOptOut) return;
+    const now = performance.now(); if (idleSince == null) idleSince = now;
+    if ((now - idleSince) / 1000 >= IDLE_FAST_AFTER) { S.fast = 10; S.autoFast = true; }
   }, 500);
 })();
