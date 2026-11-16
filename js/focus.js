@@ -3,13 +3,13 @@
 //  • Durante um desafio só ficam o painel do evento e a rotina:
 //    some a barra de dicas do computador, o "Você sabia?" e o
 //    aviso de fome (voltam quando o desafio acaba).
-//  • Parado por 10 s na nave (sem desafio, sem painel aberto e sem
+//  • Parado por 5 s na nave (sem desafio, sem painel aberto e sem
 //    tarefa pendente da rotina), o tempo vai para 10x até o próximo
 //    evento, como o Shift+S. Qualquer tecla ou clique volta ao normal.
 // ============================================================
 'use strict';
 
-const IDLE_FAST_AFTER = 10; // segundos parado
+const IDLE_FAST_AFTER = 5; // segundos parado
 const inChallenge = () => !!(S && S.event && S.event.phase !== 'result');
 
 (function () {
@@ -54,6 +54,6 @@ const inChallenge = () => !!(S && S.event && S.event.phase !== 'result');
     if (S.scene === 'ship' && routinePending()) return; // ainda tem tarefa do dia: não pula o tempo do jogador
     if ((performance.now() - U.lastInput) / 1000 < IDLE_FAST_AFTER) return;
     S.fast = 10; S.autoFast = true;
-    toastLocal(K('⏩ Parado por 10 s: tempo 10x até o próximo evento (qualquer tecla volta ao normal).', '⏩ Idle for 10 s: time 10x until the next event (any key returns to normal).', '⏩ Inactivo 10 s: tiempo 10x hasta el próximo evento (cualquier tecla vuelve a lo normal).'));
+    toastLocal(K('⏩ Parado por 5 s: tempo 10x até o próximo evento (qualquer tecla volta ao normal).', '⏩ Idle for 5 s: time 10x until the next event (any key returns to normal).', '⏩ Inactivo 5 s: tiempo 10x hasta el próximo evento (cualquier tecla vuelve a lo normal).'));
   }, 500);
 })();
